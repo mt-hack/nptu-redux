@@ -1,7 +1,11 @@
 // ==UserScript==
-// @name NPTU Web Panel QOL Improvements
-// @author Still Hsu
+// @name NPTU Redux
+// @description Provides QOL improvements for the web control panel of Taiwan Pingtung University
+// @license MIT
+// @author MT.Hack
 // @match http://webap.nptu.edu.tw/Web/Message/default.aspx
+// @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
+// @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @grant none
 // ==/UserScript==
 
