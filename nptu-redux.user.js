@@ -4,6 +4,7 @@
 // @license MIT
 // @author MT.Hack
 // @match http://webap.nptu.edu.tw/Web/Message/default.aspx
+// @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @grant none
