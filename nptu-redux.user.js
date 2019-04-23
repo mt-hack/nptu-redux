@@ -26,10 +26,12 @@ function fontFix() {
     contentHead.insertAdjacentElement('beforeend', css);
 };
 
+let brokenTablePages = ["A0432SPage", "A0433SPage"]
+
 // Fix A0432S broken implementation of tables
 function tableFix() {
     let contentBody = main.contentDocument.body;
-    if (contentBody.querySelector('form').name === "A0432SPage") {
+    if (brokenTablePages.includes(contentBody.querySelector('form').name)) {
         let rails = contentBody.querySelectorAll('div[id*=Rail]');
         let bars = contentBody.querySelectorAll('div[id*=Bar]');
         rails.forEach(element => {
@@ -59,9 +61,8 @@ function tableFix() {
         let trs = contentBody.querySelectorAll('table[id*=dgData] tr');
         trs.forEach(tr => {
             let tds = tr.querySelectorAll('td');
-            tds[5].style = "position: sticky; left: 0; background: #FEECE6";
-        })
-        trs[0].style.backgroundImage = "url(../Images/Common/TdBack.png);";
+            tds[5].style = "position: sticky; left: 0; background: #FEECE6; color: black;";
+        });
 
         var oldTableHeader = contentBody.querySelector("[id$=dgDataCopy] tbody");
         oldTableHeader.remove();
