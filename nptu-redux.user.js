@@ -70,7 +70,7 @@ function tableFix() {
         newTableHeader.innerHTML = oldTableHeader.innerHTML;
         var tableContent = contentBody.querySelector("[id$=dgData]");
         tableContent.prepend(newTableHeader);
-        tableContent.parentNode.style.width = "40%";
+        // tableContent.parentNode.style.width = "40%";
         tableContent.parentNode.parentNode.style.background = null;
     }
 };
