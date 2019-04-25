@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.4
+// @version 1.0.5
 // ==/UserScript==
 
 var options = {
@@ -23,6 +23,7 @@ var options = {
     tableFixApplication: ["A0432S", "A0433S"],
 };
 
+
 MAIN.frameElement.onload = function () {
     let currentPage = getMainForm();
     injectCss();
@@ -33,9 +34,10 @@ MAIN.frameElement.onload = function () {
         tableFix();
     }
     printFix();
-    setupClipboard();
+    setupClipboard(MAIN.document.body);
 };
 
+var customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
 function injectCss() {
     let contentHead = MAIN.document.head;
     let contentBody = MAIN.document.body;
@@ -128,7 +130,7 @@ function injectCss() {
         html: newHeaderHtml
     });
     injectStyle(contentHead, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-    injectStyle(contentHead, 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css');
+    injectStyle(contentHead, customCss);
     getMainForm().prepend(newHeader);
     if (options.disableOldHeader)
         oldHeader.remove();
@@ -183,9 +185,11 @@ function decorateHomePage() {
         });
         infoDiv.appendChild(gradesFrame);
         gradesFrame.addEventListener('load', function () {
+            // inject css 
+            injectStyle(gradesFrame.contentDocument.head, customCss);
+            // remove irrelevant elements
             let frameBody = gradesFrame.contentDocument.body;
             let gradesTable = frameBody.querySelector('#A0809Q_dgData');
-            gradesTable.style.boxShadow = '0 4px 5px 0 rgba(0,0,0,0.14),0 1px 10px 0 rgba(0,0,0,0.12),0 2px 4px -1px rgba(0,0,0,0.3)';
             let gradesInfo = frameBody.querySelector('#A0809Q_lblSCO_AVG');
             frameBody.querySelector('form').remove();
             let gradesDiv = make({
@@ -197,6 +201,13 @@ function decorateHomePage() {
             gradesDiv.appendChild(gradesInfo);
             gradesDiv.appendChild(gradesTable);
             frameBody.appendChild(gradesDiv);
+            let subjectNames = gradesTable.querySelectorAll('tr:not(:first-child)  td:nth-of-type(3)');
+            if (subjectNames){
+                subjectNames.forEach(subjectName => {
+                    subjectName.className += ` copyable`;
+                });
+                setupClipboard(frameBody);
+            }
             gradesFrame.height = gradesFrame.contentDocument.body.scrollHeight;
         });
     }
@@ -317,8 +328,7 @@ function printFix() {
     }
 };
 
-function setupClipboard() {
-    let contentBody = MAIN.document.body;
+function setupClipboard(contentBody) {
     // Clipboard
     contentBody.querySelectorAll('.copyable').forEach(element => {
         element.addEventListener('click', function () {

@@ -4,11 +4,15 @@ body {
 
 /* copyable */
 
-.copyable.hoverable {
-    transition: text-shadow .5s;
+.copyable {
+    font-size: 100%;
+    text-decoration: none;
+    transition: text-shadow .3s, text-decoration .3s, font-size .4s;
 }
 
-.copyable.hoverable:hover {
+.copyable:hover {
+    font-size: 120%;
+    text-decoration: underline;
     text-shadow: 3px 3px 1px rgba(0, 0, 0, 0.5);
     cursor: pointer;
 }
