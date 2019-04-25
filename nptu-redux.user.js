@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.5
+// @version 1.0.6
 // ==/UserScript==
 
 var options = {
@@ -20,7 +20,7 @@ var options = {
     // Shows the old header in case of component breakage
     disableOldHeader: true,
     // Pages whose tables need to be fixed; works like a whitelist
-    tableFixApplication: ["A0432S", "A0433S"],
+    tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
 
 
@@ -30,7 +30,7 @@ MAIN.frameElement.onload = function () {
     if (/Main.aspx/g.test(currentPage.action)) {
         decorateHomePage();
     }
-    if (options.tableFixApplication.includes(currentPage.name + 'Page')) {
+    if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix();
     }
     printFix();
