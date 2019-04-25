@@ -1,5 +1,9 @@
+:root {
+    --msft-fonts: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
 body {
-    font-family: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-family: var(--msft-fonts);
 }
 
 /* copyable */
@@ -13,7 +17,7 @@ body {
 .copyable:hover {
     font-size: 120%;
     text-decoration: underline;
-    text-shadow: 3px 3px 1px rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
     cursor: pointer;
 }
 
@@ -155,7 +159,12 @@ body {
 
 /* Table headers */
 .TRHeaderStyle {
+    font-family: var(--msft-fonts);
     background: #1b5e20 !important;
+}
+
+.TDItemStyle {
+    font-family: var(--msft-fonts);
 }
 
 .DgTable {
