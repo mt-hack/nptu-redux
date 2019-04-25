@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.7
+// @version 1.0.8
 // ==/UserScript==
 
 var options = {
@@ -40,7 +40,7 @@ MAIN.frameElement.onload = function () {
     setupClipboard(MAIN.document.body);
 };
 
-var customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
+var customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1.0.8/nptu-redux.min.css';
 
 function injectCss() {
     let contentHead = MAIN.document.head;
