@@ -27,8 +27,11 @@ var options = {
 MAIN.frameElement.onload = function () {
     let currentPage = getMainForm();
     injectCss();
-    if (/Main.aspx/g.test(currentPage.action)) {
-        decorateHomePage();
+    pageCleanup();
+    // Additional check for the semester change button
+    // If it doesn't exist, the user is likely a student
+    if (/Main.aspx/g.test(currentPage.action) && options.addGradeOnHome && !currentPage.querySelector('#CommonHeader_ibtChgSYearSeme')) {
+        injectGradesTable();
     }
     if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix();
@@ -38,6 +41,7 @@ MAIN.frameElement.onload = function () {
 };
 
 var customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
+
 function injectCss() {
     let contentHead = MAIN.document.head;
     let contentBody = MAIN.document.body;
@@ -136,8 +140,7 @@ function injectCss() {
         oldHeader.remove();
 }
 
-
-function decorateHomePage() {
+function pageCleanup() {
     let contentBody = MAIN.document.body;
     // #region Page Cleanup
     let mainBodies = contentBody.querySelectorAll('.MainBody');
@@ -160,58 +163,63 @@ function decorateHomePage() {
     mainForm.appendChild(mainDiv);
     contentBody.querySelector('.TableDefault').remove();
     // #endregion
-
+    
     let infoDiv = contentBody.querySelector('.main .menu');
     infoDiv.className += ' information';
-
+    
     let oldAnnounceHeader = contentBody.querySelector("img[src*='Images/HotNews/Hotnew.gif']");
     if (oldAnnounceHeader) {
         let newAnnounceHeader = createHeader('系統公告 Announcements', 'speaker_notes');
         oldAnnounceHeader.parentNode.innerHTML = newAnnounceHeader.outerHTML;
     }
-
-    // Additional check for the semester change button
-    // If it doesn't exist, the user is likely a student
-    if (options.addGradeOnHome && !contentBody.querySelector('#CommonHeader_ibtChgSYearSeme')) {
-        let gradesHeader = createHeader('近學期成績 Recent Semester Grade', 'assessment');
-        infoDiv.appendChild(gradesHeader);
-        let gradesFrame = make({
-            el: 'iframe',
-            class: 'inline-frame',
-            attr: {
-                id: 'grades-frame',
-                src: '../A08/A0809QPage.aspx'
-            },
-        });
-        infoDiv.appendChild(gradesFrame);
-        gradesFrame.addEventListener('load', function () {
-            // inject css 
-            injectStyle(gradesFrame.contentDocument.head, customCss);
-            // remove irrelevant elements
-            let frameBody = gradesFrame.contentDocument.body;
-            let gradesTable = frameBody.querySelector('#A0809Q_dgData');
-            let gradesInfo = frameBody.querySelector('#A0809Q_lblSCO_AVG');
-            frameBody.querySelector('form').remove();
-            let gradesDiv = make({
-                el: 'div',
-                attr: {
-                    style: 'display: flex; flex-direction: column; align-items: center;'
-                }
-            });
-            gradesDiv.appendChild(gradesInfo);
-            gradesDiv.appendChild(gradesTable);
-            frameBody.appendChild(gradesDiv);
-            let subjectNames = gradesTable.querySelectorAll('tr:not(:first-child)  td:nth-of-type(3)');
-            if (subjectNames){
-                subjectNames.forEach(subjectName => {
-                    subjectName.className += ` copyable`;
-                });
-                setupClipboard(frameBody);
-            }
-            gradesFrame.height = gradesFrame.contentDocument.body.scrollHeight;
-        });
-    }
 }
+
+function injectGradesTable() {
+    let contentBody = MAIN.document.body;
+    let infoDiv = contentBody.querySelector('.information');
+    if (!infoDiv){
+        log("Info div not found; this shouldn't happen, hopefully.");
+        return;
+    }
+    let gradesHeader = createHeader('近學期成績 Recent Semester Grade', 'assessment');
+    infoDiv.appendChild(gradesHeader);
+    let gradesFrame = make({
+        el: 'iframe',
+        class: 'inline-frame',
+        attr: {
+            id: 'grades-frame',
+            src: '../A08/A0809QPage.aspx'
+        },
+    });
+    infoDiv.appendChild(gradesFrame);
+    gradesFrame.addEventListener('load', function () {
+        // inject css 
+        injectStyle(gradesFrame.contentDocument.head, customCss);
+        // remove irrelevant elements
+        let frameBody = gradesFrame.contentDocument.body;
+        let gradesTable = frameBody.querySelector('#A0809Q_dgData');
+        let gradesInfo = frameBody.querySelector('#A0809Q_lblSCO_AVG');
+        frameBody.querySelector('form').remove();
+        let gradesDiv = make({
+            el: 'div',
+            attr: {
+                style: 'display: flex; flex-direction: column; align-items: center;'
+            }
+        });
+        gradesDiv.appendChild(gradesInfo);
+        gradesDiv.appendChild(gradesTable);
+        frameBody.appendChild(gradesDiv);
+        let subjectNames = gradesTable.querySelectorAll('tr:not(:first-child)  td:nth-of-type(3)');
+        if (subjectNames) {
+            subjectNames.forEach(subjectName => {
+                subjectName.className += ` copyable`;
+            });
+            setupClipboard(frameBody);
+        }
+        gradesFrame.height = gradesFrame.contentDocument.body.scrollHeight + 20;
+    });
+}
+
 // Fix A0432S broken implementation of tables
 function tableFix() {
     let contentBody = MAIN.document.body;
