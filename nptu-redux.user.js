@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.2
+// @version 1.0.4
 // ==/UserScript==
 
 var options = {
@@ -128,7 +128,7 @@ function injectCss() {
         html: newHeaderHtml
     });
     injectStyle(contentHead, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-    injectStyle(contentHead, 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.css');
+    injectStyle(contentHead, 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css');
     getMainForm().prepend(newHeader);
     if (options.disableOldHeader)
         oldHeader.remove();
