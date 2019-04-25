@@ -1,16 +1,18 @@
 // ==UserScript==
 // @name NPTU Redux
 // @description Provides QOL improvements for the web control panel of Taiwan Pingtung University
+// @description:zh-TW 改進屏東大學校務行政系統之頁面
 // @license MIT
 // @author MT.Hack
 // @grant GM_setClipboard
 // @grant GM_notification
 // @require https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
-// @match http://webap.nptu.edu.tw/Web/Message/default.aspx
-// @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
+// @match http*://webap.nptu.edu.tw/Web/Message/default.aspx
+// @run-at document-start
+// @version 1.0.0
 // ==/UserScript==
 
 var options = {
