@@ -11,8 +11,7 @@
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @match http*://webap.nptu.edu.tw/Web/Message/default.aspx
-// @run-at document-start
-// @version 1.0.0
+// @version 1.0.1
 // ==/UserScript==
 
 var options = {
