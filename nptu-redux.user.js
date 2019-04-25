@@ -1,176 +1,47 @@
 // ==UserScript==
 // @name NPTU Redux
 // @description Provides QOL improvements for the web control panel of Taiwan Pingtung University
-// @description:zh-TW 改進屏東大學校務行政系統之頁面
 // @license MIT
 // @author MT.Hack
 // @grant GM_setClipboard
 // @grant GM_notification
 // @require https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
+// @match http://webap.nptu.edu.tw/Web/Message/default.aspx
+// @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @match http*://webap.nptu.edu.tw/Web/Message/default.aspx
-// @version 1.0.1
+// @version 1.0.2
 // ==/UserScript==
 
 var options = {
+    // Enables grade viewing on homepage
+    addGradeOnHome: true,
+    // Shows the old header in case of component breakage
     disableOldHeader: true,
+    // Pages whose tables need to be fixed; works like a whitelist
+    tableFixApplication: ["A0432S", "A0433S"],
 };
 
 MAIN.frameElement.onload = function () {
+    let currentPage = getMainForm();
     injectCss();
-    tableFix();
+    if (/Main.aspx/g.test(currentPage.action)) {
+        decorateHomePage();
+    }
+    if (options.tableFixApplication.includes(currentPage.name + 'Page')) {
+        tableFix();
+    }
     printFix();
     setupClipboard();
-};
-
-function setupClipboard() {
-    let contentBody = MAIN.document.body;
-    // Clipboard
-    contentBody.querySelectorAll('.copyable').forEach(element => {
-        element.addEventListener('click', function () {
-            clipboard.writeText(this.innerText);
-            GM_notification(this.innerText, "已複製至剪貼簿中！");
-        });
-    });
 };
 
 function injectCss() {
     let contentHead = MAIN.document.head;
     let contentBody = MAIN.document.body;
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
-    //  #region [CSS]
-    let newHeaderStyle = make({
-        el: "style",
-        html: `
-        body {
-            font-family: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-        }
-        
-        /* copyable */
-        
-        .copyable.hoverable {
-            transition: text-shadow .5s;
-        }
-        
-        .copyable.hoverable:hover {
-            text-shadow: 3px 3px 1px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-        }
-        
-        /* header */
-        .main.container {
-            flex-direction: column;
-            flex: 2.5
-        }
-        
-        .alt.container {
-            flex: 1;
-        }
-        
-        .alt.buttons.container.right {
-            justify-content: flex-end;
-        }
-        
-        .alt.buttons.container.left {
-            justify-content: flex-start;
-        }
-        
-        #module-info {
-            text-align: right;
-            padding-right: .5em;
-        }
-        
-        #user-info {
-            text-align: left;
-            padding-left: .5em;
-        }
-        
-        .header-container {
-            display: flex;
-            background-color: #1b5e20;
-            color: white;
-            border-radius: 15px;
-            font-size: 1.35em;
-            padding: .5em;
-            -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-        }
-        
-        .header-container .container {
-            display: inline-flex;
-        }
-        
-        .header-container .container div {
-            display: inline;
-            vertical-align: top;
-        }
-        
-        .header-container .material-icons {
-            text-shadow: 1px 1px 1px black;
-        }
-        
-        /* buttons */
-        
-        .btn {
-            font-family: 'Material Icons';
-            font-size: 3em;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: white;
-            padding-right: .1em;
-        }
-        
-        .btn.hoverable {
-            -webkit-transition: -webkit-box-shadow .25s;
-            transition: -webkit-box-shadow .25s;
-            transition: box-shadow .25s;
-            transition: box-shadow .25s, -webkit-box-shadow .25s
-        }
-        
-        .btn.hoverable:hover {
-            -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
-        }
-        
-        /* Print button */
-        .print.btn {
-            background: gray;
-            border: 1px solid rgba(0, 0, 0, .1);
-            font-size: 18pt;
-            padding: 0 1.25em;
-            letter-spacing: .5px;
-            outline: 0;
-            border-radius: 5px;
-        }
-
-        .print.container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            justify-content: center;
-        }
-
-        .export-link,
-        .export-link:hover,
-        .export-link:active,
-        .export-link:focus,
-        .export-link:focus-within {
-            text-decoration: none;
-        }
-
-        .export-section {
-            padding: 1em 2em;
-        }
-        `
-    });
-    //  #endregion
-
     //  #region [HTML Declaration]
-    let newHeaderHtml = `<div class="header-container"><div class="alt buttons container left">`;
+    let newHeaderHtml = `<div class="top header container"><div class="alt buttons container left">`;
     //    #region [Button] Home
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
@@ -178,7 +49,7 @@ function injectCss() {
             <input id=${oldHome.id} value="" type="image" class="btn hoverable" name=${oldHome.name} title=${oldHome.title} alt='home'">`;
     }
     //  #endregion
-    newHeaderHtml += `</div><div class="main container" id="module-info">`;
+    newHeaderHtml += `</div><div class="sub container" id="module-info">`;
     //    #region [Display] Page Name
     let moduleName = contentBody.querySelector('#CommonHeader_lblModule').innerText;
     if (moduleName) {
@@ -203,7 +74,7 @@ function injectCss() {
             </div>`;
     }
     //  #endregion
-    newHeaderHtml += `</div><div class="main container" id="user-info">`;
+    newHeaderHtml += `</div><div class="sub container" id="user-info">`;
     //    #region [Display] Username
     let loginName = contentBody.querySelector('#CommonHeader_lblName').innerText;
     if (loginName) {
@@ -256,60 +127,129 @@ function injectCss() {
         el: "header",
         html: newHeaderHtml
     });
-    contentHead.insertAdjacentElement('afterbegin', newHeaderStyle);
-    injectStyle(contentHead, '//fonts.googleapis.com/icon?family=Material+Icons');
-    oldHeader.parentNode.prepend(newHeader);
+    injectStyle(contentHead, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+    injectStyle(contentHead, 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.css');
+    getMainForm().prepend(newHeader);
     if (options.disableOldHeader)
         oldHeader.remove();
 }
 
-let brokenTablePages = ["A0432SPage", "A0433SPage"]
 
+function decorateHomePage() {
+    let contentBody = MAIN.document.body;
+    // #region Page Cleanup
+    let mainBodies = contentBody.querySelectorAll('.MainBody');
+    let mainForm = getMainForm();
+    let mainDiv = make({
+        el: 'div',
+        class: 'main container',
+    });
+    mainBodies.forEach(element => {
+        element.remove();
+        if (element.childElementCount > 0) {
+            let elementDiv = make({
+                el: 'div',
+                class: 'menu container',
+                html: element.innerHTML
+            });
+            mainDiv.appendChild(elementDiv);
+        }
+    });
+    mainForm.appendChild(mainDiv);
+    contentBody.querySelector('.TableDefault').remove();
+    // #endregion
+
+    let infoDiv = contentBody.querySelector('.main .menu');
+    infoDiv.className += ' information';
+
+    let oldAnnounceHeader = contentBody.querySelector("img[src*='Images/HotNews/Hotnew.gif']");
+    if (oldAnnounceHeader) {
+        let newAnnounceHeader = createHeader('系統公告 Announcements', 'speaker_notes');
+        oldAnnounceHeader.parentNode.innerHTML = newAnnounceHeader.outerHTML;
+    }
+
+    // Additional check for the semester change button
+    // If it doesn't exist, the user is likely a student
+    if (options.addGradeOnHome && !contentBody.querySelector('#CommonHeader_ibtChgSYearSeme')) {
+        let gradesHeader = createHeader('近學期成績 Recent Semester Grade', 'assessment');
+        infoDiv.appendChild(gradesHeader);
+        let gradesFrame = make({
+            el: 'iframe',
+            class: 'inline-frame',
+            attr: {
+                id: 'grades-frame',
+                src: '../A08/A0809QPage.aspx'
+            },
+        });
+        infoDiv.appendChild(gradesFrame);
+        gradesFrame.addEventListener('load', function () {
+            let frameBody = gradesFrame.contentDocument.body;
+            let gradesTable = frameBody.querySelector('#A0809Q_dgData');
+            gradesTable.style.boxShadow = '0 4px 5px 0 rgba(0,0,0,0.14),0 1px 10px 0 rgba(0,0,0,0.12),0 2px 4px -1px rgba(0,0,0,0.3)';
+            let gradesInfo = frameBody.querySelector('#A0809Q_lblSCO_AVG');
+            frameBody.querySelector('form').remove();
+            let gradesDiv = make({
+                el: 'div',
+                attr: {
+                    style: 'display: flex; flex-direction: column; align-items: center;'
+                }
+            });
+            gradesDiv.appendChild(gradesInfo);
+            gradesDiv.appendChild(gradesTable);
+            frameBody.appendChild(gradesDiv);
+            gradesFrame.height = gradesFrame.contentDocument.body.scrollHeight;
+        });
+    }
+}
 // Fix A0432S broken implementation of tables
 function tableFix() {
     let contentBody = MAIN.document.body;
-    if (brokenTablePages.includes(contentBody.querySelector('form').name)) {
-        let rails = contentBody.querySelectorAll('div[id*=Rail]');
-        let bars = contentBody.querySelectorAll('div[id*=Bar]');
-        rails.forEach(element => {
-            element.remove();
-        });
-        bars.forEach(element => {
-            element.remove();
-        });
-        let dataWrapper = contentBody.querySelector('div[id*=dgDataWrapper]');
+    let rails = contentBody.querySelectorAll('div[id*=Rail]');
+    let bars = contentBody.querySelectorAll('div[id*=Bar]');
+    rails.forEach(element => {
+        element.remove();
+    });
+    bars.forEach(element => {
+        element.remove();
+    });
+    let dataWrapper = contentBody.querySelector('div[id*=dgDataWrapper]');
+    if (dataWrapper) {
         dataWrapper.style.width = null;
         dataWrapper.style.height = null;
-        let panelHeaders = contentBody.querySelectorAll('div[id*=dgDataPanelHeader]');
-        panelHeaders.forEach(element => {
-            element.style.width = null;
-            element.style.overflow = "auto";
-        });
-        let panelItems = contentBody.querySelectorAll('div[id*=dgDataPanelItem]');
-        panelItems.forEach(element => {
-            element.style.width = null;
-            element.style.height = null;
-            element.style.overflow = "auto";
-        });
-        let panelFreeze = contentBody.querySelectorAll('div[id*=ContentFreeze');
-        panelFreeze.forEach(element => {
-            element.remove();
-        });
-        let trs = contentBody.querySelectorAll('table[id*=dgData] tr');
-        trs.forEach(tr => {
-            let tds = tr.querySelectorAll('td');
+    }
+    let panelHeaders = contentBody.querySelectorAll('div[id*=dgDataPanelHeader]');
+    panelHeaders.forEach(element => {
+        element.style.width = null;
+        element.style.overflow = "auto";
+    });
+    let panelItems = contentBody.querySelectorAll('div[id*=dgDataPanelItem]');
+    panelItems.forEach(element => {
+        element.style.width = null;
+        element.style.height = null;
+        element.style.overflow = "auto";
+    });
+    let panelFreeze = contentBody.querySelectorAll('div[id*=ContentFreeze');
+    panelFreeze.forEach(element => {
+        element.remove();
+    });
+    let trs = contentBody.querySelectorAll('table[id*=dgData] tr');
+    trs.forEach(tr => {
+        let tds = tr.querySelectorAll('td');
+        if (trs.length >= 6) {
             tds[5].style = "position: sticky; left: 0; background: #FEECE6; color: black;";
-        });
+        }
+    });
 
-        var oldTableHeader = contentBody.querySelector("[id$=dgDataCopy] tbody");
+    var oldTableHeader = contentBody.querySelector("[id$=dgDataCopy] tbody");
+    if (oldTableHeader) {
         oldTableHeader.remove();
         var newTableHeader = document.createElement("thead");
         newTableHeader.innerHTML = oldTableHeader.innerHTML;
         var tableContent = contentBody.querySelector("[id$=dgData]");
         tableContent.prepend(newTableHeader);
-        // tableContent.parentNode.style.width = "40%";
         tableContent.parentNode.parentNode.style.background = null;
     }
+
 };
 
 // Add export options for spreadsheet printing
@@ -377,6 +317,17 @@ function printFix() {
     }
 };
 
+function setupClipboard() {
+    let contentBody = MAIN.document.body;
+    // Clipboard
+    contentBody.querySelectorAll('.copyable').forEach(element => {
+        element.addEventListener('click', function () {
+            clipboard.writeText(this.innerText);
+            GM_notification(this.innerText, "已複製至剪貼簿中！");
+        });
+    });
+};
+
 /* Helper Method */
 
 // Copied from GitHub Dark Script
@@ -403,8 +354,23 @@ function make(obj) {
     return el;
 }
 
-/* Helper Scripts */
+function createHeader(text, icon) {
+    let htmlString = '';
+    if (icon) {
+        htmlString += `<i class="material-icons">${icon}</i>`;
+    }
+    htmlString += `<span class='title-with-icon left'>${text}</span>`
+    return make({
+        el: 'div',
+        class: 'header container',
+        html: htmlString
+    });
+}
 
+
+function getMainForm() {
+    return MAIN.document.body.querySelector('body>form');
+}
 
 function injectStyle(head, style) {
     let css = document.createElement('link');
