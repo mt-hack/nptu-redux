@@ -5,7 +5,6 @@
 // @author MT.Hack
 // @grant GM_setClipboard
 // @grant GM_notification
-// @require https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
 // @match http://webap.nptu.edu.tw/Web/Message/default.aspx
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
