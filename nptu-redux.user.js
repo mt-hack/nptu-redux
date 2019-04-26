@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.10
+// @version 1.0.11
 // ==/UserScript==
 
 let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css`;
@@ -35,7 +35,8 @@ MAIN.frameElement.onload = function () {
     pageCleanup();
     if (/Main.aspx/g.test(currentPage.action)) {
         // Check for the semester change button; if one doesn't exist, likely student
-        if (!currentPage.querySelector('#CommonHeader_ibtChgSYearSeme')) {
+        if (!currentPage.querySelector('#CommonHeader_ibtChgSYearSeme') &&
+            !currentPage.querySelector('input[src*=GST_M]')) {
             if (options.enableGradeOnHome) {
                 injectGradesTable();
             }
