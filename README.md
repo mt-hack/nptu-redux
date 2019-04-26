@@ -12,7 +12,7 @@
     * [Edge](https://www.microsoft.com/en-us/p/tampermonkey/9nblggh5162s)
     * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
     * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
-2. [點此安裝 NPTU-Redux](https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.js)
+2. [點此安裝 NPTU-Redux](https://github.com/mt-hack/nptu-redux/raw/master/nptu-redux.user.js)
 3. 大功告成！享受新版平台吧！
 
 ## 功能
