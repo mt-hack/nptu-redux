@@ -9,8 +9,9 @@
 ## 安裝
 
 1. 依照您的瀏覽器安裝 ViolentMonkey 或 TamperMonkey
-    * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
+    * [Edge](https://www.microsoft.com/en-us/p/tampermonkey/9nblggh5162s)
     * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
+    * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 2. [點此安裝 NPTU-Redux](https://github.com/mt-hack/nptu-redux/raw/master/nptu-redux.user.js)
 3. 大功告成！享受新版平台吧！
 
