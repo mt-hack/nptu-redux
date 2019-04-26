@@ -162,23 +162,37 @@ function pageCleanup() {
         el: 'div',
         class: 'main container',
     });
+    let menuElements = [];
+    let elementDiv = null;
     mainBodies.forEach(element => {
         element.remove();
-        if (element.childElementCount > 0) {
-            let elementDiv = make({
-                el: 'div',
-                class: 'menu container',
-                html: element.innerHTML
-            });
-            mainDiv.appendChild(elementDiv);
+        if (element.childElementCount > 0 && !isNullOrWhitespace(element.innerText)) {
+            // identifier for menu tabs
+            if (!element.querySelector('td.UnUse')) {
+                elementDiv = make({
+                    el: 'div',
+                    class: 'menu container',
+                    html: element.innerHTML
+                });
+                mainDiv.appendChild(elementDiv);
+            } else {
+                menuElements.push(element.innerHTML);
+            }
         }
     });
+    if (elementDiv) {
+        menuElements.forEach(element => {
+            elementDiv.insertAdjacentHTML('afterbegin', element);
+        });
+    }
     mainForm.appendChild(mainDiv);
     contentBody.querySelector('.TableDefault').remove();
     // #endregion
 
     let infoDiv = contentBody.querySelector('.main .menu');
-    infoDiv.className += ' information';
+    if (infoDiv) {
+        infoDiv.className += ' information';
+    }
 
     let oldAnnounceHeader = contentBody.querySelector("img[src*='Images/HotNews/Hotnew.gif']");
     if (oldAnnounceHeader) {
@@ -424,6 +438,10 @@ function make(obj) {
         $(obj.appendTo).appendChild(el);
     }
     return el;
+}
+
+function isNullOrWhitespace(input) {
+    return !input || !input.trim();
 }
 
 function createHeader(text, icon) {
