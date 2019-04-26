@@ -27,10 +27,18 @@ let options = {
 
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 
-MAIN.frameElement.onload = function () {
+let mainElement = document.querySelector('frame[name=MAIN]');
+if (!mainElement) {
+    log('Main element cannot be found; exiting.');
+    return;
+} else {
+    var mainWindow = mainElement.contentWindow;
+}
+
+mainWindow.frameElement.onload = function () {
     let currentPage = getMainForm();
-    injectStyle(MAIN.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-    injectStyle(MAIN.document.head, customCss);
+    injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+    injectStyle(mainWindow.document.head, customCss);
     if (options.enableMaterialHeader) {
         injectHeader();
     }
@@ -51,12 +59,12 @@ MAIN.frameElement.onload = function () {
         tableFix();
     }
     printFix();
-    setupClipboard(MAIN.document.body);
+    setupClipboard(mainWindow.document.body);
 };
 
 
 function injectHeader() {
-    let contentBody = MAIN.document.body;
+    let contentBody = mainWindow.document.body;
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
     //  #region [HTML Declaration]
     let newHeaderHtml = `<div class="top header container"><div class="alt buttons container left">`;
@@ -154,7 +162,7 @@ function injectHeader() {
 }
 
 function pageCleanup() {
-    let contentBody = MAIN.document.body;
+    let contentBody = mainWindow.document.body;
     // #region Page Cleanup
     let mainBodies = contentBody.querySelectorAll('.MainBody');
     let mainForm = getMainForm();
@@ -202,7 +210,7 @@ function pageCleanup() {
 }
 
 function injectAbsenceTable() {
-    let contentBody = MAIN.document.body;
+    let contentBody = mainWindow.document.body;
     // we should probably create one on the fly instead?
     let infoDiv = contentBody.querySelector('.information');
     if (!infoDiv) {
@@ -241,7 +249,7 @@ function injectAbsenceTable() {
 }
 
 function injectGradesTable() {
-    let contentBody = MAIN.document.body;
+    let contentBody = mainWindow.document.body;
     // we should probably create one on the fly instead?
     let infoDiv = contentBody.querySelector('.information');
     if (!infoDiv) {
@@ -290,7 +298,7 @@ function injectGradesTable() {
 
 // Fix A0432S broken implementation of tables
 function tableFix() {
-    let contentBody = MAIN.document.body;
+    let contentBody = mainWindow.document.body;
     let rails = contentBody.querySelectorAll('div[id*=Rail]');
     let bars = contentBody.querySelectorAll('div[id*=Bar]');
     rails.forEach(element => {
@@ -341,7 +349,7 @@ function tableFix() {
 
 // Add export options for spreadsheet printing
 function printFix() {
-    let contentBody = MAIN.document.body;
+    let contentBody = mainWindow.document.body;
     let printButtons = contentBody.querySelectorAll("form a[id*='Print']");
     if (printButtons !== null && printButtons.length > 0) {
         printButtons.forEach(printButton => {
@@ -467,7 +475,7 @@ function enableCellWrap(content) {
 }
 
 function getMainForm() {
-    return MAIN.document.body.querySelector('body>form');
+    return mainWindow.document.body.querySelector('body>form');
 }
 
 // not using GM_addstyle since we need to access various frame heads
