@@ -114,6 +114,7 @@ body {
     margin: 1em;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .sub.container {
