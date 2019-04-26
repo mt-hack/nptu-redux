@@ -49,7 +49,7 @@ body {
 /* buttons */
 
 .btn {
-    font-family: 'Material Icons';
+    font-family: 'Material Icons', sans-serif;
     font-size: 3em;
     cursor: pointer;
     background: none;
@@ -72,7 +72,7 @@ body {
     border: 1px solid rgba(0, 0, 0, .1);
     font-size: 18pt;
     padding: 0 1.25em;
-    letter-spacing: .5px;
+    letter-spacing: 1px;
     outline: 0;
     border-radius: 5px;
 }
@@ -165,7 +165,7 @@ body {
 
 .DgTable {
     transition: box-shadow .3s;
-    box-shadow: rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px, rgba(0, 0, 0, 0.3) 0px 2px 4px -1px;
+    box-shadow: rgba(0, 0, 0, 0.14) 0 4px 5px 0, rgba(0, 0, 0, 0.12) 0 1px 10px 0, rgba(0, 0, 0, 0.3) 0 2px 4px -1px;
 }
 
 .DgTable:hover {

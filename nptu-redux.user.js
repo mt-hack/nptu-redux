@@ -11,10 +11,11 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.8
+// @version 1.0.9
 // ==/UserScript==
 
-var options = {
+let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@${GM_info.script.version}/nptu-redux.min.css`;
+let options = {
     // Enables grade viewing on homepage
     addGradeOnHome: true,
     // Shows the old header in case of component breakage
@@ -22,7 +23,6 @@ var options = {
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
-
 
 MAIN.frameElement.onload = function () {
     let currentPage = getMainForm();
@@ -40,7 +40,6 @@ MAIN.frameElement.onload = function () {
     setupClipboard(MAIN.document.body);
 };
 
-var customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1.0.8/nptu-redux.min.css';
 
 function injectCss() {
     let contentHead = MAIN.document.head;
@@ -69,7 +68,7 @@ function injectCss() {
     }
     //  #endregion
     //    #region [Display] Semester
-    let semesterName = contentBody.querySelector('#CommonHeader_lblYSC').innerText.replace(/:|：/g, '');
+    let semesterName = contentBody.querySelector('#CommonHeader_lblYSC').innerText.replace(/[:：]/g, '');
     if (semesterName) {
         newHeaderHtml += `
             <div>
@@ -163,10 +162,10 @@ function pageCleanup() {
     mainForm.appendChild(mainDiv);
     contentBody.querySelector('.TableDefault').remove();
     // #endregion
-    
+
     let infoDiv = contentBody.querySelector('.main .menu');
     infoDiv.className += ' information';
-    
+
     let oldAnnounceHeader = contentBody.querySelector("img[src*='Images/HotNews/Hotnew.gif']");
     if (oldAnnounceHeader) {
         let newAnnounceHeader = createHeader('系統公告 Announcements', 'speaker_notes');
@@ -177,7 +176,7 @@ function pageCleanup() {
 function injectGradesTable() {
     let contentBody = MAIN.document.body;
     let infoDiv = contentBody.querySelector('.information');
-    if (!infoDiv){
+    if (!infoDiv) {
         log("Info div not found; this shouldn't happen, hopefully.");
         return;
     }
@@ -255,21 +254,21 @@ function tableFix() {
     trs.forEach(tr => {
         let tds = tr.querySelectorAll('td');
         if (trs.length >= 6) {
-            tds[5].style = "position: sticky; left: 0; background: #FEECE6; color: black;";
+            tds[5].style = 'position: sticky; left: 0; background: #FEECE6; color: black;';
         }
     });
 
-    var oldTableHeader = contentBody.querySelector("[id$=dgDataCopy] tbody");
+    let oldTableHeader = contentBody.querySelector("[id$=dgDataCopy] tbody");
     if (oldTableHeader) {
         oldTableHeader.remove();
-        var newTableHeader = document.createElement("thead");
+        let newTableHeader = document.createElement("thead");
         newTableHeader.innerHTML = oldTableHeader.innerHTML;
-        var tableContent = contentBody.querySelector("[id$=dgData]");
+        let tableContent = contentBody.querySelector("[id$=dgData]");
         tableContent.prepend(newTableHeader);
         tableContent.parentNode.parentNode.style.background = null;
     }
 
-};
+}
 
 // Add export options for spreadsheet printing
 function printFix() {
@@ -284,7 +283,7 @@ function printFix() {
             // create export label
             let exportLabel = document.createElement("label");
             exportLabel.for = "export-menu";
-            exportLabel.innerText = "匯出選項："
+            exportLabel.innerText = "匯出選項：";
 
             // prepare export menu
             let exportMenu = document.createElement("select");
@@ -318,8 +317,8 @@ function printFix() {
             function updatePrint() {
                 let url = new URL(exportLink.href);
                 url.searchParams.set("init", exportMenu.value);
-                exportLink.href = url;
-            };
+                exportLink.href = url.href;
+            }
 
             exportMenuDiv.appendChild(exportLabel);
             exportMenuDiv.appendChild(exportMenu);
@@ -334,7 +333,7 @@ function printFix() {
             updatePrint();
         });
     }
-};
+}
 
 function setupClipboard(contentBody) {
     // Clipboard
@@ -344,7 +343,7 @@ function setupClipboard(contentBody) {
             GM_notification(this.innerText, "已複製至剪貼簿中！");
         });
     });
-};
+}
 
 /* Helper Method */
 
@@ -377,7 +376,7 @@ function createHeader(text, icon) {
     if (icon) {
         htmlString += `<i class="material-icons">${icon}</i>`;
     }
-    htmlString += `<span class='title-with-icon left'>${text}</span>`
+    htmlString += `<span class='title-with-icon left'>${text}</span>`;
     return make({
         el: 'div',
         class: 'header container',
@@ -390,6 +389,7 @@ function getMainForm() {
     return MAIN.document.body.querySelector('body>form');
 }
 
+// not using GM_addstyle since we need to access various frame heads
 function injectStyle(head, style) {
     let css = document.createElement('link');
     css.href = style;
