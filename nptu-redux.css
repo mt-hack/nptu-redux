@@ -1,5 +1,5 @@
 :root {
-    --msft-fonts: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    --msft-fonts: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -106,6 +106,10 @@ body {
     background-color: #b71c1c;
 }
 
+.header.container:nth-of-type(3n):not(.top) {
+    background-color: #154648;
+}
+
 .main.container {
     margin: 1em;
     display: flex;
@@ -155,12 +159,12 @@ body {
 
 /* Table headers */
 .TRHeaderStyle {
-    font-family: var(--msft-fonts);
+    font-family: inherit !important;
     background: #1b5e20 !important;
 }
 
 .TDItemStyle {
-    font-family: var(--msft-fonts);
+    font-family: inherit !important;
 }
 
 .DgTable {

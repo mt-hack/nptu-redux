@@ -1,8 +1,19 @@
 # nptu-redux
 
+[![](https://data.jsdelivr.com/v1/package/gh/mt-hack/nptu-redux/badge)](https://www.jsdelivr.com/package/gh/mt-hack/nptu-redux)
+
 > 請注意！本插件仍在早期設計階段中，若有任何問題，請將其插件關閉並回報於 Issues 中。
 
 一套為了改進某學校系統介面及使用性而寫的 GreaseMonkey 插件。
+
+## 安裝
+
+1. 依照您的瀏覽器安裝 ViolentMonkey 或 TamperMonkey
+    * [Edge](https://www.microsoft.com/en-us/p/tampermonkey/9nblggh5162s)
+    * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
+    * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
+2. [點此安裝 NPTU-Redux](https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.js)
+3. 大功告成！享受新版平台吧！
 
 ## 功能
 
@@ -20,11 +31,7 @@
 
 * Coming soon!
 
-## 安裝
+## 已知問題
 
-1. 依照您的瀏覽器安裝 ViolentMonkey 或 TamperMonkey
-    * [Edge](https://www.microsoft.com/en-us/p/tampermonkey/9nblggh5162s)
-    * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
-    * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
-2. [點此安裝 NPTU-Redux](https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.js)
-3. 大功告成！享受新版平台吧！
+* CSS 需 fallback 支援 (如 404 或MIME type mismatch 時應用舊版)
+* 目前 Javascript 急需整理

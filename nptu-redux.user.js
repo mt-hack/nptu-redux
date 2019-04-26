@@ -11,27 +11,38 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.9
+// @version 1.0.10
 // ==/UserScript==
 
-let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@${GM_info.script.version}/nptu-redux.min.css`;
+let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css`;
 let options = {
     // Enables grade viewing on homepage
-    addGradeOnHome: true,
+    enableGradeOnHome: true,
+    enableAbsenceOnHome: true,
     // Shows the old header in case of component breakage
-    disableOldHeader: true,
+    enableMaterialHeader: true,
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
 
 MAIN.frameElement.onload = function () {
     let currentPage = getMainForm();
-    injectCss();
+    injectStyle(MAIN.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+    injectStyle(MAIN.document.head, customCss);
+    if (options.enableMaterialHeader) {
+        injectHeader();
+    }
     pageCleanup();
-    // Additional check for the semester change button
-    // If it doesn't exist, the user is likely a student
-    if (/Main.aspx/g.test(currentPage.action) && options.addGradeOnHome && !currentPage.querySelector('#CommonHeader_ibtChgSYearSeme')) {
-        injectGradesTable();
+    if (/Main.aspx/g.test(currentPage.action)) {
+        // Check for the semester change button; if one doesn't exist, likely student
+        if (!currentPage.querySelector('#CommonHeader_ibtChgSYearSeme')) {
+            if (options.enableGradeOnHome) {
+                injectGradesTable();
+            }
+            if (options.enableAbsenceOnHome) {
+                injectAbsenceTable();
+            }
+        }
     }
     if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix();
@@ -41,8 +52,7 @@ MAIN.frameElement.onload = function () {
 };
 
 
-function injectCss() {
-    let contentHead = MAIN.document.head;
+function injectHeader() {
     let contentBody = MAIN.document.body;
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
     //  #region [HTML Declaration]
@@ -132,11 +142,8 @@ function injectCss() {
         el: "header",
         html: newHeaderHtml
     });
-    injectStyle(contentHead, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-    injectStyle(contentHead, customCss);
     getMainForm().prepend(newHeader);
-    if (options.disableOldHeader)
-        oldHeader.remove();
+    oldHeader.remove();
 }
 
 function pageCleanup() {
@@ -173,8 +180,48 @@ function pageCleanup() {
     }
 }
 
+function injectAbsenceTable() {
+    let contentBody = MAIN.document.body;
+    // we should probably create one on the fly instead?
+    let infoDiv = contentBody.querySelector('.information');
+    if (!infoDiv) {
+        log("Info div not found; this shouldn't happen, hopefully.");
+        return;
+    }
+    let absenceHeader = createHeader('曠課紀錄 Recent Absences', 'schedule');
+    infoDiv.appendChild(absenceHeader);
+    let absenceFrame = make({
+        el: 'iframe',
+        class: 'inline-frame',
+        attr: {
+            id: 'absence-frame',
+            src: '../B01/B0105SPage.aspx'
+        },
+    });
+    infoDiv.appendChild(absenceFrame);
+    absenceFrame.addEventListener('load', function () {
+        // inject css 
+        injectStyle(absenceFrame.contentDocument.head, customCss);
+        // remove irrelevant elements
+        let frameBody = absenceFrame.contentDocument.body;
+        let absenceTable = frameBody.querySelector('table[id*=dgData]');
+        let absenceDiv = make({
+            el: 'div',
+            attr: {
+                style: 'display: flex; flex-direction: column; align-items: center;'
+            }
+        });
+        frameBody.querySelector('form').remove();
+        enableCellWrap(absenceTable);
+        absenceDiv.appendChild(absenceTable);
+        frameBody.appendChild(absenceDiv);
+        absenceFrame.height = absenceFrame.contentDocument.body.scrollHeight + 20;
+    });
+}
+
 function injectGradesTable() {
     let contentBody = MAIN.document.body;
+    // we should probably create one on the fly instead?
     let infoDiv = contentBody.querySelector('.information');
     if (!infoDiv) {
         log("Info div not found; this shouldn't happen, hopefully.");
@@ -196,15 +243,16 @@ function injectGradesTable() {
         injectStyle(gradesFrame.contentDocument.head, customCss);
         // remove irrelevant elements
         let frameBody = gradesFrame.contentDocument.body;
-        let gradesTable = frameBody.querySelector('#A0809Q_dgData');
+        let gradesTable = frameBody.querySelector('table[id*=dgData]');
         let gradesInfo = frameBody.querySelector('#A0809Q_lblSCO_AVG');
-        frameBody.querySelector('form').remove();
         let gradesDiv = make({
             el: 'div',
             attr: {
                 style: 'display: flex; flex-direction: column; align-items: center;'
             }
         });
+        frameBody.querySelector('form').remove();
+        enableCellWrap(gradesTable);
         gradesDiv.appendChild(gradesInfo);
         gradesDiv.appendChild(gradesTable);
         frameBody.appendChild(gradesDiv);
@@ -384,6 +432,14 @@ function createHeader(text, icon) {
     });
 }
 
+function enableCellWrap(content){
+    let wrapCells = content.querySelectorAll('td');
+    if (wrapCells) {
+        wrapCells.forEach(element => {
+            element.noWrap = false;
+        });
+    }
+}
 
 function getMainForm() {
     return MAIN.document.body.querySelector('body>form');
