@@ -352,20 +352,20 @@ function printFix() {
             // create export label
             let exportLabel = document.createElement("label");
             exportLabel.for = "export-menu";
-            exportLabel.innerText = "匯出選項：";
+            exportLabel.appendChild(document.createTextNode('匯出選項：'));
 
             // prepare export menu
             let exportMenu = document.createElement("select");
             exportMenu.className = "export-menu";
             let exportPdf = document.createElement("option");
             exportPdf.value = "pdf";
-            exportPdf.innerText = "PDF";
+            exportPdf.appendChild(document.createTextNode('PDF'));
             let exportExcel = document.createElement("option");
             exportExcel.value = "xls";
-            exportExcel.innerText = "Excel";
+            exportExcel.appendChild(document.createTextNode('Excel'));
             let exportRtf = document.createElement("option");
             exportRtf.value = "rtf";
-            exportRtf.innerText = "RTF";
+            exportRtf.appendChild(document.createTextNode('RTF'));
             exportMenu.appendChild(exportPdf);
             exportMenu.appendChild(exportExcel);
             exportMenu.appendChild(exportRtf);
@@ -373,7 +373,7 @@ function printFix() {
             // change print button
             let exportButton = document.createElement('div');
             exportButton.className = 'print btn material-icon hoverable';
-            exportButton.innerText = 'print 點此下載報表';
+            exportButton.appendChild(document.createTextNode('print 點此下載報表'));
             let exportLink = document.createElement('a');
             exportLink.target = "_blank";
             exportLink.href = printButton.href;
