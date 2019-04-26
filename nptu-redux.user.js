@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.11
+// @version 1.0.12
 // ==/UserScript==
 
 let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css`;
@@ -24,6 +24,8 @@ let options = {
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
+
+let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 
 MAIN.frameElement.onload = function () {
     let currentPage = getMainForm();
@@ -120,21 +122,24 @@ function injectHeader() {
     let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
     if (oldSemSwitch) {
         newHeaderHtml += `
-            <input id=${oldSemSwitch.id} value="" type="image" class="btn hoverable" name=${oldSemSwitch.name} title=${oldSemSwitch.title} alt='event'>`;
+            <label for=${oldSemSwitch.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>event</label>
+            <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
     }
     //    #endregion
     //    #region [Button] Password Change
     let oldPwdBtn = contentBody.querySelector('#CommonHeader_ibtChgPwd');
     if (oldPwdBtn) {
         newHeaderHtml += `
-        <input id=${oldPwdBtn.id} value="" type="image" class="waves-button btn hoverable" name=${oldPwdBtn.name} title=${oldPwdBtn.title} alt='lock'>`;
+            <label for=${oldPwdBtn.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
+            <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
     }
     //    #endregion
     //    #region [Button] Logout
     let oldLogout = contentBody.querySelector('#CommonHeader_ibtLogOut');
     if (oldLogout) {
         newHeaderHtml += `
-            <input id=${oldLogout.id} value="" type="image" class="btn hoverable" name=${oldLogout.name} title=${oldLogout.title} alt='exit_to_app' onclick="return LogOutConfirm();">`;
+            <label for=${oldLogout.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
+            <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldLogout.name} title=${oldLogout.title}>`;
     }
     //  #endregion
     newHeaderHtml += `</div></div>`;
@@ -433,7 +438,7 @@ function createHeader(text, icon) {
     });
 }
 
-function enableCellWrap(content){
+function enableCellWrap(content) {
     let wrapCells = content.querySelectorAll('td');
     if (wrapCells) {
         wrapCells.forEach(element => {
