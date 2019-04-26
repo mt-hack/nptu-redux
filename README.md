@@ -9,7 +9,6 @@
 ## 安裝
 
 1. 依照您的瀏覽器安裝 ViolentMonkey 或 TamperMonkey
-    * [Edge](https://www.microsoft.com/en-us/p/tampermonkey/9nblggh5162s)
     * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
     * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
 2. [點此安裝 NPTU-Redux](https://github.com/mt-hack/nptu-redux/raw/master/nptu-redux.user.js)
@@ -33,5 +32,6 @@
 
 ## 已知問題
 
+* Microsoft Edge (非 Chromium 版) 無法正常顯示部分 Material Icons
 * CSS 需 fallback 支援 (如 404 或MIME type mismatch 時應用舊版)
 * 目前 Javascript 急需整理
