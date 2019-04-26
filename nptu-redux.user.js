@@ -11,7 +11,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.12
+// @version 1.0.13
 // ==/UserScript==
 
 let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css`;
@@ -64,7 +64,8 @@ function injectHeader() {
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
         newHeaderHtml += `
-            <input id=${oldHome.id} value="" type="image" class="btn hoverable" name=${oldHome.name} title=${oldHome.title} alt='home'">`;
+            <label for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
+            <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} title=${oldHome.title}>`;
     }
     //  #endregion
     newHeaderHtml += `</div><div class="sub container" id="module-info">`;
