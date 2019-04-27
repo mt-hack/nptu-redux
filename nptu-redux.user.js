@@ -15,7 +15,6 @@
 // @version 1.0.13
 // ==/UserScript==
 
-let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css`;
 let options = {
     // Enables grade widget
     enableGradeOnHome: true,
@@ -24,54 +23,52 @@ let options = {
     // Shows the old header in case of component breakage
     enableMaterialHeader: true,
     // Enables custom export options for printing
-    enableCustomExport: false,
+    enableCustomExport: true,
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
 
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
-
+let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css';
 let mainElement = document.querySelector('frame[name=MAIN]');
 if (!mainElement) {
-    log('Main element cannot be found; exiting.');
-    return;
+    log('Main element cannot be found.');
 } else {
     var mainWindow = mainElement.contentWindow;
 }
 
 mainWindow.frameElement.onload = function () {
-    let currentPage = mainWindow.document.body.querySelector('body>form');
+    let contentBody = mainWindow.document.body;
+    let currentPage = contentBody.querySelector('body>form');
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-indigo.min.css');
     injectStyle(mainWindow.document.head, customCss);
     if (options.enableMaterialHeader) {
-        injectHeader();
+        injectHeader(contentBody);
     }
-    if (options.enableCustomExport){
-        printFix();
-    }
-    pageCleanup();
+    pageCleanup(contentBody);
     if (/Main.aspx/g.test(currentPage.action)) {
         // Check for the semester change button; if one doesn't exist, likely student
         if (!currentPage.querySelector('#CommonHeader_ibtChgSYearSeme') &&
-            !currentPage.querySelector('input[src*=GST_M]')) {
+        !currentPage.querySelector('input[src*=GST_M]')) {
             if (options.enableGradeOnHome) {
-                injectGradesTable();
+                injectGradesTable(contentBody);
             }
             if (options.enableAbsenceOnHome) {
-                injectAbsenceTable();
+                injectAbsenceTable(contentBody);
             }
         }
     }
-    if (options.tableFixApplication.includes(currentPage.name)) {
-        tableFix();
+    if (options.enableCustomExport){
+        printFix(contentBody);
     }
-    setupClipboard(mainWindow.document.body);
+    if (options.tableFixApplication.includes(currentPage.name)) {
+        tableFix(contentBody);
+    }
+    setupClipboard(contentBody);
 };
 
-
-function injectHeader() {
-    let contentBody = mainWindow.document.body;
+function injectHeader(contentBody) {
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
     //  #region [HTML Declaration]
     let newHeaderHtml = `<div class="top header container"><div class="alt buttons container left">`;
@@ -80,7 +77,7 @@ function injectHeader() {
     if (oldHome) {
         newHeaderHtml += `
             <label for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
-            <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} title=${oldHome.title}>`;
+            <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
     //  #endregion
     newHeaderHtml += `</div><div class="sub container" id="module-info">`;
@@ -139,7 +136,7 @@ function injectHeader() {
     if (oldSemSwitch) {
         newHeaderHtml += `
             <label for=${oldSemSwitch.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>event</label>
-            <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
+            <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
     }
     //    #endregion
     //    #region [Button] Password Change
@@ -147,7 +144,7 @@ function injectHeader() {
     if (oldPwdBtn) {
         newHeaderHtml += `
             <label for=${oldPwdBtn.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
-            <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
+            <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldPwdBtn.name} name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
     }
     //    #endregion
     //    #region [Button] Logout
@@ -155,7 +152,7 @@ function injectHeader() {
     if (oldLogout) {
         newHeaderHtml += `
             <label for=${oldLogout.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
-            <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldLogout.name} title=${oldLogout.title}>`;
+            <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
     //  #endregion
     newHeaderHtml += `</div></div>`;
@@ -168,8 +165,8 @@ function injectHeader() {
     oldHeader.remove();
 }
 
-function pageCleanup() {
-    let contentBody = mainWindow.document.body;
+// Replaces each MainBody (td) with a div
+function pageCleanup(contentBody) {
     // #region Page Cleanup
     let mainTable = contentBody.querySelector('.TableDefault');
     if (!mainTable) {
@@ -185,7 +182,6 @@ function pageCleanup() {
     let menuElements = [];
     let elementDiv = null;
     mainBodies.forEach(element => {
-        element.remove();
         if (!isSafeToDelete(element)) {
             // identifier for menu tabs
             if (!element.querySelector('td.UnUse')) {
@@ -194,7 +190,11 @@ function pageCleanup() {
                     class: 'menu container',
                     html: element.innerHTML
                 });
-                console.log(`Appending ${element.id || element.className}`);
+                // Extreme edge case; thank you whoever designed this system, very cool
+                let printButtons = contentBody.querySelectorAll('a[id*=hylPrint]');
+                for (let i = 0; i < printButtons.length; i++) {
+                    elementDiv.appendChild(printButtons[i]);
+                }
                 mainDiv.appendChild(elementDiv);
             } else {
                 console.log(`Queued up ${element.id || element.className}`);
@@ -227,7 +227,7 @@ function pageCleanup() {
         let newHelpPanel = make({
             el: 'div',
             class: 'help container'
-        });;
+        });
         if (helpText.length === 0) {
             helpText = '此頁並無提供說明。No description provided.'
         }
@@ -235,7 +235,7 @@ function pageCleanup() {
         let helpTextContainer = make({
             el: 'div',
             class: 'text container',
-        })
+        });
         helpTextContainer.appendChild(document.createTextNode(helpText));
         newHelpPanel.appendChild(helpHeader);
         newHelpPanel.appendChild(helpTextContainer);
@@ -243,8 +243,7 @@ function pageCleanup() {
     }
 }
 
-function injectAbsenceTable() {
-    let contentBody = mainWindow.document.body;
+function injectAbsenceTable(contentBody) {
     // we should probably create one on the fly instead?
     let infoDiv = contentBody.querySelector('.information');
     if (!infoDiv) {
@@ -281,8 +280,7 @@ function injectAbsenceTable() {
     });
 }
 
-function injectGradesTable() {
-    let contentBody = mainWindow.document.body;
+function injectGradesTable(contentBody) {
     // we should probably create one on the fly instead?
     let infoDiv = contentBody.querySelector('.information');
     if (!infoDiv) {
@@ -329,8 +327,7 @@ function injectGradesTable() {
 }
 
 // Fix A0432S broken implementation of tables
-function tableFix() {
-    let contentBody = mainWindow.document.body;
+function tableFix(contentBody) {
     let dataWrapper = contentBody.querySelector('div[id*=dgDataWrapper]');
     if (!dataWrapper) {
         log('Valid table not found, skipping...');
@@ -384,8 +381,7 @@ function tableFix() {
 }
 
 // Add export options for spreadsheet printing
-function printFix() {
-    let contentBody = mainWindow.document.body;
+function printFix(contentBody) {
     let printButtons = contentBody.querySelectorAll("form a[id*='Print']");
     if (printButtons.length > 0) {
         printButtons.forEach(printButton => {
@@ -415,14 +411,19 @@ function printFix() {
             exportMenu.appendChild(exportRtf);
 
             // change print button
-            let exportButton = document.createElement('div');
-            exportButton.className = 'print btn material-icon hoverable';
-            exportButton.appendChild(document.createTextNode('print 點此下載報表'));
+            let exportLinkText = document.createElement('i');
+            exportLinkText.className = 'material-icons';
+            exportLinkText.appendChild(document.createTextNode('print 點此下載報表'));
             let exportLink = document.createElement('a');
             exportLink.target = "_blank";
             exportLink.href = printButton.href;
             exportLink.title = printButton.title;
-            exportLink.appendChild(exportButton);
+            exportLink.className = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
+            exportLink.style.display = 'flex';
+            exportLink.style.alignItems = 'center';
+            exportLink.style.textDecoration = 'none';
+            exportLink.appendChild(exportLinkText);
+            componentHandler.upgradeElement(exportLink);
 
             // hook printing button update
             exportMenu.onchange = updatePrint;
@@ -440,15 +441,15 @@ function printFix() {
             exportDiv.className = 'print container';
             exportDiv.appendChild(exportMenuDiv);
             exportDiv.appendChild(exportLink);
-            printButton.parentNode.parentNode.replaceChild(exportDiv, printButton.parentNode);
+            printButton.parentNode.replaceChild(exportDiv, printButton);
             // update button on load
             updatePrint();
         });
     }
 }
 
-function injectTableDownload() {
-    let tables = mainWindow.document.body.querySelectorAll('table[id*=dgData]');
+function injectTableDownload(contentBody) {
+    let tables = contentBody.querySelectorAll('table[id*=dgData]');
     if (tables.length !== 0) {
         return;
     }
