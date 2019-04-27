@@ -6,6 +6,8 @@
 // @grant GM_setClipboard
 // @grant GM_notification
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
+// @require https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js
+// @require https://code.getmdl.io/1.3.0/material.min.js
 // @match http://webap.nptu.edu.tw/Web/Message/default.aspx
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
@@ -15,11 +17,14 @@
 
 let customCss = `https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css`;
 let options = {
-    // Enables grade viewing on homepage
+    // Enables grade widget
     enableGradeOnHome: true,
+    // Enables absence widget
     enableAbsenceOnHome: true,
     // Shows the old header in case of component breakage
     enableMaterialHeader: true,
+    // Enables custom export options for printing
+    enableCustomExport: false,
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
@@ -35,11 +40,15 @@ if (!mainElement) {
 }
 
 mainWindow.frameElement.onload = function () {
-    let currentPage = getMainForm();
+    let currentPage = mainWindow.document.body.querySelector('body>form');
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-indigo.min.css');
     injectStyle(mainWindow.document.head, customCss);
     if (options.enableMaterialHeader) {
         injectHeader();
+    }
+    if (options.enableCustomExport){
+        printFix();
     }
     pageCleanup();
     if (/Main.aspx/g.test(currentPage.action)) {
@@ -57,7 +66,6 @@ mainWindow.frameElement.onload = function () {
     if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix();
     }
-    printFix();
     setupClipboard(mainWindow.document.body);
 };
 
@@ -156,15 +164,20 @@ function injectHeader() {
         el: "header",
         html: newHeaderHtml
     });
-    getMainForm().prepend(newHeader);
+    mainWindow.document.body.querySelector('body>form').prepend(newHeader);
     oldHeader.remove();
 }
 
 function pageCleanup() {
     let contentBody = mainWindow.document.body;
     // #region Page Cleanup
+    let mainTable = contentBody.querySelector('.TableDefault');
+    if (!mainTable) {
+        log('TableDefault does not exist, skipping page cleanup.');
+        return;
+    }
     let mainBodies = contentBody.querySelectorAll('.MainBody');
-    let mainForm = getMainForm();
+    let mainForm = contentBody.querySelector('body>form');
     let mainDiv = make({
         el: 'div',
         class: 'main container',
@@ -173,7 +186,7 @@ function pageCleanup() {
     let elementDiv = null;
     mainBodies.forEach(element => {
         element.remove();
-        if (element.childElementCount > 0 && !isNullOrWhitespace(element.innerText)) {
+        if (!isSafeToDelete(element)) {
             // identifier for menu tabs
             if (!element.querySelector('td.UnUse')) {
                 elementDiv = make({
@@ -181,8 +194,10 @@ function pageCleanup() {
                     class: 'menu container',
                     html: element.innerHTML
                 });
+                console.log(`Appending ${element.id || element.className}`);
                 mainDiv.appendChild(elementDiv);
             } else {
+                console.log(`Queued up ${element.id || element.className}`);
                 menuElements.push(element.innerHTML);
             }
         }
@@ -192,8 +207,7 @@ function pageCleanup() {
             elementDiv.insertAdjacentHTML('afterbegin', element);
         });
     }
-    mainForm.appendChild(mainDiv);
-    contentBody.querySelector('.TableDefault').remove();
+    mainForm.replaceChild(mainDiv, mainTable);
     // #endregion
 
     let infoDiv = contentBody.querySelector('.main .menu');
@@ -204,7 +218,28 @@ function pageCleanup() {
     let oldAnnounceHeader = contentBody.querySelector("img[src*='Images/HotNews/Hotnew.gif']");
     if (oldAnnounceHeader) {
         let newAnnounceHeader = createHeader('系統公告 Announcements', 'speaker_notes');
-        oldAnnounceHeader.parentNode.innerHTML = newAnnounceHeader.outerHTML;
+        oldAnnounceHeader.parentNode.replaceChild(newAnnounceHeader, oldAnnounceHeader);
+    }
+
+    let oldHelpPanel = contentBody.querySelector('#TableHelp');
+    if (oldHelpPanel) {
+        let helpText = oldHelpPanel.innerText.trim();
+        let newHelpPanel = make({
+            el: 'div',
+            class: 'help container'
+        });;
+        if (helpText.length === 0) {
+            helpText = '此頁並無提供說明。No description provided.'
+        }
+        let helpHeader = createHeader('說明 Information', 'help');
+        let helpTextContainer = make({
+            el: 'div',
+            class: 'text container',
+        })
+        helpTextContainer.appendChild(document.createTextNode(helpText));
+        newHelpPanel.appendChild(helpHeader);
+        newHelpPanel.appendChild(helpTextContainer);
+        oldHelpPanel.parentNode.replaceChild(newHelpPanel, oldHelpPanel);
     }
 }
 
@@ -239,10 +274,9 @@ function injectAbsenceTable() {
                 style: 'display: flex; flex-direction: column; align-items: center;'
             }
         });
-        frameBody.querySelector('form').remove();
         enableCellWrap(absenceTable);
         absenceDiv.appendChild(absenceTable);
-        frameBody.appendChild(absenceDiv);
+        frameBody.replaceChild(absenceDiv, frameBody.querySelector('form'));
         absenceFrame.height = absenceFrame.contentDocument.body.scrollHeight + 20;
     });
 }
@@ -279,11 +313,10 @@ function injectGradesTable() {
                 style: 'display: flex; flex-direction: column; align-items: center;'
             }
         });
-        frameBody.querySelector('form').remove();
         enableCellWrap(gradesTable);
         gradesDiv.appendChild(gradesInfo);
         gradesDiv.appendChild(gradesTable);
-        frameBody.appendChild(gradesDiv);
+        frameBody.replaceChild(gradesDiv, frameBody.querySelector('form'));
         let subjectNames = gradesTable.querySelectorAll('tr:not(:first-child)  td:nth-of-type(3)');
         if (subjectNames) {
             subjectNames.forEach(subjectName => {
@@ -298,6 +331,14 @@ function injectGradesTable() {
 // Fix A0432S broken implementation of tables
 function tableFix() {
     let contentBody = mainWindow.document.body;
+    let dataWrapper = contentBody.querySelector('div[id*=dgDataWrapper]');
+    if (!dataWrapper) {
+        log('Valid table not found, skipping...');
+        return;
+    } else {
+        dataWrapper.style.width = null;
+        dataWrapper.style.height = null;
+    }
     let rails = contentBody.querySelectorAll('div[id*=Rail]');
     let bars = contentBody.querySelectorAll('div[id*=Bar]');
     rails.forEach(element => {
@@ -306,11 +347,6 @@ function tableFix() {
     bars.forEach(element => {
         element.remove();
     });
-    let dataWrapper = contentBody.querySelector('div[id*=dgDataWrapper]');
-    if (dataWrapper) {
-        dataWrapper.style.width = null;
-        dataWrapper.style.height = null;
-    }
     let panelHeaders = contentBody.querySelectorAll('div[id*=dgDataPanelHeader]');
     panelHeaders.forEach(element => {
         element.style.width = null;
@@ -328,6 +364,7 @@ function tableFix() {
     });
     let trs = contentBody.querySelectorAll('table[id*=dgData] tr');
     trs.forEach(tr => {
+        // definitely replace this with css instead of this nonsense
         let tds = tr.querySelectorAll('td');
         if (trs.length >= 6) {
             tds[5].style = 'position: sticky; left: 0; background: #FEECE6; color: black;';
@@ -350,7 +387,7 @@ function tableFix() {
 function printFix() {
     let contentBody = mainWindow.document.body;
     let printButtons = contentBody.querySelectorAll("form a[id*='Print']");
-    if (printButtons !== null && printButtons.length > 0) {
+    if (printButtons.length > 0) {
         printButtons.forEach(printButton => {
             // create outer div for export options
             let exportMenuDiv = document.createElement("div");
@@ -403,12 +440,32 @@ function printFix() {
             exportDiv.className = 'print container';
             exportDiv.appendChild(exportMenuDiv);
             exportDiv.appendChild(exportLink);
-            printButton.parentNode.parentNode.appendChild(exportDiv);
-            printButton.parentNode.remove();
+            printButton.parentNode.parentNode.replaceChild(exportDiv, printButton.parentNode);
             // update button on load
             updatePrint();
         });
     }
+}
+
+function injectTableDownload() {
+    let tables = mainWindow.document.body.querySelectorAll('table[id*=dgData]');
+    if (tables.length !== 0) {
+        return;
+    }
+    tables.forEach(table => {
+        let newTableContainer = make({
+            el: 'div',
+            class: 'tbl container',
+            html: table.outerHTML,
+        });
+        let downloadBtn = document.createElement('button');
+        downloadBtn.className = 'mdl-button mdl-js-button mdl-js-ripple-effect material-icon';
+        downloadBtn.appendChild(document.createTextNode('image 另存圖檔'));
+        componentHandler.upgradeElement(downloadBtn);
+        newTableContainer.prepend(downloadBtn);
+        let oldTableContainer = table.parentNode;
+        oldTableContainer.parentNode.replaceChild(newTableContainer, oldTableContainer);
+    });
 }
 
 function setupClipboard(contentBody) {
@@ -473,8 +530,14 @@ function enableCellWrap(content) {
     }
 }
 
-function getMainForm() {
-    return mainWindow.document.body.querySelector('body>form');
+function isSafeToDelete(element) {
+    if (!isNullOrWhitespace(element.innerText)) {
+        return false;
+    }
+    if (element.querySelector('a, img, button, input')) {
+        return false;
+    }
+    return true;
 }
 
 // not using GM_addstyle since we need to access various frame heads

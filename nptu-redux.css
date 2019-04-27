@@ -1,5 +1,6 @@
 :root {
     --msft-fonts: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --school-green: #1b5e20;
 }
 
 body {
@@ -44,6 +45,9 @@ body {
 
 .top.header.container .material-icons {
     text-shadow: 1px 1px 1px black;
+}
+.top.header.container .buttons.container label{
+    padding-top: .25em;
 }
 
 /* buttons */
@@ -93,7 +97,7 @@ body {
 
 .header.container {
     display: flex;
-    background-color: #1b5e20;
+    background-color: var(--school-green);
     color: white;
     border-radius: 15px;
     font-size: 1.35em;
@@ -152,6 +156,14 @@ body {
     padding: 1em 2em;
 }
 
+.help .text.container{
+    white-space: pre-wrap;
+    border: solid 1.25px var(--school-green);
+    padding: 1em;
+    border-radius: 6px;
+    margin: 0 1em;
+}
+
 /* frames */
 
 .inline-frame {
@@ -161,11 +173,12 @@ body {
 /* Table headers */
 .TRHeaderStyle {
     font-family: inherit !important;
-    background: #1b5e20 !important;
+    background: var(--school-green) !important;
 }
 
 .TDItemStyle {
     font-family: inherit !important;
+    min-width: 3em;
 }
 
 .DgTable {
