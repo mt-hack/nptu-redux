@@ -4,6 +4,7 @@
 // @license MIT
 // @author MT.Hack
 // @grant GM_setClipboard
+// @grant GM_download
 // @grant GM_notification
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js
@@ -30,6 +31,7 @@ let options = {
 
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css';
+let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
 let mainElement = document.querySelector('frame[name=MAIN]');
 if (!mainElement) {
     log('Main element cannot be found.');
@@ -50,7 +52,7 @@ mainWindow.frameElement.onload = function () {
     if (/Main.aspx/g.test(currentPage.action)) {
         // Check for the semester change button; if one doesn't exist, likely student
         if (!currentPage.querySelector('#CommonHeader_ibtChgSYearSeme') &&
-        !currentPage.querySelector('input[src*=GST_M]')) {
+            !currentPage.querySelector('input[src*=GST_M]')) {
             if (options.enableGradeOnHome) {
                 injectGradesTable(contentBody);
             }
@@ -59,11 +61,16 @@ mainWindow.frameElement.onload = function () {
             }
         }
     }
-    if (options.enableCustomExport){
+    if (options.enableCustomExport) {
         printFix(contentBody);
     }
     if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix(contentBody);
+    }
+    let tableData = contentBody.querySelectorAll('table[id*=dgData]');
+    for (let i = 0, ti = tableData.length; i < ti; i++) {
+        if (tableData[i].innerText.includes('科目'))
+            injectTableDownload(tableData[i]);
     }
     setupClipboard(contentBody);
 };
@@ -212,7 +219,7 @@ function pageCleanup(contentBody) {
 
     let infoDiv = contentBody.querySelector('.main .menu');
     if (infoDiv) {
-        infoDiv.className += ' information';
+        infoDiv.classList.add('information');
     }
 
     let oldAnnounceHeader = contentBody.querySelector("img[src*='Images/HotNews/Hotnew.gif']");
@@ -318,7 +325,7 @@ function injectGradesTable(contentBody) {
         let subjectNames = gradesTable.querySelectorAll('tr:not(:first-child)  td:nth-of-type(3)');
         if (subjectNames) {
             subjectNames.forEach(subjectName => {
-                subjectName.className += ` copyable`;
+                subjectName.classList.add('copyable');
             });
             setupClipboard(frameBody);
         }
@@ -418,7 +425,7 @@ function printFix(contentBody) {
             exportLink.target = "_blank";
             exportLink.href = printButton.href;
             exportLink.title = printButton.title;
-            exportLink.className = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
+            exportLink.className = raisedButtonClassnames;
             exportLink.style.display = 'flex';
             exportLink.style.alignItems = 'center';
             exportLink.style.textDecoration = 'none';
@@ -448,24 +455,33 @@ function printFix(contentBody) {
     }
 }
 
-function injectTableDownload(contentBody) {
-    let tables = contentBody.querySelectorAll('table[id*=dgData]');
-    if (tables.length !== 0) {
-        return;
-    }
-    tables.forEach(table => {
-        let newTableContainer = make({
-            el: 'div',
-            class: 'tbl container',
-            html: table.outerHTML,
+function injectTableDownload(table) {
+    let newTableContainer = make({
+        el: 'div',
+        class: 'tbl container',
+        html: table.outerHTML,
+    });
+    let downloadBtn = document.createElement('a');
+    downloadBtn.className = raisedButtonClassnames;
+    downloadBtn.classList.add('tbl-btn');
+    downloadBtn.href = '#';
+    componentHandler.upgradeElement(downloadBtn);
+    let downloadTxt = make({
+        el: 'i',
+        class: 'material-icons'
+    });
+    downloadTxt.appendChild(document.createTextNode('存成圖檔'));
+    downloadBtn.appendChild(downloadTxt);
+    newTableContainer.prepend(downloadBtn);
+    table.parentNode.replaceChild(newTableContainer, table);
+    // define table again
+    table = newTableContainer.querySelector('table');
+    downloadBtn.addEventListener('click', function () {
+        toggleOverlay(table.getRootNode());
+        domtoimage.toPng(table).then(function (url) {
+            GM_download(url, 'image.png');
+            toggleOverlay(table.getRootNode());
         });
-        let downloadBtn = document.createElement('button');
-        downloadBtn.className = 'mdl-button mdl-js-button mdl-js-ripple-effect material-icon';
-        downloadBtn.appendChild(document.createTextNode('image 另存圖檔'));
-        componentHandler.upgradeElement(downloadBtn);
-        newTableContainer.prepend(downloadBtn);
-        let oldTableContainer = table.parentNode;
-        oldTableContainer.parentNode.replaceChild(newTableContainer, oldTableContainer);
     });
 }
 
@@ -503,6 +519,41 @@ function make(obj) {
         $(obj.appendTo).appendChild(el);
     }
     return el;
+}
+
+function toggleOverlay(document) {
+    let overlay = getOrCreateLoadingOverlay(document);
+    if (overlay.style.display === 'none'){
+        overlay.style.opacity = 0.75;
+        overlay.style.display = 'flex';
+    }else{
+        overlay.style.opacity = 0;
+        overlay.style.display = 'none';
+    }
+}
+
+function getOrCreateLoadingOverlay(document) {
+    let overlay = document.querySelector('.redux.overlay');
+    if (!overlay) {
+        overlay = make({
+            el: 'div',
+            class: 'redux overlay',
+            attr: {
+                style: 'background: black;height: 100%;width: 100%;position: absolute;top: 0;left: 0;opacity: 0;display: none;justify-content: center;align-items: center; transition: opacity 0.5s'
+            }
+        });
+        let spinner = make({
+            el: 'div',
+            class: 'mdl-spinner mdl-js-spinner is-active',
+            attr: {
+                style: 'width: 12em; height: 12em;'
+            }
+        });
+        componentHandler.upgradeElement(spinner);
+        overlay.appendChild(spinner);
+        document.body.prepend(overlay);
+    }
+    return overlay;
 }
 
 function isNullOrWhitespace(input) {

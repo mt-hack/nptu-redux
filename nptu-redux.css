@@ -46,7 +46,8 @@ body {
 .top.header.container .material-icons {
     text-shadow: 1px 1px 1px black;
 }
-.top.header.container .buttons.container label{
+
+.top.header.container .buttons.container label {
     padding-top: .25em;
 }
 
@@ -117,12 +118,12 @@ body {
     flex: 2.5
 }
 
-.menu.container {
-    flex: 1;
+.menu.container{
     display: flex;
     flex-direction: column;
 }
 
+.menu.container,
 .alt.container {
     flex: 1;
 }
@@ -147,7 +148,7 @@ body {
     padding: 1em 2em;
 }
 
-.help .text.container{
+.help .text.container {
     white-space: pre-wrap;
     border: solid 1px var(--school-green);
     padding: 1em;
@@ -161,7 +162,12 @@ body {
     border: none;
 }
 
-/* Table headers */
+/* Table */
+
+.tbl-btn{
+    display: block;
+}
+
 .TRHeaderStyle {
     font-family: inherit !important;
     background: var(--school-green) !important;
