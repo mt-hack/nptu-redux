@@ -568,7 +568,7 @@ function getOrCreateLoadingOverlay(document) {
             el: 'div',
             class: 'redux overlay',
             attr: {
-                style: 'background: black;height: 100%;width: 100%;position: absolute;top: 0;left: 0;opacity: 0;display: none;justify-content: center;align-items: center; transition: opacity 0.5s'
+                style: 'background: black;height: 100%;width: 100%;position: absolute;top: 0;left: 0;opacity: 0;display: none;justify-content: center;align-items: center; transition: opacity 0.5s; flex-direction: column;'
             }
         });
         let spinner = make({
@@ -578,8 +578,17 @@ function getOrCreateLoadingOverlay(document) {
                 style: 'width: 12em; height: 12em;'
             }
         });
+        let loadTxt = make({
+            el: 'div',
+            class: 'white text',
+            attr:{
+                style: 'color: white; padding: 1em 0; font-size: 24pt;'
+            }
+        });
+        loadTxt.appendChild(document.createTextNode('載入中...'));
         componentHandler.upgradeElement(spinner);
         overlay.appendChild(spinner);
+        overlay.appendChild(loadTxt);
         document.body.prepend(overlay);
     }
     return overlay;
