@@ -233,7 +233,6 @@ function pageCleanup(contentBody) {
                 }
                 mainDiv.appendChild(elementDiv);
             } else {
-                console.log(`Queued up ${element.id || element.className}`);
                 menuElements.push(element.innerHTML);
             }
         }
@@ -635,7 +634,6 @@ function injectStyle(head, style) {
     css.href = style;
     css.rel = "stylesheet";
     head.appendChild(css);
-    log(`Injected '${style}'.`);
 }
 
 function injectScript(head, script) {
