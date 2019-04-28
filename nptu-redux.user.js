@@ -25,6 +25,8 @@ let options = {
     enableMaterialHeader: true,
     // Enables custom export options for printing
     enableCustomExport: true,
+    // Enables experimental features (use at your own risk!)
+    enableExperimental: false,
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
@@ -67,10 +69,14 @@ mainWindow.frameElement.onload = function () {
     if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix(contentBody);
     }
-    let tableData = contentBody.querySelectorAll('table[id*=dgData]');
-    for (let i = 0, ti = tableData.length; i < ti; i++) {
-        if (tableData[i].innerText.includes('科目'))
-            injectTableDownload(tableData[i]);
+    // Experimental features
+    if (options.enableExperimental){
+        // Table image export feature; currently buggy
+        let tableData = contentBody.querySelectorAll('table[id*=dgData]');
+        for (let i = 0, ti = tableData.length; i < ti; i++) {
+            if (tableData[i].innerText.includes('科目'))
+                injectTableDownload(tableData[i]);
+        }
     }
     setupClipboard(contentBody);
 };
