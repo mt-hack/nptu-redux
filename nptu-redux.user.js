@@ -16,6 +16,12 @@
 // @version 1.0.13
 // ==/UserScript==
 
+/* 
+=========================================================
+User configurable options 
+=========================================================
+*/
+
 let options = {
     // Enables grade widget
     enableGradeOnHome: true,
@@ -30,6 +36,13 @@ let options = {
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
 };
+
+/* 
+=========================================================
+LIVE CODE
+DO NOT TOUCH THE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
+=========================================================
+*/
 
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css';
