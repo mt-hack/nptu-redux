@@ -42,6 +42,16 @@ if (!mainElement) {
 }
 
 mainWindow.frameElement.onload = function () {
+    let unsafeFrame = unsafeWindow.document.querySelector('frame[name=MAIN]');
+    if (unsafeFrame){
+        let webFormMethod = unsafeFrame.contentWindow.WebForm_OnSubmit;
+        if (webFormMethod){
+            unsafeFrame.contentWindow.WebForm_OnSubmit = function(){
+                toggleOverlay(mainWindow.document);
+            }
+        }
+    }
+    
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
