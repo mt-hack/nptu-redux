@@ -427,37 +427,36 @@ function printFix(contentBody) {
 
             // create export label
             let exportLabel = document.createElement("label");
-            exportLabel.for = "export-menu";
             exportLabel.appendChild(document.createTextNode('匯出選項：'));
 
             // prepare export menu
-            let exportMenu = document.createElement("select");
-            exportMenu.className = "export-menu";
-            let exportPdf = document.createElement("option");
-            exportPdf.value = "pdf";
-            exportPdf.appendChild(document.createTextNode('PDF'));
-            let exportExcel = document.createElement("option");
-            exportExcel.value = "xls";
-            exportExcel.appendChild(document.createTextNode('Excel'));
-            let exportRtf = document.createElement("option");
-            exportRtf.value = "rtf";
-            exportRtf.appendChild(document.createTextNode('RTF'));
-            exportMenu.appendChild(exportPdf);
-            exportMenu.appendChild(exportExcel);
-            exportMenu.appendChild(exportRtf);
+            let exportMenu = make({
+                el: 'select',
+                class: 'export-menu',
+                html: 
+                `
+                    <option value="pdf">PDF (Adobe PDF)</option>
+                    <option value="xls">XLS (97-2003 Excel 表格)</option>
+                    <option value="ods">ODS (OpenDocument 表格)</option>
+                    <option value="rtf">RTF (富文字)</option>
+                    <option value="txt">TXT (純文字)</option>
+                `
+            });
 
             // change print button
             let exportLinkText = document.createElement('i');
             exportLinkText.className = 'material-icons';
             exportLinkText.appendChild(document.createTextNode('print 點此下載報表'));
-            let exportLink = document.createElement('a');
-            exportLink.target = "_blank";
-            exportLink.href = printButton.href;
-            exportLink.title = printButton.title;
-            exportLink.className = raisedButtonClassnames;
-            exportLink.style.display = 'flex';
-            exportLink.style.alignItems = 'center';
-            exportLink.style.textDecoration = 'none';
+            let exportLink = make({
+                el: 'a',
+                class: raisedButtonClassnames,
+                attr:{
+                    target: '_blank',
+                    href: printButton.href,
+                    title: printButton.title,
+                    style: 'display: flex; align-items: center; text-decoration: none;'
+                }
+            });
             exportLink.appendChild(exportLinkText);
             componentHandler.upgradeElement(exportLink);
 
