@@ -56,15 +56,15 @@ if (!mainElement) {
 
 mainWindow.frameElement.onload = function () {
     let unsafeFrame = unsafeWindow.document.querySelector('frame[name=MAIN]');
-    if (unsafeFrame){
+    if (unsafeFrame) {
         let webFormMethod = unsafeFrame.contentWindow.WebForm_OnSubmit;
-        if (webFormMethod){
-            unsafeFrame.contentWindow.WebForm_OnSubmit = function(){
+        if (webFormMethod) {
+            unsafeFrame.contentWindow.WebForm_OnSubmit = function () {
                 toggleOverlay(mainWindow.document);
             }
         }
     }
-    
+
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
@@ -93,7 +93,7 @@ mainWindow.frameElement.onload = function () {
         tableFix(contentBody);
     }
     // Experimental features
-    if (options.enableExperimental){
+    if (options.enableExperimental) {
         // Table image export feature; currently buggy
         let tableData = contentBody.querySelectorAll('table[id*=dgData]');
         for (let i = 0, ti = tableData.length; i < ti; i++) {
@@ -433,8 +433,7 @@ function printFix(contentBody) {
             let exportMenu = make({
                 el: 'select',
                 class: 'export-menu',
-                html: 
-                `
+                html: `
                     <option value="pdf">PDF (Adobe PDF)</option>
                     <option value="xls">XLS (97-2003 Excel 表格)</option>
                     <option value="ods">ODS (OpenDocument 表格)</option>
@@ -450,7 +449,7 @@ function printFix(contentBody) {
             let exportLink = make({
                 el: 'a',
                 class: raisedButtonClassnames,
-                attr:{
+                attr: {
                     target: '_blank',
                     href: printButton.href,
                     title: printButton.title,
@@ -483,32 +482,48 @@ function printFix(contentBody) {
     }
 }
 
-function organizeCourseList(contentBody){
-    let openIdLists = contentBody.querySelectorAll('select[name*=ddlOPEN_ID]');
-    openIdLists.forEach(openIdList => {
+function organizeCourseList(contentBody) {
+    let openIdList = contentBody.querySelector('select[name*=ddlOPEN_ID]');
+    if (openIdList) {
         let incompleteGroup = make({
-            el: 'optgroup',
-            attr: {
-                label: '尚未排課'
-            }
+            el: 'div',
+            class: 'menu container'
         });
+        let incompleteText = make({
+            el: 'div',
+            class: 'text container'
+        });
+        let incompleteHeader = createHeader('尚未排課', 'warning');
+        incompleteHeader.style.backgroundColor = '#b71c1c';
+        incompleteGroup.appendChild(incompleteHeader);
+
         let completeGroup = make({
-            el: 'optgroup',
-            attr: {
-                label: '已排課'
-            }
+            el: 'div',
+            class: 'menu container'
         });
+        let completeText = make({
+            el: 'div',
+            class: 'text container'
+        });
+        let completeHeader = createHeader('已排課', 'check_circle');
+        completeGroup.appendChild(completeHeader);
+
         let idListOptions = openIdList.querySelectorAll('option');
         idListOptions.forEach(option => {
-           if (/\d\/\d/g.test(option.innerText)) {
-               completeGroup.appendChild(option);
-           }else{
-               incompleteGroup.appendChild(option);
-           };
+            if (/\d\/\d/g.test(option.innerText)) {
+                completeText.appendChild(document.createTextNode(option.innerText));
+                completeText.appendChild(document.createElement('br'));
+            } else {
+                incompleteText.appendChild(document.createTextNode(option.innerText));
+                incompleteText.appendChild(document.createElement('br'));
+            }
         });
-        openIdList.appendChild(incompleteGroup);
-        openIdList.appendChild(completeGroup);
-    });
+        completeGroup.appendChild(completeText);
+        incompleteGroup.appendChild(incompleteText);
+        let menuContainer = contentBody.querySelector('.menu.container');
+        menuContainer.appendChild(completeGroup);
+        menuContainer.appendChild(incompleteGroup);
+    }
 }
 
 function injectTableDownload(table) {
@@ -579,10 +594,10 @@ function make(obj) {
 
 function toggleOverlay(document) {
     let overlay = getOrCreateLoadingOverlay(document);
-    if (overlay.style.display === 'none'){
+    if (overlay.style.display === 'none') {
         overlay.style.opacity = 0.75;
         overlay.style.display = 'flex';
-    }else{
+    } else {
         overlay.style.opacity = 0;
         overlay.style.display = 'none';
     }
@@ -608,7 +623,7 @@ function getOrCreateLoadingOverlay(document) {
         let loadTxt = make({
             el: 'div',
             class: 'white text',
-            attr:{
+            attr: {
                 style: 'color: white; padding: 1em 0; font-size: 24pt;'
             }
         });

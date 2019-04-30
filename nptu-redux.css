@@ -149,8 +149,11 @@ body {
 }
 
 .help .text.container {
-    white-space: pre-wrap;
     border: solid 1px var(--school-green);
+}
+
+.text.container{
+    white-space: pre-wrap;
     padding: 1em;
     border-radius: 6px;
     margin: 0 1em;
