@@ -523,8 +523,12 @@ function organizeCourseList(contentBody) {
         completeGroup.appendChild(completeText);
         incompleteGroup.appendChild(incompleteText);
         let menuContainer = contentBody.querySelector('.menu.container');
-        menuContainer.appendChild(incompleteGroup);
-        menuContainer.appendChild(completeGroup);
+        if (incompleteGroup.childNodes.length > 0){
+            menuContainer.appendChild(incompleteGroup);
+        }
+        if (completeGroup.childNodes.length > 0){
+            menuContainer.appendChild(completeGroup);
+        }
         menuContainer.style.flexWrap = 'wrap';
     }
 }
