@@ -13,7 +13,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.0.18
+// @version 1.1.0
 // ==/UserScript==
 
 /* 
@@ -124,7 +124,7 @@ function injectHeader(contentBody) {
         newHeaderHtml += `
             <div>
                 <i class="material-icons">dashboard</i>
-                <div class="copyable hoverable" id="page-name">
+                <div class="hoverable" id="page-name">
                     ${moduleName}
                 </div>
             </div>`;
@@ -132,15 +132,18 @@ function injectHeader(contentBody) {
     //  #endregion
     //    #region [Display] Semester
     let semesterName = contentBody.querySelector('#CommonHeader_lblYSC').innerText.replace(/[:：]/g, '');
+    let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
     if (semesterName) {
-        newHeaderHtml += `
-            <div>
-                <i class="material-icons">event</i>
-                <div class="copyable hoverable" id="semester-name">
-                    ${semesterName}
-                </div>
-            </div>`;
+        newHeaderHtml += `<div><i class="material-icons">event</i>`;
     }
+    if (oldSemSwitch){
+        newHeaderHtml += `
+            <label class="text clickable" id="semester-name" onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>${semesterName}</div>
+            <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
+    }else{
+        newHeaderHtml += `<div class="hoverable" id="semester-name">${semesterName}</div>`;
+    }
+    newHeaderHtml += `</div>`;
     //  #endregion
     newHeaderHtml += `</div><div class="sub container" id="user-info">`;
     //    #region [Display] Username
@@ -149,7 +152,7 @@ function injectHeader(contentBody) {
         newHeaderHtml += `
             <div>
                 <i class="material-icons">person</i>
-                <div class="copyable hoverable" id="user-name">
+                <div class="hoverable" id="user-name">
                     ${loginName}
                 </div>
             </div>`;
@@ -161,20 +164,13 @@ function injectHeader(contentBody) {
         newHeaderHtml += `
             <div>
                 <i class="material-icons">people</i>
-                <div class="copyable hoverable" id="user-count">
+                <div class="hoverable" id="user-count">
                     ${onlineUsers}
                 </div>
             </div>`;
     }
     //  #endregion
     newHeaderHtml += `</div><div class="alt buttons container right">`;
-    //    #region [Button] Change Semester
-    let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
-    if (oldSemSwitch) {
-        newHeaderHtml += `
-            <label for=${oldSemSwitch.id} class='btn hoverable' onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>event</label>
-            <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
-    }
     //    #endregion
     //    #region [Button] Password Change
     let oldPwdBtn = contentBody.querySelector('#CommonHeader_ibtChgPwd');

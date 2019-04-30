@@ -9,12 +9,14 @@ body {
 
 /* copyable */
 
+.text.clickable,
 .copyable {
     font-size: 100%;
     text-decoration: none;
     transition: text-shadow .3s, text-decoration .3s, font-size .4s;
 }
 
+.text.clickable:hover,
 .copyable:hover {
     font-size: 120%;
     text-decoration: underline;
@@ -47,7 +49,7 @@ body {
     text-shadow: 1px 1px 1px black;
 }
 
-.top.header.container .buttons.container label {
+.top.header.container .buttons.container label.btn {
     padding-top: .25em;
 }
 
