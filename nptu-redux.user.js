@@ -13,7 +13,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.1.0
+// @version 1.1.1
 // ==/UserScript==
 
 /* 
@@ -45,7 +45,7 @@ DO NOT TOUCH THE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
 */
 
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
-let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux@1/nptu-redux.min.css';
+let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
 let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
 let mainElement = document.querySelector('frame[name=MAIN]');
 if (!mainElement) {
