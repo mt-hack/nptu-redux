@@ -13,7 +13,7 @@
 // @match https://webap.nptu.edu.tw/Web/Message/default.aspx
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.1.2
+// @version 1.1.3
 // ==/UserScript==
 
 /* 
@@ -67,7 +67,7 @@ mainWindow.frameElement.onload = function () {
 
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
-    injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-indigo.min.css');
     injectStyle(mainWindow.document.head, customCss);
     if (options.enableMaterialHeader) {
         injectHeader(contentBody);
