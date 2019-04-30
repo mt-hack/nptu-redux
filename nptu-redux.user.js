@@ -227,11 +227,6 @@ function pageCleanup(contentBody) {
                     class: 'menu container',
                     html: element.innerHTML
                 });
-                // Extreme edge case; thank you whoever designed this system, very cool
-                let printButtons = contentBody.querySelectorAll('a[id*=hylPrint]');
-                for (let i = 0; i < printButtons.length; i++) {
-                    elementDiv.appendChild(printButtons[i]);
-                }
                 mainDiv.appendChild(elementDiv);
             } else {
                 menuElements.push(element.innerHTML);
@@ -418,7 +413,7 @@ function tableFix(contentBody) {
 
 // Add export options for spreadsheet printing
 function printFix(contentBody) {
-    let printButtons = contentBody.querySelectorAll("form a[id*='Print']");
+    let printButtons = contentBody.querySelectorAll("a[id*=hylPrint]");
     if (printButtons.length > 0) {
         printButtons.forEach(printButton => {
             // create outer div for export options
@@ -514,7 +509,7 @@ function organizeCourseList(contentBody) {
                 completeText.appendChild(document.createTextNode(option.innerText));
                 completeText.appendChild(document.createElement('br'));
             } else {
-                if (!option.innerText.includes('專題') && !option.innerText.includes('檢定')){
+                if (!option.innerText.includes('專題') && !option.innerText.includes('檢定')) {
                     incompleteText.appendChild(document.createTextNode(option.innerText));
                     incompleteText.appendChild(document.createElement('br'));
                 }
@@ -523,10 +518,11 @@ function organizeCourseList(contentBody) {
         completeGroup.appendChild(completeText);
         incompleteGroup.appendChild(incompleteText);
         let menuContainer = contentBody.querySelector('.menu.container');
-        if (incompleteGroup.childNodes.length > 0){
+        // TODO: but what about the header appended?
+        if (incompleteGroup.childNodes.length > 0) {
             menuContainer.appendChild(incompleteGroup);
         }
-        if (completeGroup.childNodes.length > 0){
+        if (completeGroup.childNodes.length > 0) {
             menuContainer.appendChild(completeGroup);
         }
         menuContainer.style.flexWrap = 'wrap';
