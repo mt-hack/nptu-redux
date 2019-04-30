@@ -101,6 +101,7 @@ mainWindow.frameElement.onload = function () {
                 injectTableDownload(tableData[i]);
         }
     }
+    organizeCourseList(contentBody);
     setupClipboard(contentBody);
 };
 
@@ -480,6 +481,34 @@ function printFix(contentBody) {
             updatePrint();
         });
     }
+}
+
+function organizeCourseList(contentBody){
+    let openIdLists = contentBody.querySelectorAll('select[name*=ddlOPEN_ID]');
+    openIdLists.forEach(openIdList => {
+        let incompleteGroup = make({
+            el: 'optgroup',
+            attr: {
+                label: '尚未排課'
+            }
+        });
+        let completeGroup = make({
+            el: 'optgroup',
+            attr: {
+                label: '已排課'
+            }
+        });
+        let idListOptions = openIdList.querySelectorAll('option');
+        idListOptions.forEach(option => {
+           if (/\d\/\d/g.test(option.innerText)) {
+               completeGroup.appendChild(option);
+           }else{
+               incompleteGroup.appendChild(option);
+           };
+        });
+        openIdList.appendChild(incompleteGroup);
+        openIdList.appendChild(completeGroup);
+    });
 }
 
 function injectTableDownload(table) {
