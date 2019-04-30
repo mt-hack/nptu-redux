@@ -138,7 +138,7 @@ function injectHeader(contentBody) {
     }
     if (oldSemSwitch){
         newHeaderHtml += `
-            <label class="text clickable" id="semester-name" onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>${semesterName}</div>
+            <label class="text clickable" id="semester-name" onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>${semesterName}</label>
             <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
     }else{
         newHeaderHtml += `<div class="hoverable" id="semester-name">${semesterName}</div>`;
