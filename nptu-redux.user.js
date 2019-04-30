@@ -113,7 +113,7 @@ function injectHeader(contentBody) {
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
         newHeaderHtml += `
-            <label for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
+            <label for=${oldHome.id} class='btn hoverable' onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>home</label>
             <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
     //  #endregion
@@ -172,7 +172,7 @@ function injectHeader(contentBody) {
     let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
     if (oldSemSwitch) {
         newHeaderHtml += `
-            <label for=${oldSemSwitch.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>event</label>
+            <label for=${oldSemSwitch.id} class='btn hoverable' onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>event</label>
             <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
     }
     //    #endregion
@@ -180,7 +180,7 @@ function injectHeader(contentBody) {
     let oldPwdBtn = contentBody.querySelector('#CommonHeader_ibtChgPwd');
     if (oldPwdBtn) {
         newHeaderHtml += `
-            <label for=${oldPwdBtn.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
+            <label for=${oldPwdBtn.id} class='btn hoverable' onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>lock</label>
             <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldPwdBtn.name} name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
     }
     //    #endregion
@@ -188,7 +188,7 @@ function injectHeader(contentBody) {
     let oldLogout = contentBody.querySelector('#CommonHeader_ibtLogOut');
     if (oldLogout) {
         newHeaderHtml += `
-            <label for=${oldLogout.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
+            <label for=${oldLogout.id} class='btn hoverable' onclick='toggleOverlay(this.getRootNode());this.nextElementSibling.click();'>exit_to_app</label>
             <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
     //  #endregion
