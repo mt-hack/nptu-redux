@@ -514,15 +514,18 @@ function organizeCourseList(contentBody) {
                 completeText.appendChild(document.createTextNode(option.innerText));
                 completeText.appendChild(document.createElement('br'));
             } else {
-                incompleteText.appendChild(document.createTextNode(option.innerText));
-                incompleteText.appendChild(document.createElement('br'));
+                if (!option.innerText.includes('專題') && !option.innerText.includes('檢定')){
+                    incompleteText.appendChild(document.createTextNode(option.innerText));
+                    incompleteText.appendChild(document.createElement('br'));
+                }
             }
         });
         completeGroup.appendChild(completeText);
         incompleteGroup.appendChild(incompleteText);
         let menuContainer = contentBody.querySelector('.menu.container');
-        menuContainer.appendChild(completeGroup);
         menuContainer.appendChild(incompleteGroup);
+        menuContainer.appendChild(completeGroup);
+        menuContainer.style.flexWrap = 'wrap';
     }
 }
 
