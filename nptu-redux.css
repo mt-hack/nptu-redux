@@ -11,14 +11,15 @@ body {
 
 .text.clickable,
 .copyable {
-    font-size: 100%;
+    font-size: 1em;
     text-decoration: none;
     transition: text-shadow .3s, text-decoration .3s, font-size .4s;
 }
 
 .text.clickable:hover,
 .copyable:hover {
-    font-size: 120%;
+    font-size: 1.2em;
+    vertical-align: top;
     text-decoration: underline;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
     cursor: pointer;
@@ -47,10 +48,6 @@ body {
 
 .top.header.container .material-icons {
     text-shadow: 1px 1px 1px black;
-}
-
-.top.header.container .buttons.container label.btn {
-    padding-top: .25em;
 }
 
 /* buttons */
