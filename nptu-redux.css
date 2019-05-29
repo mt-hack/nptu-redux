@@ -46,8 +46,9 @@ body {
     vertical-align: top;
 }
 
-.top.header.container .material-icons {
+.top.header.container .btn {
     text-shadow: 1px 1px 1px black;
+    padding-top: .25em;
 }
 
 /* buttons */
