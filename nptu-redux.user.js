@@ -9,11 +9,10 @@
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js
 // @require https://code.getmdl.io/1.3.0/material.min.js
-// @match http://webap.nptu.edu.tw/Web/Message/default.aspx
-// @match https://webap.nptu.edu.tw/Web/Message/default.aspx
+// @match *://webap*.nptu.edu.tw/*/Message/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.1.4
+// @version 1.1.5
 // ==/UserScript==
 
 /* 
