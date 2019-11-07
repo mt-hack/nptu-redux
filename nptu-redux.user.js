@@ -354,56 +354,40 @@ function injectGradesTable(contentBody) {
 
 // Fix A0432S broken implementation of tables
 function tableFix(contentBody) {
-    let dataWrapper = contentBody.querySelector('div[id*=dgDataWrapper]');
-    if (!dataWrapper) {
+    let dataHeader = contentBody.querySelector('div[id*=dgData_Header]');
+    let dataContent = contentBody.querySelector('div[id*=dgData_Content]');
+    if (!dataHeader || !dataContent) {
         log('Valid table not found, skipping...');
         return;
-    } else {
-        dataWrapper.style.width = null;
-        dataWrapper.style.height = null;
     }
-    let rails = contentBody.querySelectorAll('div[id*=Rail]');
-    let bars = contentBody.querySelectorAll('div[id*=Bar]');
-    rails.forEach(element => {
-        element.remove();
-    });
-    bars.forEach(element => {
-        element.remove();
-    });
-    let panelHeaders = contentBody.querySelectorAll('div[id*=dgDataPanelHeader]');
-    panelHeaders.forEach(element => {
-        element.style.width = null;
-        element.style.overflow = "auto";
-    });
-    let panelItems = contentBody.querySelectorAll('div[id*=dgDataPanelItem]');
-    panelItems.forEach(element => {
-        element.style.width = null;
-        element.style.height = null;
-        element.style.overflow = "auto";
-    });
-    let panelFreeze = contentBody.querySelectorAll('div[id*=ContentFreeze');
-    panelFreeze.forEach(element => {
-        element.remove();
-    });
-    let trs = contentBody.querySelectorAll('table[id*=dgData] tr');
-    trs.forEach(tr => {
-        // definitely replace this with css instead of this nonsense
-        let tds = tr.querySelectorAll('td');
-        if (trs.length >= 6) {
-            tds[5].style = 'position: sticky; left: 0; background: #FEECE6; color: black;';
-        }
-    });
-
-    let oldTableHeader = contentBody.querySelector("[id$=dgDataCopy] tbody");
-    if (oldTableHeader) {
-        oldTableHeader.remove();
-        let newTableHeader = document.createElement("thead");
-        newTableHeader.innerHTML = oldTableHeader.innerHTML;
-        let tableContent = contentBody.querySelector("[id$=dgData]");
-        tableContent.prepend(newTableHeader);
-        tableContent.parentNode.parentNode.style.background = null;
+    dataHeader.childNodes.forEach(node=>{
+        node.style.overflow = null;
+        node.style.width = null;
+        node.style.height = null;
+        node.style.position = null;
+        node.style.top = null;
+        node.style.left = null;
+        node.style.right = null;
+        node.style.bottom = null;
+    })
+    dataContent.childNodes.forEach(node =>{
+        node.style.overflow = null;
+        node.style.width = null;
+        node.style.height = null;
+        node.style.position = null;
+        node.style.top = null;
+        node.style.left = null;
+        node.style.right = null;
+        node.style.bottom = null;
+    })
+    let fixedHeader = contentBody.querySelector('div[id*=dgData_Header_Freeze]');
+    if (fixedHeader){
+        fixedHeader.remove()
     }
-
+    let fixedContent = contentBody.querySelector('div[id*=dgData_Content_Freeze]');
+    if(fixedContent){
+        fixedContent.remove()
+    }
 }
 
 // Add export options for spreadsheet printing
