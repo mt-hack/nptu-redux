@@ -154,24 +154,24 @@ if (window.location.href.match(/Web\/Secure\//g)) {
     }
     return;
 }
+
+/*
+===================
+Main Page Injection
+===================
+*/
+
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
 let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
-let mainElement = document.querySelector('frame[name=MAIN]');
-if (!mainElement) {
-    log('Main element cannot be found.');
-} else {
-    var mainWindow = mainElement.contentWindow;
-}
-
-mainWindow.frameElement.onload = function () {
-    let unsafeFrame = unsafeWindow.document.querySelector('frame[name=MAIN]');
-    if (unsafeFrame) {
-        let webFormMethod = unsafeFrame.contentWindow.WebForm_OnSubmit;
-        if (webFormMethod) {
-            unsafeFrame.contentWindow.WebForm_OnSubmit = function () {
-                toggleOverlay(mainWindow.document);
-            }
+let mainElement = document.querySelector('frame') || document.querySelector('form');
+let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultView;
+let frameElement = mainWindow.frameElement || mainWindow;
+frameElement.onload = function () {
+    let contentWindow = frameElement.contentWindow || frameElement;
+    if (contentWindow.WebForm_OnSubmit) {
+        contentWindow.WebForm_OnSubmit = function () {
+            toggleOverlay(mainWindow.document);
         }
     }
 
