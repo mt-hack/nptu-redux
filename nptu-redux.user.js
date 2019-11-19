@@ -43,6 +43,20 @@ DO NOT TOUCH THE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
 =========================================================
 */
 
+/*
+===================
+Image Fix Injection
+===================
+*/
+
+let images = document.querySelectorAll('*[src*="_EN"]')
+images.forEach(img => {
+    img.addEventListener('error', function () {
+        let englishSuffixRegex = new RegExp(/_en/gi);
+        this.src = this.src.replace(englishSuffixRegex, '');
+    })
+})
+
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
 let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
