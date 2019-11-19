@@ -30,11 +30,67 @@ let options = {
     enableMaterialHeader: true,
     // Enables custom export options for printing
     enableCustomExport: true,
+    // Enables max student number autofill based on classroom selection
+    enableClassroomAutofillOnSelect: true,
+    // Enables classroom shortcut in selection
+    enableClassroomShortcut: true,
+    enableInstructorShortcut: true,
+    enableShortcutAutoSubmit: true,
     // Enables experimental features (use at your own risk!)
     enableExperimental: false,
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
+    locationSelectionPage: ["A0413A02Page"],
+    insturctorShortcutPage: ["A0413S1Page"]
 };
+
+let subjectGroups = {
+    ENG1001: 30,
+    ENG1003: 60,
+    ENG1004: 60,
+    ENG2001: 30,
+    ENG2002: 30,
+    ENG2003: 60,
+    ENG2005: 60,
+    ENG2027: 30,
+    ENG3001: 30,
+    ENG3005: 60,
+    ENG3032: 30,
+    ENG4001: 30,
+    ENG4002: 60,
+    ENG2008: 49,
+    ENG2028: 30,
+    ENG2031: 60,
+    ENG2032: 49,
+    ENG2033: 49,
+    ENG3004: 49,
+    ENG3009: 60,
+    ENG3039: 60,
+    ENG4008: 60,
+    ENG4014: 49,
+    ENG4036: 49,
+    ENG4037: 30,
+    ENG4041: 30,
+}
+
+let locationShortcuts = {
+    人文館103: 'G103',
+    人文館104: 'G104',
+    人文館二討: 'G212',
+    五育樓5F視聽: 'I500'
+}
+let instructorShortcuts = {
+    金大衛: '200010027',
+    余慧珠: '200010033',
+    項偉恩: '200009296',
+    梁愷: '200008819',
+    梁中行: '200009049',
+    王彩姿: '200008861',
+    楊昕昕: '200008862',
+    李惠敏: '200008812',
+    楊琇琇: '200008724',
+    張理宏: '200008741'
+}
 
 /* 
 =========================================================
@@ -83,6 +139,18 @@ mainWindow.frameElement.onload = function () {
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-indigo.min.css');
     injectStyle(mainWindow.document.head, customCss);
+    if (options.locationSelectionPage.includes(currentPage.name)) {
+        if (options.enableClassroomShortcut) {
+            createQuickLocationSelection(contentBody);
+        }
+        return;
+    }
+    if (options.insturctorShortcutPage.includes(currentPage.name)) {
+        if (options.enableInstructorShortcut) {
+            createInstructorShortcut(contentBody);
+        }
+        return;
+    }
     if (options.enableMaterialHeader) {
         injectHeader(contentBody);
     }
@@ -104,14 +172,19 @@ mainWindow.frameElement.onload = function () {
     }
     if (options.tableFixApplication.includes(currentPage.name)) {
         tableFix(contentBody);
+        if (options.enableClassroomAutofillOnSelect) {
+            injectTableAutoFillByClassroomType(contentBody);
+        }
+        for (var key in subjectGroups) {
+            injectTableAutofillBySubjectId(contentBody, key, subjectGroups[key]);
+        }
     }
     // Experimental features
     if (options.enableExperimental) {
         // Table image export feature; currently buggy
         let tableData = contentBody.querySelectorAll('table[id*=dgData]');
         for (let i = 0, ti = tableData.length; i < ti; i++) {
-            if (tableData[i].innerText.includes('科目'))
-                injectTableDownload(tableData[i]);
+            injectTableDownload(tableData[i]);
         }
     }
     organizeCourseList(contentBody);
@@ -393,15 +466,55 @@ function tableFix(contentBody) {
         node.style.left = null;
         node.style.right = null;
         node.style.bottom = null;
+
+function injectTableAutoFillByClassroomType(contentBody) {
+    let selectGroups = contentBody.querySelectorAll('select[id*=ddlROOM_GROUP]');
+    selectGroups.forEach(selectElement => {
+        selectElement.addEventListener('change', function () {
+            let parentRow = this.parentNode.parentNode;
+            if (!parentRow) {
+                throw "Parent row cannot be found"
+            }
+            let maxStudentInput = parentRow.querySelector('input[id*=txtSTD_MAX]');
+            if (!maxStudentInput) {
+                throw "Max student input cannot be found"
+            }
+            if (this.options[this.selectedIndex].text.includes('普通教室')) {
+                maxStudentInput.value = 49
+                maxStudentInput.style.backgroundColor = 'antiquewhite'
+            }
+            if (this.options[this.selectedIndex].text.includes('大教室') ||
+                this.options[this.selectedIndex].text.includes('視聽教室')) {
+                maxStudentInput.value = 60
+                maxStudentInput.style.backgroundColor = 'antiquewhite'
+            }
+        })
     })
-    let fixedHeader = contentBody.querySelector('div[id*=dgData_Header_Freeze]');
-    if (fixedHeader){
-        fixedHeader.remove()
+}
+
+function injectTableAutofillBySubjectId(contentBody, subjectId, studentsInSubject) {
+    let ownerDocument = contentBody.ownerDocument;
+    let results = ownerDocument.evaluate(`//span[contains(.,"${subjectId}")]`, ownerDocument);
+    const nodes = [];
+    let node = results.iterateNext();
+    while (node) {
+        nodes.push(node);
+        node = results.iterateNext();
     }
-    let fixedContent = contentBody.querySelector('div[id*=dgData_Content_Freeze]');
-    if(fixedContent){
-        fixedContent.remove()
-    }
+    nodes.forEach(n => {
+        let parentRow = n.parentNode.parentNode;
+        if (!parentRow) {
+            log("Parent row not found")
+            return;
+        }
+        let maxStudentInput = parentRow.querySelector('input[id*=txtSTD_MAX]');
+        if (!maxStudentInput) {
+            log("Max student input cannot be found")
+            return;
+        }
+        maxStudentInput.value = studentsInSubject
+        maxStudentInput.style.backgroundColor = 'green'
+    });
 }
 
 // Add export options for spreadsheet printing
@@ -560,6 +673,83 @@ function setupClipboard(contentBody) {
             GM_notification(this.innerText, "已複製至剪貼簿中！");
         });
     });
+}
+function createInstructorShortcut(contentBody) {
+    let firstTable = contentBody.querySelector('table');
+    if (!firstTable) {
+        throw "Table element does not exist; failed to inject instructor shortcuts."
+    }
+    let selectionContainer = make({
+        el: 'div',
+        class: 'quick-selection container',
+        attr: {
+            'style': 'display: grid; grid: auto-flow dense/repeat(3, auto);'
+        }
+    });
+    for (var key in instructorShortcuts) {
+        let button = createShortcutButton(key);
+        button.key = key;
+        button.keyValue = instructorShortcuts[key];
+        button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
+        button.addEventListener('click', function (event) {
+            let ddlEmployeeSelection = contentBody.querySelector('select[id*=ddlEMP_ID]');
+            if (!ddlEmployeeSelection) {
+                throw "Failed to the obtain employee selection dropdown menu."
+            }
+            log(`${event.currentTarget.key}: ${event.currentTarget.keyValue}`);
+            ddlEmployeeSelection.value = event.currentTarget.keyValue;
+            if (event.currentTarget.shouldAutoSubmit) {
+                let submitButton = contentBody.querySelector('input[id*=ibtSave]');
+                submitButton.click();
+            }
+        });
+        selectionContainer.appendChild(button);
+    }
+    firstTable.appendChild(selectionContainer);
+}
+function createQuickLocationSelection(contentBody) {
+    let firstTable = contentBody.querySelector('table');
+    if (!firstTable) {
+        throw "Table element does not exist; failed to inject location shortcuts."
+    }
+    let selectionContainer = make({
+        el: 'div',
+        class: 'quick-selection container',
+        attr: {
+            'style': 'display: grid; grid: auto-flow dense/repeat(3, auto);'
+        }
+    });
+    for (var key in locationShortcuts) {
+        let button = createShortcutButton(key);
+        button.key = key;
+        button.keyValue = locationShortcuts[key];
+        button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
+        button.addEventListener('click', function (event) {
+            let ddlRoomSelection = contentBody.querySelector('select[id*=ddlROOM_ID]');
+            if (!ddlRoomSelection) {
+                throw "Failed to the obtain room selection dropdown menu."
+            }
+            log(`${event.currentTarget.key}: ${event.currentTarget.keyValue}`);
+            ddlRoomSelection.value = event.currentTarget.keyValue;
+            if (event.currentTarget.shouldAutoSubmit) {
+                let submitButton = contentBody.querySelector('input[id*=ibtSave]');
+                submitButton.click();
+            }
+        });
+        selectionContainer.appendChild(button);
+    }
+    firstTable.appendChild(selectionContainer);
+}
+function createShortcutButton(text) {
+    let button = make({
+        el: 'div',
+        class: 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+        attr: {
+            'style': 'margin: .5em'
+        }
+    });
+    button.innerText = text;
+    return button;
 }
 
 /* Helper Method */
