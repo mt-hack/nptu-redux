@@ -488,7 +488,15 @@ function tableFix(contentBody) {
         log('Valid table not found, skipping...');
         return;
     }
-    dataHeader.childNodes.forEach(node=>{
+    let dataFixedGrid = dataHeader.querySelector('table[id*=dgData_Header_Fixed_Grid]');
+    let dataFixedContent = dataContent.querySelector('table[class=DgTable]');
+    dataFixedContent.insertAdjacentHTML('afterbegin', dataFixedGrid.innerHTML);
+    dataHeader.remove();
+    let fixedContent = dataContent.querySelector('div[id*=dgData_Content_Freeze]');
+    if (fixedContent) {
+        fixedContent.remove()
+    }
+    dataContent.childNodes.forEach(node => {
         node.style.overflow = null;
         node.style.width = null;
         node.style.height = null;
@@ -498,15 +506,26 @@ function tableFix(contentBody) {
         node.style.right = null;
         node.style.bottom = null;
     })
-    dataContent.childNodes.forEach(node =>{
-        node.style.overflow = null;
-        node.style.width = null;
-        node.style.height = null;
-        node.style.position = null;
-        node.style.top = null;
-        node.style.left = null;
-        node.style.right = null;
-        node.style.bottom = null;
+    let subjectColumns = dataContent.querySelectorAll('td:nth-child(6)');
+    subjectColumns.forEach(x => {
+        x.style.position = 'sticky';
+        x.style.left = 0;
+        x.style.background = 'rgba(100,200,100,0.9)';
+    })
+    let tableRows = dataContent.querySelectorAll('tr');
+    if (tableRows) {
+        tableRows.forEach(x => {
+            x.removeAttribute('onclick');
+            x.addEventListener('click', function () {
+                if (this.style.backgroundColor === 'rgb(221, 238, 242)') {
+                    this.style.backgroundColor = '#fff'
+                } else {
+                    this.style.backgroundColor = "rgb(221, 238, 242)"
+                }
+            });
+        });
+    }
+}
 
 function injectTableAutoFillByClassroomType(contentBody) {
     let selectGroups = contentBody.querySelectorAll('select[id*=ddlROOM_GROUP]');
