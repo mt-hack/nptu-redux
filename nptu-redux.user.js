@@ -113,6 +113,47 @@ images.forEach(img => {
     })
 })
 
+/*
+====================
+Homepage Injection
+====================
+*/
+
+if (window.location.href.match(/Web\/Secure\//g)) {
+    let mainTable = document.querySelector('table[id=TableMain]')
+    if (mainTable) {
+        mainTable.querySelectorAll('table[id*=TableMain]').forEach(t => {
+            t.style.border = '2px solid #1ba7e5'
+            t.style.padding = '0.5em';
+            t.style.margin = '0.5em 0';
+            t.style.borderRadius = '6px'
+        });
+        let logo = document.querySelector('#LoginDefault_imgUse_TP');
+        if (logo) {
+            removeEmptyElement(logo);
+        }
+        document.querySelectorAll('td, img').forEach(x => {
+            var regexString = /C\d(Back)?\.gif/g;
+            if (typeof x.src !== 'undefined') {
+                if (x.src.match(regexString)) {
+                    removeEmptyElement(x);
+                }
+            }
+            if (x.style.backgroundImage.match(regexString)) {
+                removeEmptyElement(x);
+            }
+        });
+        function removeEmptyElement(element) {
+            let outerNode = element.parentNode;
+            while (outerNode && outerNode.innerText.trim().length === 0) {
+                outerNode.remove()
+                outerNode = outerNode.parentNode;
+            }
+            element.remove();
+        }
+    }
+    return;
+}
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
 let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
