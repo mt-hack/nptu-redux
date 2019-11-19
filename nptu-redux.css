@@ -198,3 +198,7 @@ body {
 .title-with-icon.right {
     margin-right: .5em;
 }
+
+.class-option{
+    cursor: pointer
+}

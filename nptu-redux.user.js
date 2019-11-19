@@ -671,12 +671,21 @@ function organizeCourseList(contentBody) {
 
         let idListOptions = openIdList.querySelectorAll('option');
         idListOptions.forEach(option => {
+            let textElement = make({
+                el: 'a',
+                class: 'class-option'
+            });
+            textElement.innerText = option.innerText;
+            textElement.addEventListener('click', function(){
+                option.parentNode.selectedIndex = option.index;
+                option.parentNode.onchange();
+            });
             if (/\d\/\d/g.test(option.innerText)) {
-                completeText.appendChild(document.createTextNode(option.innerText));
+                completeText.appendChild(textElement);
                 completeText.appendChild(document.createElement('br'));
             } else {
                 if (!option.innerText.includes('專題') && !option.innerText.includes('檢定')) {
-                    incompleteText.appendChild(document.createTextNode(option.innerText));
+                    incompleteText.appendChild(textElement);
                     incompleteText.appendChild(document.createElement('br'));
                 }
             }
@@ -691,7 +700,6 @@ function organizeCourseList(contentBody) {
         if (completeGroup.childNodes.length > 0) {
             menuContainer.appendChild(completeGroup);
         }
-        menuContainer.style.flexWrap = 'wrap';
     }
 }
 
