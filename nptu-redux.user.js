@@ -240,8 +240,8 @@ function injectHeader(contentBody) {
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
         newHeaderHtml += `
-            <label for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
-            <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
+                <label for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
+                <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
     //  #endregion
     newHeaderHtml += `</div><div class="sub container" id="module-info">`;
@@ -249,12 +249,12 @@ function injectHeader(contentBody) {
     let moduleName = contentBody.querySelector('#CommonHeader_lblModule').innerText;
     if (moduleName) {
         newHeaderHtml += `
-            <div>
-                <i class="material-icons">dashboard</i>
-                <div class="hoverable" id="page-name">
-                    ${moduleName}
-                </div>
-            </div>`;
+                <div>
+                    <i class="material-icons">dashboard</i>
+                    <div class="hoverable" id="page-name">
+                        ${moduleName}
+                    </div>
+                </div>`;
     }
     //  #endregion
     //    #region [Display] Semester
@@ -263,11 +263,11 @@ function injectHeader(contentBody) {
     if (semesterName) {
         newHeaderHtml += `<div><i class="material-icons">event</i>`;
     }
-    if (oldSemSwitch){
+    if (oldSemSwitch) {
         newHeaderHtml += `
-            <label class="text clickable" id="semester-name" onclick='this.nextElementSibling.click();'>${semesterName}</label>
-            <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
-    }else{
+                <label class="text clickable" id="semester-name" onclick='this.nextElementSibling.click();'>${semesterName}</label>
+                <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
+    } else {
         newHeaderHtml += `<div class="hoverable" id="semester-name">${semesterName}</div>`;
     }
     newHeaderHtml += `</div>`;
@@ -277,24 +277,24 @@ function injectHeader(contentBody) {
     let loginName = contentBody.querySelector('#CommonHeader_lblName').innerText;
     if (loginName) {
         newHeaderHtml += `
-            <div>
-                <i class="material-icons">person</i>
-                <div class="hoverable" id="user-name">
-                    ${loginName}
-                </div>
-            </div>`;
+                <div>
+                    <i class="material-icons">person</i>
+                    <div class="hoverable" id="user-name">
+                        ${loginName}
+                    </div>
+                </div>`;
     }
     //  #endregion
     //    #region [Display] Online User Count
     let onlineUsers = contentBody.querySelector('.CommomHeadstyle2 font').innerText;
     if (onlineUsers) {
         newHeaderHtml += `
-            <div>
-                <i class="material-icons">people</i>
-                <div class="hoverable" id="user-count">
-                    ${onlineUsers}
-                </div>
-            </div>`;
+                <div>
+                    <i class="material-icons">people</i>
+                    <div class="hoverable" id="user-count">
+                        ${onlineUsers}
+                    </div>
+                </div>`;
     }
     //  #endregion
     newHeaderHtml += `</div><div class="alt buttons container right">`;
@@ -303,16 +303,16 @@ function injectHeader(contentBody) {
     let oldPwdBtn = contentBody.querySelector('#CommonHeader_ibtChgPwd');
     if (oldPwdBtn) {
         newHeaderHtml += `
-            <label for=${oldPwdBtn.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
-            <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldPwdBtn.name} name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
+                <label for=${oldPwdBtn.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
+                <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldPwdBtn.name} name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
     }
     //    #endregion
     //    #region [Button] Logout
     let oldLogout = contentBody.querySelector('#CommonHeader_ibtLogOut');
     if (oldLogout) {
         newHeaderHtml += `
-            <label for=${oldLogout.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
-            <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
+                <label for=${oldLogout.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
+                <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
     //  #endregion
     newHeaderHtml += `</div></div>`;
@@ -595,12 +595,12 @@ function printFix(contentBody) {
                 el: 'select',
                 class: 'export-menu',
                 html: `
-                    <option value="pdf">PDF (Adobe PDF)</option>
-                    <option value="xls">XLS (97-2003 Excel 表格)</option>
-                    <option value="ods">ODS (OpenDocument 表格)</option>
-                    <option value="rtf">RTF (富文字)</option>
-                    <option value="txt">TXT (純文字)</option>
-                `
+                        <option value="pdf">PDF (Adobe PDF)</option>
+                        <option value="xls">XLS (97-2003 Excel 表格)</option>
+                        <option value="ods">ODS (OpenDocument 表格)</option>
+                        <option value="rtf">RTF (富文字)</option>
+                        <option value="txt">TXT (純文字)</option>
+                    `
             });
 
             // change print button
