@@ -4,7 +4,7 @@
 @version        1.0.1
 @license        MIT
 @author         Still Hsu <business@stillu.cc>
-@updateURL      https://github.com/mt-hack/nptu-redux/nptu-openstudy.user.css
+@updateURL      https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-openstudy.user.css
 ==/UserStyle== */
 
 @-moz-document regexp("https://openstudy.nptu.edu.tw/(.*.php|course).*") {
