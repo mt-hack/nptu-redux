@@ -1,0 +1,448 @@
+@-moz-document regexp("https://openstudy.nptu.edu.tw/(.*.php|course).*") {
+    :root {
+        --bg-color: #171717;
+        --light-bg-color: #2c2c2c;
+        --text-color: #ccc;
+        --bright-text: #fff;
+        --red: #f85e5e;
+        --orange: rgba(243, 163, 92);
+        --yellow: rgba(247, 212, 122);
+        --green: rgba(177, 204, 159);
+        --blue: rgba(165, 218, 210);
+        --dark-blue: rgb(116, 172, 237);
+        --row-color: rgb(44, 47, 51);
+        --alt-row-color: rgb(35, 39, 42);
+        --menu-width: auto;
+        --family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        --page-width: 1296px;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    @keyframes CustomAnimation {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    body,
+    div {
+        font-family: var(--family)
+    }
+
+    table>tbody>tr>td>span {
+        font-size: 12px !important;
+    }
+
+    #sysbar>.clear {
+        display: none
+    }
+
+    .em,
+    .boxHeader,
+    .infoPath .curr,
+    #menu .selectBox .title,
+    .title,
+    .mnuTitle,
+    #currPosTitle,
+    .blockTitle,
+    .blockTitle2 {
+        color: var(--text-color) !important;
+    }
+
+    #logo {
+        background: none;
+        width: auto;
+        height: auto;
+        float: inherit;
+    }
+
+    #logo img {
+        display: none;
+    }
+
+    #logo::after {
+        font-size: 1.5em;
+        color: var(--bright-text);
+        content: '📚 屏東大學數位學習平台';
+        background: linear-gradient(300deg, var(--red), var(--orange)) 0% 0% / 200% 200%;
+        animation: 10s ease 0s infinite normal none running CustomAnimation;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding: 0.5em;
+        border-bottom: 2px solid var(--yellow);
+    }
+
+    #base div#sysbar {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--yellow);
+        align-items: center;
+        padding-top: 1em;
+    }
+
+    #menu .boxBody,
+    #menu .boxHeader,
+    #menu .boxFooter,
+    .mnu .mnuTop,
+    .mnu .mnuBody,
+    .mnu .mnuBottom,
+    .BlockItem {
+        background: var(--light-bg-color);
+    }
+
+    #menu,
+    #main {
+        width: auto;
+    }
+
+    #menu,
+    #mainbody>#left {
+        flex: 1;
+    }
+
+    #main,
+    #mainbody>#right {
+        flex: 4;
+        padding-left: 3em;
+    }
+
+    #menu .box,
+    .mnu {
+        border-radius: 5px;
+        border: 2px solid var(--orange);
+        margin: 4pt 0;
+        white-space: normal;
+        width: var(--menu-width);
+        padding: 0;
+    }
+
+    #left,
+    #right {
+        width: var(--menu-width);
+    }
+
+    #menu>.selectBox {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 5px;
+        border: 2px solid var(--green);
+        background: var(--light-bg-color);
+        width: var(--menu-width);
+        margin: 4pt 0;
+        padding: 1em 0;
+    }
+
+    #menu>.selectBox>.select {
+        width: 80%;
+        color: var(--bg-color);
+    }
+
+    #menu>.selectBox>.title {
+        padding-bottom: 4pt;
+        font-size: 12pt;
+    }
+
+    #menu>.selectBox>.title:before {
+        content: '🏫 ';
+    }
+
+    #copyright {
+        border-top: 3px solid var(--yellow);
+        padding-top: 1em;
+    }
+
+    #main,
+    #menu,
+    .mnu,
+    #currPos~div,
+    #profile {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #content,
+    #mainbody {
+        display: flex;
+    }
+
+    .BlockItem {
+        height: auto;
+        display: flex;
+        padding: .5em 0;
+        width: auto !important;
+    }
+
+    .BlockItem>div:nth-child(1) {
+        padding: 0 .5em;
+    }
+
+    .BlockL>div:nth-child(1),
+    .BlockR>div:nth-child(1),
+    #mainbody {
+        border-bottom: 0px;
+    }
+
+    .BlockItem,
+    .BlockHeader {
+        border-bottom: 2px solid var(--blue) !important;
+    }
+
+    .BlockL>div:nth-child(1),
+    .BlockR>div:nth-child(1) {
+        border-bottom: 2px solid var(--orange) !important;
+    }
+
+    .thread {
+        border: 2px solid var(--orange);
+        margin: 1em;
+        padding: 1em;
+    }
+
+    .BlockHeader,
+    .BlockL>div:nth-child(1),
+    .BlockR>div:nth-child(1) {
+        padding: 0 0 2em 0;
+    }
+
+    .BlockItem {
+        border-left: 2px solid var(--blue);
+        border-right: 2px solid var(--blue);
+    }
+
+    .postNote span,
+    .thread span:not(.btn):not(.btnOver),
+    .thread p,
+    .thread div {
+        font-family: var(--family);
+        background-color: var(--bg-color) !important;
+        color: var(--text-color) !important;
+        font-size: 12px !important;
+    }
+
+    a:link,
+    a:visited {
+        color: var(--dark-blue);
+    }
+
+    .vmiddle {
+        display: none;
+    }
+
+    #main>.infoPath,
+    #main>.toolWrapper {
+        display: block !important;
+    }
+
+    tr.listRowOver {
+        filter: invert(1) grayscale(1);
+    }
+
+    #main .infoTable>table>tbody>tr:nth-child(1n)>.col1,
+    #main .infoTable>table>tbody>tr:nth-child(1n)>.col2,
+    .tableBox>table>tbody>tr:nth-child(1n),
+    #recent>table>tbody>tr.listRow,
+    .Form>tbody>tr>TD.FormLeft {
+        background: var(--row-alt-color);
+        color: var(--text-color)
+    }
+
+    #main .infoTable>table>tbody>tr:nth-child(1n)>.header1,
+    #main .infoTable>table>tbody>tr:nth-child(1n)>.header2,
+    #main .infoTable>table>tbody>tr:nth-child(2n)>.col1,
+    #main .infoTable>table>tbody>tr:nth-child(2n)>.col2,
+    #recent>table>tbody>tr.listHeader,
+    #recent>table>tbody>tr.listRow2,
+    .tableBox>table>tbody>tr.header,
+    .tableBox>table>tbody>tr:nth-child(2n),
+    .Form>tbody>tr>TD.FormRight {
+        background: var(--row-color);
+        color: var(--text-color);
+    }
+
+    .table>tbody>tr.header>.td,
+    table>tbody>tr.listHeader>td {
+        padding: 1em;
+    }
+
+    .table>tbody>tr.header>.td,
+    table>tbody>tr.listHeader>td,
+    #recent>table>tbody>tr>td.listFirstTD,
+    .table .td {
+        border-left: 1px solid var(--text-color);
+        border-bottom: 1px solid var(--text-color);
+    }
+
+    #recent>table>tbody>tr>td.listFirstTD,
+    .table .td {
+        padding: 0.5em;
+    }
+
+    #recent>table>tbody>tr>td.listFirstTD {
+        text-align: center;
+    }
+
+    .tableBox>table>tbody>tr.header>td>a,
+    #recent>table>tbody>tr.listHeader {
+        color: var(--bright-text);
+        font-weight: 600;
+        font-size: 1.25em;
+    }
+
+    .table,
+    .postBox,
+    #recent>table {
+        table-layout: auto;
+        border: 2px solid var(--orange);
+        border-radius: 10px;
+    }
+
+    .tableBox {
+        border: 0;
+    }
+
+    #wrapper {
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: .4rem;
+        padding-right: .4rem;
+        width: auto;
+    }
+
+    #wrapper>#base,
+    body>#base {
+        max-width: var(--page-width);
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .popup {
+        background: var(--yellow)
+    }
+
+    .Eannounce,
+    .Econtent,
+    .Ehomework {
+        padding-left: 0;
+        background: none;
+    }
+
+    .Eannounce:before {
+        content: '📢 ';
+    }
+
+    .Econtent:before {
+        content: '📔 ';
+    }
+
+    .Ehomework:before {
+        content: '📄 ';
+    }
+
+    #profile>div:nth-child(1) {
+        border: 0 !important;
+    }
+
+    .redfont,
+    .toolWrapper>span:nth-child(1) {
+        color: var(--red) !important;
+    }
+
+    .toolWrapper {
+        font-weight: 600;
+        font-size: 1.25em;
+    }
+
+    .hidden>span.hint:before {
+        content: '  ';
+    }
+
+    .btn[disabled],
+    .btn:disabled,
+    .btn.disabled,
+    .page>.curr {
+        cursor: default;
+        opacity: .5;
+        pointer-events: none;
+    }
+
+
+    .page>.item>a,
+    .page>.item>a:hover,
+    .page>.item,
+    .page>.curr {
+        color: inherit;
+        border: none;
+        padding: 0;
+        line-height: 0;
+        font-size: 12px;
+        text-decoration: none;
+        background: inherit;
+        margin-top: 0.5em;
+    }
+
+    .btn,
+    .btnOver,
+    .thread .btn,
+    .page>.item,
+    .page>.curr {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: var(--red);
+        border: .05rem solid var(--red);
+        border-radius: .1rem;
+        color: #fff;
+        cursor: pointer;
+        display: inline-block;
+        font-size: .8rem;
+        height: 1.8rem;
+        line-height: 1.2rem;
+        outline: none;
+        padding: .25rem .4rem;
+        text-align: center;
+        text-decoration: none;
+        transition: background .2s, border .2s, box-shadow .2s, color .2s;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .btn.btn-primary,
+    .page>.item,
+    .page>.curr {
+        background: var(--red);
+        border-color: var(--red);
+        color: var(--bg-color);
+    }
+
+    .btnOver,
+    .btn.btn-primary:focus,
+    .btn.btn-primary:hover,
+    .page>.item:focus,
+    .page>.item:hover,
+    .btn.btn-primary:active,
+    .btn.btn-primary.active,
+    .page>.item:active {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: var(--bg-color);
+    }
+}
