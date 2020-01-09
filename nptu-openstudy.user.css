@@ -1,3 +1,12 @@
+/* ==UserStyle==
+@name           NPTU OpenStudy LMS Dark UserStyle
+@namespace      github.com/mt-hack/nptu-redux
+@version        1.0.0
+@license        MIT
+@author         Still Hsu <business@stillu.cc>
+@updateURL      https://github.com/mt-hack/nptu-redux/nptu-openstudy.user.css
+==/UserStyle== */
+
 @-moz-document regexp("https://openstudy.nptu.edu.tw/(.*.php|course).*") {
     :root {
         --bg-color: #171717;
