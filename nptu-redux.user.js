@@ -608,9 +608,24 @@ function printFix(contentBody) {
             });
 
             // change print button
-            let exportLinkText = document.createElement('i');
-            exportLinkText.className = 'material-icons';
-            exportLinkText.appendChild(document.createTextNode('print 點此下載報表'));
+            let exportLinkTextContainer = make({
+                el: 'div',
+            });
+            let exportLinkIcon = make({
+                el: 'i',
+                class: 'material-icons'
+            })
+            exportLinkIcon.appendChild(document.createTextNode('print'));
+            let exportLinkText = make({
+                el: 'span',
+                class: 'print-text',
+                attr:{
+                    style: 'font-family: var(--msft-fonts);'
+                }
+            })
+            exportLinkText.appendChild(document.createTextNode('點此下載報表'));
+            exportLinkTextContainer.appendChild(exportLinkIcon);
+            exportLinkTextContainer.appendChild(exportLinkText);
             let exportLink = make({
                 el: 'a',
                 class: raisedButtonClassnames,
@@ -621,7 +636,7 @@ function printFix(contentBody) {
                     style: 'display: flex; align-items: center; text-decoration: none;'
                 }
             });
-            exportLink.appendChild(exportLinkText);
+            exportLink.appendChild(exportLinkTextContainer);
             componentHandler.upgradeElement(exportLink);
 
             // hook printing button update
