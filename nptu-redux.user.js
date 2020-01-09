@@ -6,6 +6,7 @@
 // @grant GM_setClipboard
 // @grant GM_download
 // @grant GM_notification
+// @inject-into auto
 // @require https://cdnjs.cloudflare.com/ajax/libs/clipboard-polyfill/2.8.0/clipboard-polyfill.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js
 // @require https://code.getmdl.io/1.3.0/material.min.js
@@ -582,6 +583,9 @@ function printFix(contentBody) {
     let printButtons = contentBody.querySelectorAll("a[id*=hylPrint]");
     if (printButtons.length > 0) {
         printButtons.forEach(printButton => {
+            if(!(/crystal[\d]\/.*\.rpt/gi.test(printButton.href))){
+                return;
+            }
             // create outer div for export options
             let exportMenuDiv = document.createElement("div");
             exportMenuDiv.className = "export-section";
