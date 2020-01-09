@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           NPTU OpenStudy LMS Dark UserStyle
 @namespace      github.com/mt-hack/nptu-redux
-@version        1.0.0
+@version        1.0.1
 @license        MIT
 @author         Still Hsu <business@stillu.cc>
 @updateURL      https://github.com/mt-hack/nptu-redux/nptu-openstudy.user.css
@@ -221,9 +221,7 @@
         padding: 1em;
     }
 
-    .BlockHeader,
-    .BlockL>div:nth-child(1),
-    .BlockR>div:nth-child(1) {
+    .BlockHeader {
         padding: 0 0 2em 0;
     }
 
@@ -235,11 +233,20 @@
     .postNote span,
     .thread span:not(.btn):not(.btnOver),
     .thread p,
-    .thread div {
+    .thread div,
+    .BlockL>div[id*=n1] div,
+    .BlockL>div[id*=n1] p,
+    .BlockL>div[id*=n1] span,
+    .BlockL>div[id*=n1],
+    .BlockR>div[id*=n1] div,
+    .BlockR>div[id*=n1] p,
+    .BlockR>div[id*=n1] span,
+    .BlockR>div[id*=n1] {
         font-family: var(--family);
         background-color: var(--bg-color) !important;
         color: var(--text-color) !important;
         font-size: 12px !important;
+        text-indent: 0 !important;
     }
 
     a:link,
@@ -256,33 +263,36 @@
         display: block !important;
     }
 
-    tr.listRowOver {
+    tr.listRowOver,
+    tr.postRowOver {
         filter: invert(1) grayscale(1);
     }
 
-    #main .infoTable>table>tbody>tr:nth-child(1n)>.col1,
-    #main .infoTable>table>tbody>tr:nth-child(1n)>.col2,
-    .tableBox>table>tbody>tr:nth-child(1n),
-    #recent>table>tbody>tr.listRow,
-    .Form>tbody>tr>TD.FormLeft {
+    table>tbody>tr:nth-child(1n)>.col1,
+    table>tbody>tr:nth-child(1n)>.col2,
+    table>tbody>tr.listRow,
+    table>tbody>tr>TD.FormLeft {
         background: var(--row-alt-color);
         color: var(--text-color)
     }
 
-    #main .infoTable>table>tbody>tr:nth-child(1n)>.header1,
-    #main .infoTable>table>tbody>tr:nth-child(1n)>.header2,
-    #main .infoTable>table>tbody>tr:nth-child(2n)>.col1,
-    #main .infoTable>table>tbody>tr:nth-child(2n)>.col2,
-    #recent>table>tbody>tr.listHeader,
-    #recent>table>tbody>tr.listRow2,
-    .tableBox>table>tbody>tr.header,
-    .tableBox>table>tbody>tr:nth-child(2n),
-    .Form>tbody>tr>TD.FormRight {
+    tr.listRowOver,
+    tr.postRowOver,
+    table>tbody>tr:nth-child(1n)>.header1,
+    table>tbody>tr:nth-child(1n)>.header2,
+    table>tbody>tr:nth-child(2n)>.col1,
+    table>tbody>tr:nth-child(2n)>.col2,
+    table>tbody>tr.listHeader,
+    table>tbody>tr.postRow2:nth-child(2),
+    table>tbody>tr.listRow2,
+    table>tbody>tr.header,
+    table>tbody>tr:nth-child(2n),
+    tbody>tr>TD.FormRight {
         background: var(--row-color);
         color: var(--text-color);
     }
 
-    .table>tbody>tr.header>.td,
+    table>tbody>tr.header>.td,
     table>tbody>tr.listHeader>td {
         padding: 1em;
     }
@@ -304,8 +314,8 @@
         text-align: center;
     }
 
-    .tableBox>table>tbody>tr.header>td>a,
-    #recent>table>tbody>tr.listHeader {
+    table>tbody>tr.header>td>a,
+    table>tbody>tr.listHeader {
         color: var(--bright-text);
         font-weight: 600;
         font-size: 1.25em;
