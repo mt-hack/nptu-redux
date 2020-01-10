@@ -14,10 +14,12 @@
         --bright-text: #fff;
         --red: #f85e5e;
         --orange: rgba(243, 163, 92);
+        --dark-orange: #dd4814;
         --yellow: rgba(247, 212, 122);
         --green: rgba(177, 204, 159);
         --blue: rgba(165, 218, 210);
         --dark-blue: rgb(116, 172, 237);
+        --dark-alt-blue: rgb(31, 74, 125);
         --row-color: rgb(44, 47, 51);
         --alt-row-color: rgb(35, 39, 42);
         --menu-width: auto;
@@ -56,7 +58,7 @@
     .btn[disabled],
     .btn:disabled,
     .btn.disabled,
-    .page>.curr {
+    .page > .curr {
         cursor: default;
         opacity: .5;
         pointer-events: none;
@@ -68,10 +70,10 @@
         color: var(--dark-blue);
     }
 
-    .page>.item>a,
-    .page>.item>a:hover,
-    .page>.item,
-    .page>.curr {
+    .page > .item > a,
+    .page > .item > a:hover,
+    .page > .item,
+    .page > .curr {
         color: inherit;
         border: none;
         padding: 0;
@@ -83,11 +85,12 @@
     }
 
     input[type=button],
+    input[type=submit],
     .btn,
     .btnOver,
     .thread .btn,
-    .page>.item,
-    .page>.curr {
+    .page > .item,
+    .page > .curr {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
@@ -114,9 +117,10 @@
     }
 
     input[type=button],
+    input[type=submit],
     .btn.btn-primary,
-    .page>.item,
-    .page>.curr {
+    .page > .item,
+    .page > .curr {
         background: var(--bright-text);
         border-color: var(--bright-text);
         color: var(--bg-color);
@@ -124,14 +128,16 @@
 
     input[type=button]:focus,
     input[type=button]:hover,
+    input[type=submit]:focus,
+    input[type=submit]:hover,
     .btnOver,
     .btn.btn-primary:focus,
     .btn.btn-primary:hover,
-    .page>.item:focus,
-    .page>.item:hover,
+    .page > .item:focus,
+    .page > .item:hover,
     .btn.btn-primary:active,
     .btn.btn-primary.active,
-    .page>.item:active {
+    .page > .item:active {
         background: var(--blue);
         border-color: var(--blue);
         color: var(--bg-color);
@@ -156,17 +162,17 @@
         align-items: center;
     }
 
-    body>div#base>div>img {
+    body > div#base > div > img {
         display: none;
     }
 
-    body>div#base>div:nth-child(2) {
+    body > div#base > div:nth-child(2) {
         margin-top: 5em !important;
         text-align: unset !important;
         padding-bottom: 3em;
     }
 
-    body>div#base>div:nth-child(2):after {
+    body > div#base > div:nth-child(2):after {
         font-size: 2em;
         color: var(--bright-text);
         content: '📚 屏東大學數位學習平台';
@@ -176,7 +182,7 @@
         padding: 1em;
     }
 
-    body>div#base>div:nth-child(3) {
+    body > div#base > div:nth-child(3) {
         width: unset !important;
         height: unset !important;
         margin: unset !important;
@@ -191,12 +197,12 @@
         animation: shadow-drop-2-br 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
     }
 
-    .loginWrapper>div {
+    .loginWrapper > div {
         display: flex;
         flex-direction: column;
     }
 
-    #base>div:nth-child(3)>div>div>div:nth-child(5) {
+    #base > div:nth-child(3) > div > div > div:nth-child(5) {
         display: flex;
         justify-content: space-evenly;
         padding-top: 1em !important;
@@ -224,11 +230,12 @@
         font-family: var(--family)
     }
 
-    table>tbody>tr>td>span {
+    table > tbody > tr > td > span {
         font-size: 12px !important;
     }
 
-    #sysbar>.clear {
+    #sysbar > .clear,
+    #sign > .clear {
         display: none
     }
 
@@ -258,21 +265,54 @@
     #logo::after {
         font-size: 1.5em;
         color: var(--bright-text);
-        content: '📚 屏東大學數位學習平台';
-        background: linear-gradient(300deg, var(--red), var(--orange)) 0% 0% / 200% 200%;
-        animation: 10s ease 0s infinite normal none running background-scroll;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+        content: '屏東大學數位學習平台';
+        border-radius: var(--border-radius);
         padding: 0.5em;
-        border-bottom: 2px solid var(--yellow);
     }
 
     #base div#sysbar {
         display: flex;
         justify-content: space-between;
-        border-bottom: 2px solid var(--yellow);
+        border-bottom: 1px solid var(--yellow);
         align-items: center;
-        padding-top: 1em;
+        background: linear-gradient(300deg, var(--red), var(--dark-orange)) 0% 0% / 200% 200%;
+        animation: 10s ease 0s infinite normal none running background-scroll;
+        color: var(--bg-color);
+        padding: 0 1em;
+    }
+    #sysbar > #sign > div a {
+        padding: 0 0.5em;
+    }
+    #sysbar > #sign {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    #sign > div {
+        display: flex;
+        padding: 0.5em 0;
+    }
+    #sign img,
+    #sign span > img {
+        display: none;
+    }
+    #sign > div a,
+    #sign > div a:visited,
+    #sign > div a:link {
+        color: white;
+    }
+    #login a[href*='home.php']:before {
+        content: '🏠';
+    }
+    #login a[href*='logout']:before {
+        content: '🚪';
+    }
+    #sysbar a[href*='changeLang']:before {
+        content: '🌎';
+    }
+    #sign a:after {
+        content: ' |';
+        color: black;
     }
 
     #menu .boxBody,
@@ -291,12 +331,12 @@
     }
 
     #menu,
-    #mainbody>#left {
+    #mainbody > #left {
         flex: 1;
     }
 
     #main,
-    #mainbody>#right {
+    #mainbody > #right {
         flex: 4;
         padding-left: 3em;
     }
@@ -316,7 +356,7 @@
         width: var(--menu-width);
     }
 
-    #menu>.selectBox {
+    #menu > .selectBox {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -328,29 +368,29 @@
         padding: 1em 0;
     }
 
-    #menu>.selectBox>.select {
+    #menu > .selectBox > .select {
         width: 80%;
         color: var(--bg-color);
     }
 
-    #menu>.selectBox>.title {
+    #menu > .selectBox > .title {
         padding-bottom: 4pt;
         font-size: 12pt;
     }
 
-    #menu>.selectBox>.title:before {
+    #menu > .selectBox > .title:before {
         content: '🏫 ';
     }
 
     #copyright {
-        border-top: 3px solid var(--yellow);
+        border: 0;
         padding-top: 1em;
     }
 
     #main,
     #menu,
     .mnu,
-    #currPos~div,
+    #currPos ~ div,
     #profile {
         display: flex;
         flex-direction: column;
@@ -361,6 +401,21 @@
         display: flex;
     }
 
+    #wrapper > #base,
+    body > #base {
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    #mainbody,
+    #mainBody {
+        min-width: calc(var(--page-width) /1.5);
+        max-width: var(--page-width);
+        align-self: center;
+    }
+
     .BlockItem {
         height: auto;
         display: flex;
@@ -368,12 +423,12 @@
         width: auto !important;
     }
 
-    .BlockItem>div:nth-child(1) {
+    .BlockItem > div:nth-child(1) {
         padding: 0 .5em;
     }
 
-    .BlockL>div:nth-child(1),
-    .BlockR>div:nth-child(1),
+    .BlockL > div:nth-child(1),
+    .BlockR > div:nth-child(1),
     #mainbody {
         border-bottom: 0px;
     }
@@ -383,8 +438,8 @@
         border-bottom: 2px solid var(--blue) !important;
     }
 
-    .BlockL>div:nth-child(1),
-    .BlockR>div:nth-child(1) {
+    .BlockL > div:nth-child(1),
+    .BlockR > div:nth-child(1) {
         border-bottom: 2px solid var(--orange) !important;
     }
 
@@ -407,14 +462,14 @@
     .thread span:not(.btn):not(.btnOver),
     .thread p,
     .thread div,
-    .BlockL>div[id*=n1] div,
-    .BlockL>div[id*=n1] p,
-    .BlockL>div[id*=n1] span,
-    .BlockL>div[id*=n1],
-    .BlockR>div[id*=n1] div,
-    .BlockR>div[id*=n1] p,
-    .BlockR>div[id*=n1] span,
-    .BlockR>div[id*=n1] {
+    .BlockL > div[id*=n1] div,
+    .BlockL > div[id*=n1] p,
+    .BlockL > div[id*=n1] span,
+    .BlockL > div[id*=n1],
+    .BlockR > div[id*=n1] div,
+    .BlockR > div[id*=n1] p,
+    .BlockR > div[id*=n1] span,
+    .BlockR > div[id*=n1] {
         font-family: var(--family);
         background-color: var(--bg-color) !important;
         color: var(--text-color) !important;
@@ -426,8 +481,8 @@
         display: none;
     }
 
-    #main>.infoPath,
-    #main>.toolWrapper {
+    #main > .infoPath,
+    #main > .toolWrapper {
         display: block !important;
     }
 
@@ -436,54 +491,54 @@
         filter: invert(1) grayscale(1);
     }
 
-    table>tbody>tr:nth-child(1n)>.col1,
-    table>tbody>tr:nth-child(1n)>.col2,
-    table>tbody>tr.listRow,
-    table>tbody>tr>TD.FormLeft {
+    table > tbody > tr:nth-child(1n) > .col1,
+    table > tbody > tr:nth-child(1n) > .col2,
+    table > tbody > tr.listRow,
+    table > tbody > tr > TD.FormLeft {
         background: var(--row-alt-color);
         color: var(--text-color)
     }
 
     tr.listRowOver,
     tr.postRowOver,
-    table>tbody>tr:nth-child(1n)>.header1,
-    table>tbody>tr:nth-child(1n)>.header2,
-    table>tbody>tr:nth-child(2n)>.col1,
-    table>tbody>tr:nth-child(2n)>.col2,
-    table>tbody>tr.listHeader,
-    table>tbody>tr.postRow2:nth-child(2),
-    table>tbody>tr.listRow2,
-    table>tbody>tr.header,
-    table>tbody>tr:nth-child(2n),
-    tbody>tr>TD.FormRight {
+    table > tbody > tr:nth-child(1n) > .header1,
+    table > tbody > tr:nth-child(1n) > .header2,
+    table > tbody > tr:nth-child(2n) > .col1,
+    table > tbody > tr:nth-child(2n) > .col2,
+    table > tbody > tr.listHeader,
+    table > tbody > tr.postRow2:nth-child(2),
+    table > tbody > tr.listRow2,
+    table > tbody > tr.header,
+    table > tbody > tr:nth-child(2n),
+    tbody > tr > TD.FormRight {
         background: var(--row-color);
         color: var(--text-color);
     }
 
-    table>tbody>tr.header>.td,
-    table>tbody>tr.listHeader>td {
+    table > tbody > tr.header > .td,
+    table > tbody > tr.listHeader > td {
         padding: 1em;
     }
 
-    .table>tbody>tr.header>.td,
-    table>tbody>tr.listHeader>td,
-    #recent>table>tbody>tr>td.listFirstTD,
+    .table > tbody > tr.header > .td,
+    table > tbody > tr.listHeader > td,
+    #recent > table > tbody > tr > td.listFirstTD,
     .table .td {
         border-left: 1px solid var(--text-color);
         border-bottom: 1px solid var(--text-color);
     }
 
-    #recent>table>tbody>tr>td.listFirstTD,
+    #recent > table > tbody > tr > td.listFirstTD,
     .table .td {
         padding: 0.5em;
     }
 
-    #recent>table>tbody>tr>td.listFirstTD {
+    #recent > table > tbody > tr > td.listFirstTD {
         text-align: center;
     }
 
-    table>tbody>tr.header>td>a,
-    table>tbody>tr.listHeader {
+    table > tbody > tr.header > td > a,
+    table > tbody > tr.listHeader {
         color: var(--bright-text);
         font-weight: 600;
         font-size: 1.25em;
@@ -491,7 +546,7 @@
 
     .table,
     .postBox,
-    #recent>table {
+    #recent > table {
         table-layout: auto;
         border: 2px solid var(--orange);
         border-radius: 10px;
@@ -504,23 +559,41 @@
     #wrapper {
         margin-left: auto;
         margin-right: auto;
-        padding-left: .4rem;
-        padding-right: .4rem;
         width: auto;
-    }
-
-    #wrapper>#base,
-    body>#base {
-        max-width: var(--page-width);
-        width: auto;
-        margin-left: auto;
-        margin-right: auto;
     }
 
     .popup {
         background: var(--yellow)
     }
 
+    .doc {
+        background: none;
+    }
+    .doc .title:before {
+        content: '📚';
+        font-size: 2em;
+        margin-right: 0.25em;
+    }
+    .doc .title,
+    .doc .toolarea {
+        margin-left: 0;
+        padding: 0;
+    }
+    .doc .title {
+        display: flex;
+        align-items: center;
+    }
+
+    .doc .toolarea {
+        margin-top: 0.5em;
+    }
+
+    .attach .blockTitle2 img {
+        display: none;
+    }
+    .attach .blockTitle2:before {
+        content: '📎';
+    }
     .Eannounce,
     .Econtent,
     .Ehomework {
@@ -540,12 +613,12 @@
         content: '📄 ';
     }
 
-    #profile>div:nth-child(1) {
+    #profile > div:nth-child(1) {
         border: 0 !important;
     }
 
     .redfont,
-    .toolWrapper>span:nth-child(1) {
+    .toolWrapper > span:nth-child(1) {
         color: var(--red) !important;
     }
 
@@ -554,7 +627,7 @@
         font-size: 1.25em;
     }
 
-    .hidden>span.hint:before {
+    .hidden > span.hint:before {
         content: '  ';
     }
 }
