@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           NPTU OpenStudy LMS Dark UserStyle
 @namespace      github.com/mt-hack/nptu-redux
-@version        1.0.4
+@version        1.0.5
 @license        MIT
 @author         Still Hsu <business@stillu.cc>
 @updateURL      https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-openstudy.user.css
@@ -23,8 +23,8 @@
         --row-color: rgb(44, 47, 51);
         --alt-row-color: rgb(35, 39, 42);
         --menu-width: auto;
-        --family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        --page-width: 1296px;
+        --family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei';
+        --page-width: 1400px;
         --border-radius: 10px;
     }
 
@@ -42,6 +42,24 @@
         }
     }
 
+    @keyframes color-change-4x {
+        0% {
+            background: #5ba4f9;
+        }
+
+        33.3333% {
+            background: #e2603b;
+        }
+
+        66.666% {
+            background: #c62859;
+        }
+
+        100% {
+            background: #342b7f;
+        }
+    }
+
     @keyframes shadow-drop-2-br {
         0% {
             -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
@@ -54,11 +72,26 @@
         }
     }
 
+    @keyframes tracking-in-expand {
+        0% {
+            letter-spacing: -1em;
+            opacity: 0;
+        }
+
+        40% {
+            opacity: 0.6;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
 
     .btn[disabled],
     .btn:disabled,
     .btn.disabled,
-    .page > .curr {
+    .page>.curr {
         cursor: default;
         opacity: .5;
         pointer-events: none;
@@ -70,10 +103,10 @@
         color: var(--dark-blue);
     }
 
-    .page > .item > a,
-    .page > .item > a:hover,
-    .page > .item,
-    .page > .curr {
+    .page>.item>a,
+    .page>.item>a:hover,
+    .page>.item,
+    .page>.curr {
         color: inherit;
         border: none;
         padding: 0;
@@ -89,8 +122,8 @@
     .btn,
     .btnOver,
     .thread .btn,
-    .page > .item,
-    .page > .curr {
+    .page>.item,
+    .page>.curr {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
@@ -119,8 +152,8 @@
     input[type=button],
     input[type=submit],
     .btn.btn-primary,
-    .page > .item,
-    .page > .curr {
+    .page>.item,
+    .page>.curr {
         background: var(--bright-text);
         border-color: var(--bright-text);
         color: var(--bg-color);
@@ -133,11 +166,11 @@
     .btnOver,
     .btn.btn-primary:focus,
     .btn.btn-primary:hover,
-    .page > .item:focus,
-    .page > .item:hover,
+    .page>.item:focus,
+    .page>.item:hover,
     .btn.btn-primary:active,
     .btn.btn-primary.active,
-    .page > .item:active {
+    .page>.item:active {
         background: var(--blue);
         border-color: var(--blue);
         color: var(--bg-color);
@@ -162,17 +195,17 @@
         align-items: center;
     }
 
-    body > div#base > div > img {
+    body>div#base>div>img {
         display: none;
     }
 
-    body > div#base > div:nth-child(2) {
+    body>div#base>div:nth-child(2) {
         margin-top: 5em !important;
         text-align: unset !important;
         padding-bottom: 3em;
     }
 
-    body > div#base > div:nth-child(2):after {
+    body>div#base>div:nth-child(2):after {
         font-size: 2em;
         color: var(--bright-text);
         content: '📚 屏東大學數位學習平台';
@@ -182,7 +215,7 @@
         padding: 1em;
     }
 
-    body > div#base > div:nth-child(3) {
+    body>div#base>div:nth-child(3) {
         width: unset !important;
         height: unset !important;
         margin: unset !important;
@@ -197,12 +230,12 @@
         animation: shadow-drop-2-br 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
     }
 
-    .loginWrapper > div {
+    .loginWrapper>div {
         display: flex;
         flex-direction: column;
     }
 
-    #base > div:nth-child(3) > div > div > div:nth-child(5) {
+    #base>div:nth-child(3)>div>div>div:nth-child(5) {
         display: flex;
         justify-content: space-evenly;
         padding-top: 1em !important;
@@ -230,12 +263,12 @@
         font-family: var(--family)
     }
 
-    table > tbody > tr > td > span {
+    table>tbody>tr>td>span {
         font-size: 12px !important;
     }
 
-    #sysbar > .clear,
-    #sign > .clear {
+    #sysbar>.clear,
+    #sign>.clear {
         display: none
     }
 
@@ -247,8 +280,13 @@
     .mnuTitle,
     #currPosTitle,
     .blockTitle,
-    .blockTitle2 {
+    .blockTitle2,
+    .tblTitle {
         color: var(--text-color) !important;
+    }
+
+    .mnuBody>.mnuItem {
+        white-space: unset;
     }
 
     #logo {
@@ -262,7 +300,7 @@
         display: none;
     }
 
-    #logo::after {
+    #logo::before {
         font-size: 1.5em;
         color: var(--bright-text);
         content: '屏東大學數位學習平台';
@@ -270,46 +308,63 @@
         padding: 0.5em;
     }
 
+    #logo::after {
+        content: 'NPTU-Redux';
+        font-size: .75em;
+        color: var(--text-color);
+        -webkit-animation: tracking-in-expand 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+        animation: tracking-in-expand 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+    }
+
     #base div#sysbar {
         display: flex;
         justify-content: space-between;
         border-bottom: 1px solid var(--yellow);
         align-items: center;
-        background: linear-gradient(300deg, var(--red), var(--dark-orange)) 0% 0% / 200% 200%;
-        animation: 10s ease 0s infinite normal none running background-scroll;
+        -webkit-animation: color-change-4x 10s cubic-bezier(0.455, 0.030, 0.515, 0.955) infinite alternate both;
+        animation: color-change-4x 10s cubic-bezier(0.455, 0.030, 0.515, 0.955) infinite alternate both;
         color: var(--bg-color);
         padding: 0 1em;
     }
-    #sysbar > #sign > div a {
+
+    #sysbar>#sign>div a {
         padding: 0 0.5em;
     }
-    #sysbar > #sign {
+
+    #sysbar>#sign {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
     }
-    #sign > div {
+
+    #sign>div {
         display: flex;
         padding: 0.5em 0;
     }
+
     #sign img,
-    #sign span > img {
+    #sign span>img {
         display: none;
     }
-    #sign > div a,
-    #sign > div a:visited,
-    #sign > div a:link {
+
+    #sign>div a,
+    #sign>div a:visited,
+    #sign>div a:link {
         color: white;
     }
+
     #login a[href*='home.php']:before {
         content: '🏠';
     }
+
     #login a[href*='logout']:before {
         content: '🚪';
     }
+
     #sysbar a[href*='changeLang']:before {
         content: '🌎';
     }
+
     #sign a:after {
         content: ' |';
         color: black;
@@ -331,13 +386,13 @@
     }
 
     #menu,
-    #mainbody > #left {
+    #mainbody>#left {
         flex: 1;
     }
 
     #main,
-    #mainbody > #right {
-        flex: 4;
+    #mainbody>#right {
+        flex: 3;
         padding-left: 3em;
     }
 
@@ -347,38 +402,39 @@
         border: 2px solid var(--orange);
         margin: 4pt 0;
         white-space: normal;
-        width: var(--menu-width);
         padding: 0;
     }
 
+    #menu .box,
+    #menu .selectBox,
+    .mnu,
     #left,
     #right {
         width: var(--menu-width);
     }
 
-    #menu > .selectBox {
+    #menu>.selectBox {
         display: flex;
         flex-direction: column;
         align-items: center;
         border-radius: 5px;
         border: 2px solid var(--green);
         background: var(--light-bg-color);
-        width: var(--menu-width);
         margin: 4pt 0;
         padding: 1em 0;
     }
 
-    #menu > .selectBox > .select {
+    #menu>.selectBox>.select {
         width: 80%;
         color: var(--bg-color);
     }
 
-    #menu > .selectBox > .title {
+    #menu>.selectBox>.title {
         padding-bottom: 4pt;
         font-size: 12pt;
     }
 
-    #menu > .selectBox > .title:before {
+    #menu>.selectBox>.title:before {
         content: '🏫 ';
     }
 
@@ -390,7 +446,7 @@
     #main,
     #menu,
     .mnu,
-    #currPos ~ div,
+    #currPos~div,
     #profile {
         display: flex;
         flex-direction: column;
@@ -401,17 +457,18 @@
         display: flex;
     }
 
-    #wrapper > #base,
-    body > #base {
+    #wrapper>#base,
+    body>#base {
         width: auto;
         margin-left: auto;
         margin-right: auto;
         display: flex;
         flex-direction: column;
     }
+
     #mainbody,
     #mainBody {
-        min-width: calc(var(--page-width) /1.5);
+        min-width: calc(var(--page-width) /1.25);
         max-width: var(--page-width);
         align-self: center;
     }
@@ -423,12 +480,12 @@
         width: auto !important;
     }
 
-    .BlockItem > div:nth-child(1) {
+    .BlockItem>div:nth-child(1) {
         padding: 0 .5em;
     }
 
-    .BlockL > div:nth-child(1),
-    .BlockR > div:nth-child(1),
+    .BlockL>div:nth-child(1),
+    .BlockR>div:nth-child(1),
     #mainbody {
         border-bottom: 0px;
     }
@@ -438,8 +495,8 @@
         border-bottom: 2px solid var(--blue) !important;
     }
 
-    .BlockL > div:nth-child(1),
-    .BlockR > div:nth-child(1) {
+    .BlockL>div:nth-child(1),
+    .BlockR>div:nth-child(1) {
         border-bottom: 2px solid var(--orange) !important;
     }
 
@@ -462,14 +519,14 @@
     .thread span:not(.btn):not(.btnOver),
     .thread p,
     .thread div,
-    .BlockL > div[id*=n1] div,
-    .BlockL > div[id*=n1] p,
-    .BlockL > div[id*=n1] span,
-    .BlockL > div[id*=n1],
-    .BlockR > div[id*=n1] div,
-    .BlockR > div[id*=n1] p,
-    .BlockR > div[id*=n1] span,
-    .BlockR > div[id*=n1] {
+    .BlockL>div[id*=n1] div,
+    .BlockL>div[id*=n1] p,
+    .BlockL>div[id*=n1] span,
+    .BlockL>div[id*=n1],
+    .BlockR>div[id*=n1] div,
+    .BlockR>div[id*=n1] p,
+    .BlockR>div[id*=n1] span,
+    .BlockR>div[id*=n1] {
         font-family: var(--family);
         background-color: var(--bg-color) !important;
         color: var(--text-color) !important;
@@ -481,64 +538,87 @@
         display: none;
     }
 
-    #main > .infoPath,
-    #main > .toolWrapper {
+    #main>.infoPath,
+    #main>.toolWrapper {
         display: block !important;
     }
 
+    tr.rowOver,
     tr.listRowOver,
     tr.postRowOver {
         filter: invert(1) grayscale(1);
     }
 
-    table > tbody > tr:nth-child(1n) > .col1,
-    table > tbody > tr:nth-child(1n) > .col2,
-    table > tbody > tr.listRow,
-    table > tbody > tr > TD.FormLeft {
+    table>tbody>tr:nth-child(1n)>.col1,
+    table>tbody>tr:nth-child(1n)>.col2,
+    table>tbody>tr.listRow,
+    table>tbody>tr>TD.FormLeft,
+    table>tbody>tr.row2,
+    table>tbody>tr:nth-child(n) 
+    .table>tbody>tr:nth-child(1n)>.col1,
+    .table>tbody>tr:nth-child(1n)>.col2,
+    .table>tbody>tr.listRow,
+    .table>tbody>tr>TD.FormLeft,
+    .table>tbody>tr.row2,
+    .table>tbody>tr:nth-child(n) {
         background: var(--row-alt-color);
         color: var(--text-color)
     }
 
+    tr.rowOver,
     tr.listRowOver,
     tr.postRowOver,
-    table > tbody > tr:nth-child(1n) > .header1,
-    table > tbody > tr:nth-child(1n) > .header2,
-    table > tbody > tr:nth-child(2n) > .col1,
-    table > tbody > tr:nth-child(2n) > .col2,
-    table > tbody > tr.listHeader,
-    table > tbody > tr.postRow2:nth-child(2),
-    table > tbody > tr.listRow2,
-    table > tbody > tr.header,
-    table > tbody > tr:nth-child(2n),
-    tbody > tr > TD.FormRight {
+    table>tbody>tr:nth-child(1n)>.header1,
+    table>tbody>tr:nth-child(1n)>.header2,
+    table>tbody>tr:nth-child(2n)>.col1,
+    table>tbody>tr:nth-child(2n)>.col2,
+    .table>tbody>tr:nth-child(1n)>.header1,
+    .table>tbody>tr:nth-child(1n)>.header2,
+    .table>tbody>tr:nth-child(2n)>.col1,
+    .table>tbody>tr:nth-child(2n)>.col2,
+    table>tbody>tr.listHeader,
+    .table>tbody>tr.listHeader,
+    table>tbody>tr.postRow2:nth-child(2),
+    .table>tbody>tr.postRow2:nth-child(2),
+    table>tbody>tr.listRow2,
+    .table>tbody>tr.listRow2,
+    table>tbody>tr.header,
+    .table>tbody>tr.header,
+    table>tbody>tr.header a,
+    .table>tbody>tr.header a,
+    table>tbody>tr.header a:visited,
+    .table>tbody>tr.header a:visited,
+    table>tbody>tr:nth-child(2n),
+    .table>tbody>tr:nth-child(2n),
+    tbody>tr>TD.FormRight {
         background: var(--row-color);
         color: var(--text-color);
     }
 
-    table > tbody > tr.header > .td,
-    table > tbody > tr.listHeader > td {
+    table>tbody>tr.header>.td,
+    table>tbody>tr.listHeader>td {
         padding: 1em;
     }
 
-    .table > tbody > tr.header > .td,
-    table > tbody > tr.listHeader > td,
-    #recent > table > tbody > tr > td.listFirstTD,
+    .table>tbody>tr.header>.td,
+    table>tbody>tr.listHeader>td,
+    #recent>table>tbody>tr>td.listFirstTD,
     .table .td {
         border-left: 1px solid var(--text-color);
         border-bottom: 1px solid var(--text-color);
     }
 
-    #recent > table > tbody > tr > td.listFirstTD,
+    #recent>table>tbody>tr>td.listFirstTD,
     .table .td {
         padding: 0.5em;
     }
 
-    #recent > table > tbody > tr > td.listFirstTD {
+    #recent>table>tbody>tr>td.listFirstTD {
         text-align: center;
     }
 
-    table > tbody > tr.header > td > a,
-    table > tbody > tr.listHeader {
+    table>tbody>tr.header>td>a,
+    table>tbody>tr.listHeader {
         color: var(--bright-text);
         font-weight: 600;
         font-size: 1.25em;
@@ -546,7 +626,7 @@
 
     .table,
     .postBox,
-    #recent > table {
+    #recent>table {
         table-layout: auto;
         border: 2px solid var(--orange);
         border-radius: 10px;
@@ -569,16 +649,19 @@
     .doc {
         background: none;
     }
+
     .doc .title:before {
         content: '📚';
         font-size: 2em;
         margin-right: 0.25em;
     }
+
     .doc .title,
     .doc .toolarea {
         margin-left: 0;
         padding: 0;
     }
+
     .doc .title {
         display: flex;
         align-items: center;
@@ -591,9 +674,11 @@
     .attach .blockTitle2 img {
         display: none;
     }
+
     .attach .blockTitle2:before {
         content: '📎';
     }
+
     .Eannounce,
     .Econtent,
     .Ehomework {
@@ -613,12 +698,12 @@
         content: '📄 ';
     }
 
-    #profile > div:nth-child(1) {
+    #profile>div:nth-child(1) {
         border: 0 !important;
     }
 
     .redfont,
-    .toolWrapper > span:nth-child(1) {
+    .toolWrapper>span:nth-child(1) {
         color: var(--red) !important;
     }
 
@@ -627,7 +712,7 @@
         font-size: 1.25em;
     }
 
-    .hidden > span.hint:before {
+    .hidden>span.hint:before {
         content: '  ';
     }
 }
