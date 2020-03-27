@@ -38,11 +38,12 @@ let options = {
     enableInstructorShortcut: true,
     enableShortcutAutoSubmit: true,
     // Enables experimental features (use at your own risk!)
-    enableExperimental: false,
+    enableExperimental: true,
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
-    insturctorShortcutPage: ["A0413S1Page"]
+    insturctorShortcutPage: ["A0413S1Page"],
+    tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData"]
 };
 
 let subjectGroups = {
@@ -224,10 +225,12 @@ frameElement.onload = function () {
     // Experimental features
     if (options.enableExperimental) {
         // Table image export feature; currently buggy
-        let tableData = contentBody.querySelectorAll('table[id*=dgData]');
-        for (let i = 0, ti = tableData.length; i < ti; i++) {
-            injectTableDownload(tableData[i]);
-        }
+        options.tableExportWhitelist.forEach(x=>{
+            let tableData = contentBody.querySelectorAll(`table[id*=${x}]`);
+            for (let i = 0, ti = tableData.length; i < ti; i++) {
+                injectTableDownload(tableData[i]);
+            }
+        })
     }
     organizeCourseList(contentBody);
     setupClipboard(contentBody);
