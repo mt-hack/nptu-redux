@@ -42,7 +42,7 @@ let options = {
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
-    insturctorShortcutPage: ["A0413S1Page"],
+    instructorShortcutPage: ["A0413S1Page"],
     tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData"]
 };
 
