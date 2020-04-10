@@ -13,7 +13,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.1.8
+// @version 1.1.9
 // ==/UserScript==
 
 /* 
@@ -42,7 +42,7 @@ let options = {
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixApplication: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
-    insturctorShortcutPage: ["A0413S1Page"]
+    instructorShortcutPage: ["A0413S1Page"]
 };
 
 let subjectGroups = {
@@ -144,6 +144,7 @@ if (window.location.href.match(/Web\/Secure\//g)) {
                 removeEmptyElement(x);
             }
         });
+
         function removeEmptyElement(element) {
             let outerNode = element.parentNode;
             while (outerNode && outerNode.innerText.trim().length === 0) {
@@ -178,6 +179,7 @@ frameElement.onload = function () {
 
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
+    log(`Current page: ${currentPage.name}`)
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-indigo.min.css');
     injectStyle(mainWindow.document.head, customCss);
@@ -187,7 +189,7 @@ frameElement.onload = function () {
         }
         return;
     }
-    if (options.insturctorShortcutPage.includes(currentPage.name)) {
+    if (options.instructorShortcutPage.includes(currentPage.name)) {
         if (options.enableInstructorShortcut) {
             createInstructorShortcut(contentBody);
         }
@@ -229,9 +231,45 @@ frameElement.onload = function () {
             injectTableDownload(tableData[i]);
         }
     }
+    if (currentPage.name === "A1007SPage" || currentPage.name === "A1014SPage") {
+        injectFillAllOptions(contentBody);
+    }
     organizeCourseList(contentBody);
     setupClipboard(contentBody);
 };
+
+function injectFillAllOptions(contentBody) {
+    let surveyAnswerInputs = contentBody.querySelectorAll("input[id*='rblANSWER']")
+    let surveyTable = contentBody.querySelector('#A1007A_dgData') || contentBody.querySelector('#A1014A_dgData');
+    if (surveyAnswerInputs.length != 0 && surveyTable) {
+        let buttonContainer = make({
+            el: "div",
+            class: "container"
+        })
+        let stronglyAgreeBtn = createShortcutButton("非常同意");
+        let agreeBtn = createShortcutButton("同意");
+        let neutralBtn = createShortcutButton("普通");
+        let disagreeBtn = createShortcutButton("不同意");
+        let stronglyDisagreeBtn = createShortcutButton("很不同意");
+        stronglyAgreeBtn.addEventListener("click", ()=>{checkAllInput(surveyTable, "rblANSWER_0")});
+        agreeBtn.addEventListener("click", ()=>{checkAllInput(surveyTable, "rblANSWER_1")});
+        neutralBtn.addEventListener("click",()=>{ checkAllInput(surveyTable, "rblANSWER_2")});
+        disagreeBtn.addEventListener("click", ()=>{checkAllInput(surveyTable, "rblANSWER_3")});
+        stronglyDisagreeBtn.addEventListener("click",()=>{checkAllInput(surveyTable, "rblANSWER_4")});
+        buttonContainer.appendChild(stronglyAgreeBtn);
+        buttonContainer.appendChild(agreeBtn);
+        buttonContainer.appendChild(neutralBtn);
+        buttonContainer.appendChild(disagreeBtn);
+        buttonContainer.appendChild(stronglyDisagreeBtn);
+        surveyTable.parentNode.prepend(buttonContainer);
+    }
+}
+
+function checkAllInput(contentBody, id) {
+    contentBody.querySelectorAll(`input[id*=\"${id}\"]`).forEach(x => {
+        x.checked = true
+    });
+}
 
 function injectHeader(contentBody) {
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
@@ -583,7 +621,7 @@ function printFix(contentBody) {
     let printButtons = contentBody.querySelectorAll("a[id*=hylPrint]");
     if (printButtons.length > 0) {
         printButtons.forEach(printButton => {
-            if(!(/crystal[\d]\/.*\.rpt/gi.test(printButton.href))){
+            if (!(/crystal[\d]\/.*\.rpt/gi.test(printButton.href))) {
                 return;
             }
             // create outer div for export options
@@ -619,7 +657,7 @@ function printFix(contentBody) {
             let exportLinkText = make({
                 el: 'span',
                 class: 'print-text',
-                attr:{
+                attr: {
                     style: 'font-family: var(--msft-fonts);'
                 }
             })
@@ -695,7 +733,7 @@ function organizeCourseList(contentBody) {
                 class: 'class-option'
             });
             textElement.innerText = option.innerText;
-            textElement.addEventListener('click', function(){
+            textElement.addEventListener('click', function () {
                 option.parentNode.selectedIndex = option.index;
                 option.parentNode.onchange();
             });
@@ -761,6 +799,7 @@ function setupClipboard(contentBody) {
         });
     });
 }
+
 function createInstructorShortcut(contentBody) {
     let firstTable = contentBody.querySelector('table');
     if (!firstTable) {
@@ -794,6 +833,7 @@ function createInstructorShortcut(contentBody) {
     }
     firstTable.appendChild(selectionContainer);
 }
+
 function createQuickLocationSelection(contentBody) {
     let firstTable = contentBody.querySelector('table');
     if (!firstTable) {
@@ -827,10 +867,11 @@ function createQuickLocationSelection(contentBody) {
     }
     firstTable.appendChild(selectionContainer);
 }
+
 function createShortcutButton(text) {
     let button = make({
         el: 'div',
-        class: 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+        class: raisedButtonClassnames,
         attr: {
             'style': 'margin: .5em'
         }

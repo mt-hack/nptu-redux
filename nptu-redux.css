@@ -1,5 +1,5 @@
 :root {
-    --msft-fonts: 'Microsoft YaHei', 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --msft-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'Microsoft JhengHei';
     --school-green: #1b5e20;
 }
 
