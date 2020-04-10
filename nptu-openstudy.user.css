@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           NPTU OpenStudy LMS Dark UserStyle
 @namespace      github.com/mt-hack/nptu-redux
-@version        1.0.5
+@version        1.0.7
 @license        MIT
 @author         Still Hsu <business@stillu.cc>
 @updateURL      https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-openstudy.user.css
@@ -17,8 +17,8 @@
         --dark-orange: #dd4814;
         --yellow: rgba(247, 212, 122);
         --green: rgba(177, 204, 159);
-        --blue: rgba(165, 218, 210);
-        --dark-blue: rgb(116, 172, 237);
+        --blue: rgb(161, 210, 247);
+        --border-color: rgb(66, 95, 138);
         --dark-alt-blue: rgb(31, 74, 125);
         --row-color: rgb(44, 47, 51);
         --alt-row-color: rgb(35, 39, 42);
@@ -100,7 +100,7 @@
 
     a:link,
     a:visited {
-        color: var(--dark-blue);
+        color: var(--blue);
     }
 
     .page>.item>a,
@@ -251,6 +251,19 @@
 }
 
 @-moz-document regexp("https://openstudy.nptu.edu.tw/(((?!login_page).)*.php|course).*") {
+    @media screen and (max-width: 1400px) {
+        #mainbody,
+        #mainBody {
+            max-width: 95vw;
+        }
+    }
+
+    #mainbody,
+    #mainBody {
+        align-self: center;
+        margin: 0 2em;
+        min-width: 75vw;
+    }
 
     body {
         background-color: var(--bg-color);
@@ -466,13 +479,6 @@
         flex-direction: column;
     }
 
-    #mainbody,
-    #mainBody {
-        min-width: calc(var(--page-width) /1.25);
-        max-width: var(--page-width);
-        align-self: center;
-    }
-
     .BlockItem {
         height: auto;
         display: flex;
@@ -491,13 +497,10 @@
     }
 
     .BlockItem,
-    .BlockHeader {
-        border-bottom: 2px solid var(--blue) !important;
-    }
-
+    .BlockHeader,
     .BlockL>div:nth-child(1),
     .BlockR>div:nth-child(1) {
-        border-bottom: 2px solid var(--orange) !important;
+        border-bottom: 2px solid var(--border-color) !important;
     }
 
     .thread {
@@ -511,8 +514,8 @@
     }
 
     .BlockItem {
-        border-left: 2px solid var(--blue);
-        border-right: 2px solid var(--blue);
+        border-left: 2px solid var(--border-color);
+        border-right: 2px solid var(--border-color);
     }
 
     .postNote span,
@@ -549,14 +552,16 @@
         filter: invert(1) grayscale(1);
     }
 
+    div.infoTable>table tr,
     table>tbody>tr:nth-child(1n)>.col1,
     table>tbody>tr:nth-child(1n)>.col2,
     table>tbody>tr.listRow,
     table>tbody>tr>TD.FormLeft,
     table>tbody>tr.row2,
-    table>tbody>tr:nth-child(n) 
-    .table>tbody>tr:nth-child(1n)>.col1,
+    table>tbody>tr:nth-child(n) .table>tbody>tr:nth-child(1n)>.col1,
     .table>tbody>tr:nth-child(1n)>.col2,
+    #main table>tbody>tr:nth-child(1n)>.col1,
+    #main table>tbody>tr:nth-child(1n)>.col2,
     .table>tbody>tr.listRow,
     .table>tbody>tr>TD.FormLeft,
     .table>tbody>tr.row2,
@@ -568,8 +573,12 @@
     tr.rowOver,
     tr.listRowOver,
     tr.postRowOver,
+    #main table>tbody>tr:nth-child(1n)>.header1,
+    #main table>tbody>tr:nth-child(1n)>.header2,
     table>tbody>tr:nth-child(1n)>.header1,
     table>tbody>tr:nth-child(1n)>.header2,
+    #main table>tbody>tr:nth-child(2n)>.col1,
+    #main table>tbody>tr:nth-child(2n)>.col2,
     table>tbody>tr:nth-child(2n)>.col1,
     table>tbody>tr:nth-child(2n)>.col2,
     .table>tbody>tr:nth-child(1n)>.header1,
