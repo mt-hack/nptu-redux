@@ -13,7 +13,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.2.0
+// @version 1.2.1
 // ==/UserScript==
 
 /* 
@@ -31,6 +31,7 @@ let options = {
     enableMaterialHeader: true,
     // Enables custom export options for printing
     enableCustomExport: true,
+    customExportBlacklist: ["A0551RPage"],
     // Enables max student number autofill based on classroom selection
     enableClassroomAutofillOnSelect: true,
     // Enables classroom shortcut in selection
@@ -40,10 +41,10 @@ let options = {
     // Enables experimental features (use at your own risk!)
     enableExperimental: true,
     // Pages whose tables need to be fixed; works like a whitelist
-    tableFixApplication: ["A0432SPage", "A0433SPage"],
+    tableFixWhitelist: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
     instructorShortcutPage: ["A0413S1Page"],
-    tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData"]
+    tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"]
 };
 
 let subjectGroups = {
@@ -102,6 +103,19 @@ DO NOT TOUCH THE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
 */
 
 /*
+MAIN INIT
+*/
+
+let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
+let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
+let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent';
+let raisedButtonAltClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
+let raisedButtonFlatClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect';
+let mainElement = document.querySelector('frame') || document.querySelector('form');
+let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultView;
+let frameElement = mainWindow.frameElement || mainWindow;
+
+/*
 ===================
 Image Fix Injection
 ===================
@@ -122,38 +136,95 @@ Homepage Injection
 */
 
 if (window.location.href.match(/Web\/Secure\//g)) {
-    let mainTable = document.querySelector('table[id=TableMain]')
-    if (mainTable) {
-        mainTable.querySelectorAll('table[id*=TableMain]').forEach(t => {
-            t.style.border = '2px solid #1ba7e5'
-            t.style.padding = '0.5em';
-            t.style.margin = '0.5em 0';
-            t.style.borderRadius = '6px'
+    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
+    document.querySelector('form').appendChild(make({
+        el: 'style',
+        html: `    
+            #button-container>.container{
+                margin: 0.5em;
+            }
+            #button-container{
+                display: grid;
+                grid: auto-flow dense/repeat(3,auto);
+                padding-bottom: 4em;
+                max-width: 60vh;
+            }
+            #nptu-redux-header{
+                height: 15vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            #nptu-redux-header>.header-text{
+                font-size: 3em;
+                text-decoration: none;
+                color: #eee;
+            }
+            @-webkit-keyframes GradientBackground {
+                0%{background-position:0% 50%}
+                50%{background-position:100% 51%}
+                100%{background-position:0% 50%}
+            }
+            @-moz-keyframes GradientBackground {
+                0%{background-position:0% 50%}
+                50%{background-position:100% 51%}
+                100%{background-position:0% 50%}
+            }
+            @keyframes GradientBackground {
+                0%{background-position:0% 50%}
+                50%{background-position:100% 51%}
+                100%{background-position:0% 50%}
+            }
+            body{
+                background: linear-gradient(270deg, #641143, #3B1255, #251758);
+                background-size: 400% 400%;
+                animation: GradientBackground 60s ease infinite;
+                color: #ddd;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei UI', 'Microsoft JhengHei';
+            }
+        `
+    }));
+    let widthDummy = document.querySelector("#LoginDefault_txtScreenWidth");
+    if (widthDummy) {
+        widthDummy.style.display = "none";
+    }
+    let heightDummy = document.querySelector("#LoginDefault_txtScreenHeight");
+    if (heightDummy) {
+        heightDummy.style.display = "none";
+    }
+    let sidebarImages = document.querySelectorAll('#LoginDefault_imgUse_TP, #LoginStd_imgMain, [src*="P1New.gif"], [src*="P5New.gif"], [src*="P4New.gif"], .auto-style3');
+    if (sidebarImages) {
+        sidebarImages.forEach(x => {
+            x.remove();
+        })
+    }
+    let headerImage = document.querySelector('[style*="T1_back"], [style*="T1_Std_back"]');
+    if (headerImage) {
+        let newHeader = make({
+            el: 'header',
+            id: 'nptu-redux-header',
+            html: "<a class='header-text' href='https://webap.nptu.edu.tw'>🏫 國立屏東大學 (NPTU-Redux)</span>"
+        })
+        headerImage.parentNode.replaceChild(newHeader, headerImage);
+    }
+    let loginButtons = document.querySelectorAll("input[id^=LoginDefault]");
+    let mainTable = document.querySelector("#TableMain");
+    if (loginButtons && mainTable) {
+        let newButtonContainer = make({
+            el: 'content',
+            class: 'container',
+            id: 'button-container'
         });
-        let logo = document.querySelector('#LoginDefault_imgUse_TP');
-        if (logo) {
-            removeEmptyElement(logo);
-        }
-        document.querySelectorAll('td, img').forEach(x => {
-            var regexString = /C\d(Back)?\.gif/g;
-            if (typeof x.src !== 'undefined') {
-                if (x.src.match(regexString)) {
-                    removeEmptyElement(x);
-                }
-            }
-            if (x.style.backgroundImage.match(regexString)) {
-                removeEmptyElement(x);
-            }
-        });
-
-        function removeEmptyElement(element) {
-            let outerNode = element.parentNode;
-            while (outerNode && outerNode.innerText.trim().length === 0) {
-                outerNode.remove()
-                outerNode = outerNode.parentNode;
-            }
-            element.remove();
-        }
+        loginButtons.forEach(x => {
+            let subButtonContainer = make({
+                el: 'div',
+                class: 'container'
+            })
+            x.style.borderRadius = "10px";
+            subButtonContainer.appendChild(x);
+            newButtonContainer.appendChild(subButtonContainer);
+        })
+        mainTable.parentNode.replaceChild(newButtonContainer, mainTable);
     }
     return;
 }
@@ -163,13 +234,6 @@ if (window.location.href.match(/Web\/Secure\//g)) {
 Main Page Injection
 ===================
 */
-
-let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
-let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
-let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
-let mainElement = document.querySelector('frame') || document.querySelector('form');
-let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultView;
-let frameElement = mainWindow.frameElement || mainWindow;
 frameElement.onload = function () {
     let contentWindow = frameElement.contentWindow || frameElement;
     if (contentWindow.WebForm_OnSubmit) {
@@ -182,7 +246,7 @@ frameElement.onload = function () {
     let currentPage = contentBody.querySelector('body>form');
     log(`Current page: ${currentPage.name}`)
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-indigo.min.css');
+    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
     injectStyle(mainWindow.document.head, customCss);
     if (options.locationSelectionPage.includes(currentPage.name)) {
         if (options.enableClassroomShortcut) {
@@ -215,7 +279,7 @@ frameElement.onload = function () {
     if (options.enableCustomExport) {
         printFix(contentBody);
     }
-    if (options.tableFixApplication.includes(currentPage.name)) {
+    if (options.tableFixWhitelist.includes(currentPage.name)) {
         tableFix(contentBody);
         if (options.enableClassroomAutofillOnSelect) {
             injectTableAutoFillByClassroomType(contentBody);
@@ -226,20 +290,138 @@ frameElement.onload = function () {
     }
     // Experimental features
     if (options.enableExperimental) {
-        // Table image export feature; currently buggy
-        options.tableExportWhitelist.forEach(x=>{
-            let tableData = contentBody.querySelectorAll(`table[id*=${x}]`);
-            for (let i = 0, ti = tableData.length; i < ti; i++) {
-                injectTableDownload(tableData[i]);
-            }
+        options.tableExportWhitelist.forEach(x => {
+            contentBody.querySelectorAll(`table[id*=${x}], div[id*=${x}]`).forEach(table => {
+                injectTableDownload(table);
+            })
         })
     }
     if (currentPage.name === "A1007SPage" || currentPage.name === "A1014SPage") {
         injectFillAllOptions(contentBody);
     }
+    if (currentPage.name === "B4002SPage") {
+        injectCheckInHelper(contentBody);
+    }
     organizeCourseList(contentBody);
     setupClipboard(contentBody);
 };
+
+function injectCheckInHelper(contentBody) {
+    let tabs = contentBody.querySelector('[id*=htbMenu]');
+    let punchInField = contentBody.querySelector('input[id*=txtPUNCH_TM]');
+    let tabsParentNode = tabs.parentNode;
+    if (!tabs || !punchInField) {
+        return;
+    }
+    let toolsContainer = make({
+        el: 'div',
+        class: 'container',
+        id: 'tools-container'
+    });
+    let toolsHeader = createHeader("常用工具 Check-in Helper", "info");
+    let buttonsContainer = make({
+        el: 'div',
+        class: 'help container',
+        id: 'help-btn-container'
+    });
+
+    let insertTodayButton = createShortcutButton("今天", undefined, "alt");
+    insertTodayButton.addEventListener('click', () => {
+        let dateField = contentBody.querySelector('input[id*=txtPUNCH_DT]');
+        if (dateField) {
+            dateField.value = getChineseYear();
+        }
+    })
+    let timeHelperContainer = makeGenericContainer();
+    timeHelperContainer.appendChild(makeChipText("插入常用時間"));
+    timeHelperContainer.appendChild(insertTodayButton);
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 8, 0));
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 8, 0));
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 10, 0));
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 12, 0));
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 13, 30));
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 15, 30));
+    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 17, 30));
+    buttonsContainer.appendChild(timeHelperContainer);
+
+    let lateCheckinContainer = makeGenericContainer();
+    lateCheckinContainer.appendChild(makeChipText("插入補打卡原因"));
+    lateCheckinContainer.appendChild(excuseFactory(contentBody, "‍"));
+    lateCheckinContainer.appendChild(excuseFactory(contentBody, "工作繁忙"));
+    lateCheckinContainer.appendChild(excuseFactory(contentBody, "忘記"));
+    buttonsContainer.appendChild(lateCheckinContainer);
+
+    let workDescriptionContainer = makeGenericContainer();
+    workDescriptionContainer.appendChild(makeChipText("插入工作內容"));
+    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "‍文書處理"));
+    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "資料彙整"));
+    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "‍剪輯影片"));
+    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "‍照片處理"));
+    buttonsContainer.appendChild(workDescriptionContainer);
+
+    toolsContainer.appendChild(toolsHeader);
+    toolsContainer.appendChild(buttonsContainer);
+    toolsContainer.appendAfter(tabsParentNode);
+}
+
+function getChineseYear(date = undefined) {
+    date = date === undefined ? new Date() : date;
+    return `${date.getFullYear()-1911}/${(date.getMonth() + 1).pad(2)}/${date.getDate().pad(2)}`;
+}
+
+function makeChipText(text) {
+    return make({
+        el: 'span',
+        class: 'mdl-chip',
+        html: `<span class='mdl-chip__text'>${text}</span>`
+    });
+}
+
+function makeGenericContainer() {
+    return make({
+        el: 'div',
+        attr: {
+            style: "display: flex; align-items: center;"
+        }
+    })
+}
+
+function workDescriptionButtonFactory(body, desc) {
+    let workDescButton = createShortcutButton(desc, undefined, "alt");
+    workDescButton.addEventListener('click', () => {
+        let workDescField = body.querySelector('input[id*=txtJOB_NOTES]');
+        if (workDescField) {
+            workDescField.value = desc
+        }
+    })
+    return workDescButton;
+}
+
+function excuseFactory(body, excuse) {
+    let excuseDescriptor = excuse.match(/[\u200B-\u200D\uFEFF]/g) ? "插入空白字元" : excuse;
+    let excuseButton = createShortcutButton(excuseDescriptor, undefined, "alt");
+    excuseButton.addEventListener('click', () => {
+        let excuseField = body.querySelector('input[id*=txtFILL_NOTES]');
+        if (excuseField) {
+            excuseField.value = excuse
+        }
+    })
+    return excuseButton;
+}
+
+function timeButtonFactory(body, hour, min) {
+    let timeButton = createShortcutButton(`${hour.pad(2)}:${min.pad(2)}`, undefined, "alt");
+    timeButton.addEventListener('click', () => {
+        let timePunch = body.querySelector('input[id*=txtPUNCH_TM]');
+        if (timePunch) {
+            let randomMin = Math.floor(Math.random() * Math.floor(10));
+            let newMin = Math.random() > 0.5 && (min - randomMin) > 0 ? min - randomMin : min + randomMin;
+            newMin = newMin < 60 ? newMin : 59;
+            timePunch.value = `${hour.pad(2)}:${newMin.pad(2)}`;
+        }
+    })
+    return timeButton;
+}
 
 function injectFillAllOptions(contentBody) {
     let surveyAnswerInputs = contentBody.querySelectorAll("input[id*='rblANSWER']")
@@ -254,11 +436,21 @@ function injectFillAllOptions(contentBody) {
         let neutralBtn = createShortcutButton("普通");
         let disagreeBtn = createShortcutButton("不同意");
         let stronglyDisagreeBtn = createShortcutButton("很不同意");
-        stronglyAgreeBtn.addEventListener("click", ()=>{checkAllInput(surveyTable, "rblANSWER_0")});
-        agreeBtn.addEventListener("click", ()=>{checkAllInput(surveyTable, "rblANSWER_1")});
-        neutralBtn.addEventListener("click",()=>{ checkAllInput(surveyTable, "rblANSWER_2")});
-        disagreeBtn.addEventListener("click", ()=>{checkAllInput(surveyTable, "rblANSWER_3")});
-        stronglyDisagreeBtn.addEventListener("click",()=>{checkAllInput(surveyTable, "rblANSWER_4")});
+        stronglyAgreeBtn.addEventListener("click", () => {
+            checkAllInput(surveyTable, "rblANSWER_0")
+        });
+        agreeBtn.addEventListener("click", () => {
+            checkAllInput(surveyTable, "rblANSWER_1")
+        });
+        neutralBtn.addEventListener("click", () => {
+            checkAllInput(surveyTable, "rblANSWER_2")
+        });
+        disagreeBtn.addEventListener("click", () => {
+            checkAllInput(surveyTable, "rblANSWER_3")
+        });
+        stronglyDisagreeBtn.addEventListener("click", () => {
+            checkAllInput(surveyTable, "rblANSWER_4")
+        });
         buttonContainer.appendChild(stronglyAgreeBtn);
         buttonContainer.appendChild(agreeBtn);
         buttonContainer.appendChild(neutralBtn);
@@ -357,13 +549,21 @@ function injectHeader(contentBody) {
                 <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
     //  #endregion
+    // For some reason they're using this for print detection? What the hell guys
+    let textUsedDummy = contentBody.querySelector('#CommonHeader_txtUsed');
+    if (textUsedDummy) {
+        newHeaderHtml += textUsedDummy.outerHTML;
+    }
     newHeaderHtml += `</div></div>`;
     //  #endregion
     let newHeader = make({
         el: "header",
         html: newHeaderHtml
     });
-    mainWindow.document.body.querySelector('body>form').prepend(newHeader);
+    componentHandler.upgradeElement(newHeader);
+
+    let mainForm = mainWindow.document.body.querySelector('body>form');
+    mainForm.prepend(newHeader);
     oldHeader.remove();
 }
 
@@ -381,17 +581,17 @@ function pageCleanup(contentBody) {
         el: 'div',
         class: 'main container',
     });
+    let printBtns = contentBody.querySelectorAll('[id*=hylPrint]');
     let menuElements = [];
-    let elementDiv = null;
+    let elementDiv = make({
+        el: 'div',
+        class: 'menu container'
+    });
     mainBodies.forEach(element => {
         if (!isSafeToDelete(element)) {
             // identifier for menu tabs
             if (!element.querySelector('td.UnUse')) {
-                elementDiv = make({
-                    el: 'div',
-                    class: 'menu container',
-                    html: element.innerHTML
-                });
+                elementDiv.innerHTML += element.innerHTML;
                 mainDiv.appendChild(elementDiv);
             } else {
                 menuElements.push(element.innerHTML);
@@ -402,6 +602,11 @@ function pageCleanup(contentBody) {
         menuElements.forEach(element => {
             elementDiv.insertAdjacentHTML('afterbegin', element);
         });
+        if (!elementDiv.querySelector('[id*=hylPrint]')) {
+            printBtns.forEach(x => {
+                elementDiv.appendChild(x);
+            });
+        }
     }
     mainForm.replaceChild(mainDiv, mainTable);
     // #endregion
@@ -436,6 +641,102 @@ function pageCleanup(contentBody) {
         newHelpPanel.appendChild(helpHeader);
         newHelpPanel.appendChild(helpTextContainer);
         oldHelpPanel.parentNode.replaceChild(newHelpPanel, oldHelpPanel);
+    }
+
+    let oldBackBtns = contentBody.querySelectorAll('[id$=ibtBackUp], [id$=ibtBack], [id$=ibtBackDown]');
+    if (oldBackBtns) {
+        oldBackBtns.forEach(oldBackBtn => {
+            let newBackBtn = createShortcutButton('回上層', "arrow_back", "flat");
+            oldBackBtn.style.display = "none";
+            newBackBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newBackBtn.appendBefore(oldBackBtn);
+        })
+    }
+
+    let oldPrintBtns = contentBody.querySelectorAll('[id$=ibtPrint]');
+    if (oldPrintBtns) {
+        oldPrintBtns.forEach(oldPrintBtn => {
+            let newPrintBtn = createShortcutButton('產生報表', "print", "alt");
+            oldPrintBtn.style.display = "none";
+            newPrintBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newPrintBtn.appendBefore(oldPrintBtn);
+        })
+    }
+
+    let oldCancelBtns = contentBody.querySelectorAll('[id$=ibtCancelUp], [id$=ibtCancel], [id$=ibtCancelDown]');
+    if (oldCancelBtns) {
+        oldCancelBtns.forEach(oldCancelBtn => {
+            let newCancelBtn = createShortcutButton('取消', "cancel", "colored");
+            oldCancelBtn.style.display = "none";
+            newCancelBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newCancelBtn.appendBefore(oldCancelBtn);
+        })
+    }
+
+    let oldDeleteBtns = contentBody.querySelectorAll('[id$=ibtDeleteUp], [id$=ibtDelete], [id$=ibtDeleteDown]');
+    if (oldDeleteBtns) {
+        oldDeleteBtns.forEach(oldDeleteBtn => {
+            let newDeleteBtn = createShortcutButton('刪除', "delete", "colored");
+            oldDeleteBtn.style.display = "none";
+            newDeleteBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newDeleteBtn.appendBefore(oldDeleteBtn);
+        })
+    }
+
+    let oldSearchBtns = contentBody.querySelectorAll('[id$=ibtQuery]');
+    if (oldSearchBtns) {
+        oldSearchBtns.forEach(oldSearchBtn => {
+            let newSearchBtn = createShortcutButton('查詢', "search", "alt");
+            oldSearchBtn.style.display = "none";
+            newSearchBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newSearchBtn.appendBefore(oldSearchBtn);
+        })
+    }
+
+    let oldLookUpBtns = contentBody.querySelectorAll('[id$=ibtLookUp]');
+    if (oldLookUpBtns) {
+        oldLookUpBtns.forEach(oldLookUpBtn => {
+            let newLookUpBtn = createShortcutButton('帶出', "pageview", "colored");
+            oldLookUpBtn.style.display = "none";
+            newLookUpBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newLookUpBtn.appendBefore(oldLookUpBtn);
+        })
+    }
+
+    let oldAddBtns = contentBody.querySelectorAll('[id$=ibtAddDown], [id$=ibtAdd], [id$=ibtAddUp]');
+    if (oldAddBtns) {
+        oldAddBtns.forEach(oldAddBtn => {
+            let newAddBtn = createShortcutButton('新增', "add", "alt");
+            oldAddBtn.style.display = "none";
+            newAddBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newAddBtn.appendBefore(oldAddBtn);
+        })
+    }
+
+    let oldSaveBtns = contentBody.querySelectorAll('[id$=ibtSaveDown], [id$=ibtSave], [id$=ibtSaveUp]');
+    if (oldSaveBtns) {
+        oldSaveBtns.forEach(oldSaveBtn => {
+            let newSaveBtn = createShortcutButton('存檔', "save", "alt");
+            oldSaveBtn.style.display = "none";
+            newSaveBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newSaveBtn.appendBefore(oldSaveBtn);
+        })
     }
 }
 
@@ -621,8 +922,9 @@ function injectTableAutofillBySubjectId(contentBody, subjectId, studentsInSubjec
 
 // Add export options for spreadsheet printing
 function printFix(contentBody) {
-    let printButtons = contentBody.querySelectorAll("a[id*=hylPrint]");
+    let printButtons = contentBody.querySelectorAll("a[id$=hylPrint]");
     if (printButtons.length > 0) {
+        log("Injecting custom export options...");
         printButtons.forEach(printButton => {
             if (!(/crystal[\d]\/.*\.rpt/gi.test(printButton.href))) {
                 return;
@@ -769,25 +1071,26 @@ function injectTableDownload(table) {
         class: 'tbl container',
         html: table.outerHTML,
     });
-    let downloadBtn = document.createElement('a');
-    downloadBtn.className = raisedButtonClassnames;
-    downloadBtn.classList.add('tbl-btn');
-    downloadBtn.href = '#';
-    componentHandler.upgradeElement(downloadBtn);
-    let downloadTxt = make({
-        el: 'i',
-        class: 'material-icons'
-    });
-    downloadTxt.appendChild(document.createTextNode('存成圖檔'));
-    downloadBtn.appendChild(downloadTxt);
-    newTableContainer.prepend(downloadBtn);
+    let svgDownloadBtn = createShortcutButton("存成 SVG", "save_alt");
+    let pngDownloadBtn = createShortcutButton("存成 PNG", "save_alt");
+    newTableContainer.prepend(svgDownloadBtn);
+    newTableContainer.prepend(pngDownloadBtn);
     table.parentNode.replaceChild(newTableContainer, table);
     // define table again
     table = newTableContainer.querySelector('table');
-    downloadBtn.addEventListener('click', function () {
+    pngDownloadBtn.addEventListener('click', function () {
         toggleOverlay(table.getRootNode());
         domtoimage.toPng(table).then(function (url) {
-            GM_download(url, 'image.png');
+            let outputName = `${table.id || "image"}.png`
+            GM_download(url, outputName);
+            toggleOverlay(table.getRootNode());
+        });
+    });
+    svgDownloadBtn.addEventListener('click', function () {
+        toggleOverlay(table.getRootNode());
+        domtoimage.toSvg(table).then(function (url) {
+            let outputName = `${table.id || "image"}.svg`
+            GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
         });
     });
@@ -871,15 +1174,40 @@ function createQuickLocationSelection(contentBody) {
     firstTable.appendChild(selectionContainer);
 }
 
-function createShortcutButton(text) {
+function createShortcutButton(text, icon = undefined, style = "colored") {
+    let classnames = "";
+    switch (style) {
+        case "colored":
+            classnames = raisedButtonClassnames;
+            break;
+        case "alt":
+            classnames = raisedButtonAltClassnames;
+            break;
+        case "flat":
+        default:
+            classnames = raisedButtonFlatClassnames;
+            break;
+    }
     let button = make({
         el: 'div',
-        class: raisedButtonClassnames,
+        class: classnames,
         attr: {
             'style': 'margin: .5em'
         }
     });
-    button.innerText = text;
+    if (icon != undefined) {
+        let iconText = make({
+            el: 'i',
+            class: 'material-icons'
+        });
+        iconText.innerText = icon;
+        button.appendChild(iconText);
+    }
+    button.appendChild(make({
+        el: 'span',
+        html: text
+    }));
+    componentHandler.upgradeElement(button);
     return button;
 }
 
@@ -890,6 +1218,9 @@ function createShortcutButton(text) {
 function make(obj) {
     let key,
         el = document.createElement(obj.el);
+    if (obj.id) {
+        el.id = obj.id;
+    }
     if (obj.class) {
         el.className = obj.class;
     }
@@ -1007,4 +1338,19 @@ function injectScript(head, script) {
 
 function log(msg) {
     console.log(`[NPTU Redux] ${msg}`);
+}
+
+// https://stackoverflow.com/a/32135318
+Element.prototype.appendAfter = function (element) {
+    element.parentNode.insertBefore(this, element.nextSibling);
+}, false;
+Element.prototype.appendBefore = function (element) {
+    element.parentNode.insertBefore(this, element);
+}, false;
+
+// modified from https://stackoverflow.com/a/10073788
+Number.prototype.pad = function (width, z) {
+    z = z || '0';
+    let n = this + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
