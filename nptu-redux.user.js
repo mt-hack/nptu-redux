@@ -53,7 +53,7 @@ let options = {
     instructorShortcutPage: ["A0413S1Page"],
     // Enables table downloading on these table/div IDs
     tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"],
-    isFlexRowWhitelist:["A0428S3Page"]
+    isFlexRowWhitelist: ["A0428S3Page", "B4002SPage"]
 };
 
 let subjectGroups = {
