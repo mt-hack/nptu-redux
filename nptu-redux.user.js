@@ -50,7 +50,8 @@ let options = {
     locationSelectionPage: ["A0413A02Page"],
     instructorShortcutPage: ["A0413S1Page"],
     // Enables table downloading on these table/div IDs
-    tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"]
+    tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"],
+    isFlexRowWhitelist:["A0428S3Page"]
 };
 
 let subjectGroups = {
@@ -269,7 +270,7 @@ frameElement.onload = function () {
     if (options.enableMaterialHeader) {
         injectHeader(contentBody);
     }
-    pageCleanup(contentBody);
+    pageCleanup(contentBody, options.isFlexRowWhitelist.includes(currentPage.name));
     if (/Main.aspx/g.test(currentPage.action)) {
         // Check for the semester change button; if one doesn't exist, likely student
         if (!currentPage.querySelector('#CommonHeader_ibtChgSYearSeme') &&
@@ -574,7 +575,7 @@ function injectHeader(contentBody) {
 }
 
 // Replaces each MainBody (td) with a div
-function pageCleanup(contentBody) {
+function pageCleanup(contentBody, shouldRenderInRows) {
     // #region Page Cleanup
     let mainTable = contentBody.querySelector('.TableDefault');
     if (!mainTable) {
@@ -589,15 +590,26 @@ function pageCleanup(contentBody) {
     });
     let printBtns = contentBody.querySelectorAll('[id*=hylPrint]');
     let menuElements = [];
-    let elementDiv = make({
-        el: 'div',
-        class: 'menu container'
-    });
+    let elementDiv = null;
+    if (!shouldRenderInRows){
+        elementDiv = make({
+            el: 'div',
+            class: 'menu container'
+        });
+    }
     mainBodies.forEach(element => {
         if (!isSafeToDelete(element)) {
             // identifier for menu tabs
             if (!element.querySelector('td.UnUse')) {
-                elementDiv.innerHTML += element.innerHTML;
+                if (!shouldRenderInRows){
+                    elementDiv = make({
+                        el: 'div',
+                        class: 'menu container',
+                        html: element.innerHTML
+                    });
+                }else{
+                    elementDiv.innerHTML += element.innerHTML;
+                }
                 mainDiv.appendChild(elementDiv);
             } else {
                 menuElements.push(element.innerHTML);
@@ -697,6 +709,18 @@ function pageCleanup(contentBody) {
         })
     }
 
+    let oldReQueryBtns = contentBody.querySelectorAll('[id$=ibtBackQueryUp], [id$=ibtBackQuery], [id$=ibtBackQueryDown]');
+    if (oldReQueryBtns) {
+        oldReQueryBtns.forEach(oldReQueryBtn => {
+            let newReQueryBtn = createShortcutButton('重新查詢', "search", "alt");
+            oldReQueryBtn.style.display = "none";
+            newReQueryBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newReQueryBtn.appendBefore(oldReQueryBtn);
+        })
+    }
+
     let oldSearchBtns = contentBody.querySelectorAll('[id$=ibtQuery]');
     if (oldSearchBtns) {
         oldSearchBtns.forEach(oldSearchBtn => {
@@ -733,7 +757,7 @@ function pageCleanup(contentBody) {
         })
     }
 
-    let oldSaveBtns = contentBody.querySelectorAll('[id$=ibtSaveDown], [id$=ibtSave], [id$=ibtSaveUp]');
+    let oldSaveBtns = contentBody.querySelectorAll('[id$=ibtSaveDown], [id$=ibtSave], [id$=ibtSaveUp], [id$=ibtGsTerm]');
     if (oldSaveBtns) {
         oldSaveBtns.forEach(oldSaveBtn => {
             let newSaveBtn = createShortcutButton('存檔', "save", "alt");
