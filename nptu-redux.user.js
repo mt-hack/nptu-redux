@@ -25,6 +25,8 @@ User configurable options
 let options = {
     // Beautifies login page (WIP)
     enableLoginPageMod: false,
+    // Enables button replacement (design WIP)
+    enableButtonReplacement: false,
     // Enables grade widget (Student accounts only)
     enableGradeOnHome: true,
     // Enables absence widget (Student accounts only)
@@ -308,6 +310,9 @@ frameElement.onload = function () {
     }
     if (currentPage.name === "B4002SPage") {
         injectCheckInHelper(contentBody);
+    }
+    if (options.enableButtonReplacement) {
+        buttonReplacement(contentBody);
     }
     organizeCourseList(contentBody);
     setupClipboard(contentBody);
