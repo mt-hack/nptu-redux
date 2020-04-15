@@ -677,113 +677,21 @@ function pageCleanup(contentBody, shouldRenderInRows) {
 }
 
 function buttonReplacement(contentBody) {
-    let oldBackBtns = contentBody.querySelectorAll('[id$=ibtBackUp], [id$=ibtBack], [id$=ibtBackDown]');
-    if (oldBackBtns) {
-        oldBackBtns.forEach(oldBackBtn => {
-            let newBackBtn = createShortcutButton('回上層', "arrow_back", "flat");
-            oldBackBtn.style.display = "none";
-            newBackBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
+    let types = Object.keys(buttonTypes);
+    types.forEach(type=>{
+        let buttonType = buttonTypes[type];
+        let oldButtons = contentBody.querySelectorAll(`[id$=ibt${buttonType.baseId}], [id$=ibt${buttonType.baseId}Down], [id$=ibt${buttonType.baseId}Up]`);
+        if (oldButtons){
+            oldButtons.forEach(oldBtn =>{
+                let newBtn = createShortcutButton(buttonType.label, buttonType.icon, buttonType.color);
+                oldBtn.style.display = "none";
+                newBtn.addEventListener('click', function (e) {
+                    this.nextElementSibling.click();
+                })
+                newBtn.appendBefore(oldBtn);
             })
-            newBackBtn.appendBefore(oldBackBtn);
-        })
-    }
-
-    let oldPrintBtns = contentBody.querySelectorAll('[id$=ibtPrint]');
-    if (oldPrintBtns) {
-        oldPrintBtns.forEach(oldPrintBtn => {
-            let newPrintBtn = createShortcutButton('產生報表', "print", "alt");
-            oldPrintBtn.style.display = "none";
-            newPrintBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newPrintBtn.appendBefore(oldPrintBtn);
-        })
-    }
-
-    let oldCancelBtns = contentBody.querySelectorAll('[id$=ibtCancelUp], [id$=ibtCancel], [id$=ibtCancelDown]');
-    if (oldCancelBtns) {
-        oldCancelBtns.forEach(oldCancelBtn => {
-            let newCancelBtn = createShortcutButton('取消', "cancel", "colored");
-            oldCancelBtn.style.display = "none";
-            newCancelBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newCancelBtn.appendBefore(oldCancelBtn);
-        })
-    }
-
-    let oldDeleteBtns = contentBody.querySelectorAll('[id$=ibtDeleteUp], [id$=ibtDelete], [id$=ibtDeleteDown]');
-    if (oldDeleteBtns) {
-        oldDeleteBtns.forEach(oldDeleteBtn => {
-            let newDeleteBtn = createShortcutButton('刪除', "delete", "colored");
-            oldDeleteBtn.style.display = "none";
-            newDeleteBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newDeleteBtn.appendBefore(oldDeleteBtn);
-        })
-    }
-
-    let oldReQueryBtns = contentBody.querySelectorAll('[id$=ibtBackQueryUp], [id$=ibtBackQuery], [id$=ibtBackQueryDown]');
-    if (oldReQueryBtns) {
-        oldReQueryBtns.forEach(oldReQueryBtn => {
-            let newReQueryBtn = createShortcutButton('重新查詢', "search", "alt");
-            oldReQueryBtn.style.display = "none";
-            newReQueryBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newReQueryBtn.appendBefore(oldReQueryBtn);
-        })
-    }
-
-    let oldSearchBtns = contentBody.querySelectorAll('[id$=ibtQuery]');
-    if (oldSearchBtns) {
-        oldSearchBtns.forEach(oldSearchBtn => {
-            let newSearchBtn = createShortcutButton('查詢', "search", "alt");
-            oldSearchBtn.style.display = "none";
-            newSearchBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newSearchBtn.appendBefore(oldSearchBtn);
-        })
-    }
-
-    let oldLookUpBtns = contentBody.querySelectorAll('[id$=ibtLookUp]');
-    if (oldLookUpBtns) {
-        oldLookUpBtns.forEach(oldLookUpBtn => {
-            let newLookUpBtn = createShortcutButton('帶出', "pageview", "colored");
-            oldLookUpBtn.style.display = "none";
-            newLookUpBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newLookUpBtn.appendBefore(oldLookUpBtn);
-        })
-    }
-
-    let oldAddBtns = contentBody.querySelectorAll('[id$=ibtAddDown], [id$=ibtAdd], [id$=ibtAddUp]');
-    if (oldAddBtns) {
-        oldAddBtns.forEach(oldAddBtn => {
-            let newAddBtn = createShortcutButton('新增', "add", "alt");
-            oldAddBtn.style.display = "none";
-            newAddBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newAddBtn.appendBefore(oldAddBtn);
-        })
-    }
-
-    let oldSaveBtns = contentBody.querySelectorAll('[id$=ibtSaveDown], [id$=ibtSave], [id$=ibtSaveUp], [id$=ibtGsTerm]');
-    if (oldSaveBtns) {
-        oldSaveBtns.forEach(oldSaveBtn => {
-            let newSaveBtn = createShortcutButton('存檔', "save", "alt");
-            oldSaveBtn.style.display = "none";
-            newSaveBtn.addEventListener('click', function (e) {
-                this.nextElementSibling.click();
-            })
-            newSaveBtn.appendBefore(oldSaveBtn);
-        })
-    }
+        }
+    })
 }
 
 function injectAbsenceTable(contentBody) {
@@ -1399,4 +1307,62 @@ Number.prototype.pad = function (width, z) {
     z = z || '0';
     let n = this + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+// Define button types (why doesn't JS support enum reeeee)
+const buttonTypes = {
+    SEARCH: {
+        icon: 'search',
+        label: '查詢',
+        color: 'alt',
+        baseId: 'Query'
+    },
+    SEARCH_AGAIN: {
+        icon: 'search',
+        label: '重新查詢',
+        color: 'alt',
+        baseId: 'BackQuery'
+    },
+    BACK: {
+        icon: 'arrow_back',
+        label: '回上層',
+        color: 'flat',
+        baseId: 'Back'
+    },
+    PRINT: {
+        icon: 'print',
+        label: '產生報表',
+        color: 'alt',
+        baseId: 'Print'
+    },
+    CANCEL: {
+        icon: 'cancel',
+        label: '取消',
+        color: 'colored',
+        baseId: 'Cancel'
+    },
+    DELETE: {
+        icon: 'delete',
+        label: '刪除',
+        color: 'colored',
+        baseId: 'Delete'
+    },
+    LOOKUP: {
+        icon: 'pageview',
+        label: '帶出',
+        color: 'colored',
+        baseId: 'LookUp'
+    },
+    ADD: {
+        icon: 'add',
+        label: '新增',
+        color: 'alt',
+        baseId: 'Add'
+    },
+    SAVE: {
+        icon: 'save',
+        label: '存檔',
+        color: 'alt',
+        baseId: 'Save'
+    }
 }
