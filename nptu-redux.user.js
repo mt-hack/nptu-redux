@@ -261,6 +261,10 @@ frameElement.onload = function () {
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
     injectStyle(mainWindow.document.head, customCss);
+    if (currentPage.name == "Form1"){
+        log('Detected sidebar; returning after style injection...');
+        return;
+    }
     if (options.locationSelectionPage.includes(currentPage.name)) {
         if (options.enableClassroomShortcut) {
             createQuickLocationSelection(contentBody);
@@ -678,11 +682,11 @@ function pageCleanup(contentBody, shouldRenderInRows) {
 
 function buttonReplacement(contentBody) {
     let types = Object.keys(buttonTypes);
-    types.forEach(type=>{
+    types.forEach(type => {
         let buttonType = buttonTypes[type];
         let oldButtons = contentBody.querySelectorAll(`[id$=ibt${buttonType.baseId}], [id$=ibt${buttonType.baseId}Down], [id$=ibt${buttonType.baseId}Up]`);
-        if (oldButtons){
-            oldButtons.forEach(oldBtn =>{
+        if (oldButtons) {
+            oldButtons.forEach(oldBtn => {
                 let newBtn = createShortcutButton(buttonType.label, buttonType.icon, buttonType.color);
                 oldBtn.style.display = "none";
                 newBtn.addEventListener('click', function (e) {
