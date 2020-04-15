@@ -670,6 +670,7 @@ function pageCleanup(contentBody, shouldRenderInRows) {
         oldHelpPanel.parentNode.replaceChild(newHelpPanel, oldHelpPanel);
     }
 
+function buttonReplacement(contentBody) {
     let oldBackBtns = contentBody.querySelectorAll('[id$=ibtBackUp], [id$=ibtBack], [id$=ibtBackDown]');
     if (oldBackBtns) {
         oldBackBtns.forEach(oldBackBtn => {
