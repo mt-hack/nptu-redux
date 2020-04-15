@@ -13,7 +13,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.2.2
+// @version 1.2.4
 // ==/UserScript==
 
 /* 
@@ -53,7 +53,7 @@ let options = {
     instructorShortcutPage: ["A0413S1Page"],
     // Enables table downloading on these table/div IDs
     tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"],
-    isFlexRowWhitelist: ["A0428S3Page", "B4002SPage"]
+    isFlexRowWhitelist: ["A0428S3Page", "B4002SPage", "A0428S1Page", "A0428S2Page", "A0428SPage"]
 };
 
 let subjectGroups = {
@@ -1216,7 +1216,7 @@ function getOrCreateLoadingOverlay(document) {
             el: 'div',
             class: 'redux overlay',
             attr: {
-                style: 'background: black;height: 100%;width: 100%;position: absolute;top: 0;left: 0;opacity: 0;display: none;justify-content: center;align-items: center; transition: opacity 0.5s; flex-direction: column;'
+                style: 'background: black;height: 100%;width: 100%;position: absolute;top: 0;left: 0;opacity: 0;display: none;justify-content: center;align-items: center; transition: opacity 0.5s; flex-direction: column;z-index: 99;'
             }
         });
         let spinner = make({
