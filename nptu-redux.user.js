@@ -670,6 +670,12 @@ function pageCleanup(contentBody, shouldRenderInRows) {
         oldHelpPanel.parentNode.replaceChild(newHelpPanel, oldHelpPanel);
     }
 
+    let dateInputFields = contentBody.querySelectorAll('input[id$=txtEND_DT], input[id$=txtBEGIN_DT]');
+    dateInputFields.forEach(x => {
+        x.autocomplete = "off";
+    })
+}
+
 function buttonReplacement(contentBody) {
     let oldBackBtns = contentBody.querySelectorAll('[id$=ibtBackUp], [id$=ibtBack], [id$=ibtBackDown]');
     if (oldBackBtns) {
