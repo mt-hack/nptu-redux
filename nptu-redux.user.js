@@ -253,6 +253,10 @@ frameElement.onload = function () {
 
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
+    if (!currentPage) {
+        log("Current page cannot be detected; assuming injected frame.");
+        return;
+    }
     log(`Current page: ${currentPage.name}`)
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
