@@ -301,14 +301,11 @@ frameElement.onload = function () {
             injectTableAutofillBySubjectId(contentBody, key, subjectGroups[key]);
         }
     }
-    // Experimental features
-    if (options.enableExperimental) {
-        options.tableExportWhitelist.forEach(x => {
-            contentBody.querySelectorAll(`table[id*=${x}], div[id*=${x}]`).forEach(table => {
-                injectTableDownload(table);
-            })
+    options.tableExportWhitelist.forEach(x => {
+        contentBody.querySelectorAll(`table[id*=${x}], div[id*=${x}]`).forEach(table => {
+            injectTableDownload(table);
         })
-    }
+    })
     if (currentPage.name === "A1007SPage" || currentPage.name === "A1014SPage") {
         injectFillAllOptions(contentBody);
     }
@@ -320,6 +317,9 @@ frameElement.onload = function () {
     }
     organizeCourseList(contentBody);
     setupClipboard(contentBody);
+
+    // Experimental features
+    if (options.enableExperimental) {}
 };
 
 function injectCheckInHelper(contentBody) {
