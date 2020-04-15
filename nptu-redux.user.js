@@ -591,7 +591,7 @@ function pageCleanup(contentBody, shouldRenderInRows) {
     let printBtns = contentBody.querySelectorAll('[id*=hylPrint]');
     let menuElements = [];
     let elementDiv = null;
-    if (!shouldRenderInRows){
+    if (shouldRenderInRows) {
         elementDiv = make({
             el: 'div',
             class: 'menu container'
@@ -601,13 +601,13 @@ function pageCleanup(contentBody, shouldRenderInRows) {
         if (!isSafeToDelete(element)) {
             // identifier for menu tabs
             if (!element.querySelector('td.UnUse')) {
-                if (!shouldRenderInRows){
+                if (!shouldRenderInRows) {
                     elementDiv = make({
                         el: 'div',
                         class: 'menu container',
                         html: element.innerHTML
                     });
-                }else{
+                } else {
                     elementDiv.innerHTML += element.innerHTML;
                 }
                 mainDiv.appendChild(elementDiv);
