@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           NPTU OpenStudy LMS Dark UserStyle
 @namespace      github.com/mt-hack/nptu-redux
-@version        1.0.7
+@version        1.0.8
 @license        MIT
 @author         Still Hsu <business@stillu.cc>
 @updateURL      https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-openstudy.user.css
@@ -24,7 +24,6 @@
         --alt-row-color: rgb(35, 39, 42);
         --menu-width: auto;
         --family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei';
-        --page-width: 1400px;
         --border-radius: 10px;
     }
 
@@ -251,10 +250,87 @@
 }
 
 @-moz-document regexp("https://openstudy.nptu.edu.tw/(((?!login_page).)*.php|course).*") {
-    @media screen and (max-width: 1400px) {
+    @media only screen and (min-device-width: 1024px) {
+
         #mainbody,
         #mainBody {
-            max-width: 95vw;
+            max-width: 90vw;
+        }
+
+        #menu,
+        #mainbody>#left {
+            flex: 1;
+        }
+
+        #main,
+        #mainbody>#right {
+            flex: 3;
+            padding-left: 3em;
+        }
+
+        #content,
+        #mainbody {
+            display: flex;
+        }
+
+        #menu .box,
+        #menu .selectBox,
+        .mnu,
+        #left,
+        #right {
+            width: var(--menu-width);
+        }
+
+        #main,
+        #menu,
+        .mnu,
+        #currPos~div,
+        #profile {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #menu .box,
+        .mnu {
+            margin: 4pt 0;
+        }
+    }
+
+    @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+
+        #content,
+        #mainbody,
+        #right>div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #left {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
+        #menu .box {
+            width: unset;
+        }
+
+        #left>div.mnu:nth-child(3),
+        #left>div.mnu:nth-child(4) {
+            display: none;
+        }
+
+        .mnu {
+            flex: 1;
+            margin-bottom: 1em;
+        }
+
+        #left,
+        .mnu {
+            width: unset;
+        }
+
+        #right>#currPos {
+            display: none;
         }
     }
 
@@ -277,7 +353,7 @@
     }
 
     table>tbody>tr>td>span {
-        font-size: 12px !important;
+        font-size: 1em !important;
     }
 
     #sysbar>.clear,
@@ -398,32 +474,13 @@
         width: auto;
     }
 
-    #menu,
-    #mainbody>#left {
-        flex: 1;
-    }
-
-    #main,
-    #mainbody>#right {
-        flex: 3;
-        padding-left: 3em;
-    }
 
     #menu .box,
     .mnu {
         border-radius: 5px;
         border: 2px solid var(--orange);
-        margin: 4pt 0;
         white-space: normal;
         padding: 0;
-    }
-
-    #menu .box,
-    #menu .selectBox,
-    .mnu,
-    #left,
-    #right {
-        width: var(--menu-width);
     }
 
     #menu>.selectBox {
@@ -454,20 +511,6 @@
     #copyright {
         border: 0;
         padding-top: 1em;
-    }
-
-    #main,
-    #menu,
-    .mnu,
-    #currPos~div,
-    #profile {
-        display: flex;
-        flex-direction: column;
-    }
-
-    #content,
-    #mainbody {
-        display: flex;
     }
 
     #wrapper>#base,
