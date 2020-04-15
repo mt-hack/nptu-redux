@@ -13,7 +13,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.2.1
+// @version 1.2.2
 // ==/UserScript==
 
 /* 
@@ -23,27 +23,33 @@ User configurable options
 */
 
 let options = {
-    // Enables grade widget
+    // Beautifies login page (WIP)
+    enableLoginPageMod: false,
+    // Enables grade widget (Student accounts only)
     enableGradeOnHome: true,
-    // Enables absence widget
+    // Enables absence widget (Student accounts only)
     enableAbsenceOnHome: true,
     // Shows the old header in case of component breakage
     enableMaterialHeader: true,
     // Enables custom export options for printing
     enableCustomExport: true,
-    customExportBlacklist: ["A0551RPage"],
-    // Enables max student number autofill based on classroom selection
+    // Enables max student number autofill based on classroom selection (Employee accounts only)
     enableClassroomAutofillOnSelect: true,
-    // Enables classroom shortcut in selection
+    // Enables classroom shortcut  (Employee accounts only)
     enableClassroomShortcut: true,
+    // Enables instructor shortcut (Employee accounts only)
     enableInstructorShortcut: true,
+    // Enables shortcut auto submit (Employee accounts only)
     enableShortcutAutoSubmit: true,
     // Enables experimental features (use at your own risk!)
     enableExperimental: true,
+    // Disables custom exports for problematic pages
+    customExportBlacklist: ["A0551RPage"],
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixWhitelist: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
     instructorShortcutPage: ["A0413S1Page"],
+    // Enables table downloading on these table/div IDs
     tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"]
 };
 
@@ -135,7 +141,7 @@ Homepage Injection
 ====================
 */
 
-if (window.location.href.match(/Web\/Secure\//g)) {
+if (window.location.href.match(/Web\/Secure\//g) && options.enableLoginPageMod) {
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
     document.querySelector('form').appendChild(make({
         el: 'style',
