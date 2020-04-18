@@ -24,9 +24,9 @@ User configurable options
 
 let options = {
     // Beautifies login page (WIP)
-    enableLoginPageMod: false,
+    enableLoginPageMod: true,
     // Enables button replacement (design WIP)
-    enableButtonReplacement: false,
+    enableButtonReplacement: true,
     // Enables grade widget (Student accounts only)
     enableGradeOnHome: true,
     // Enables absence widget (Student accounts only)
@@ -149,6 +149,75 @@ if (window.location.href.match(/Web\/Secure\//g) && options.enableLoginPageMod) 
     document.querySelector('form').appendChild(make({
         el: 'style',
         html: `    
+            .overlay {
+                background: #141827;
+                position: absolute;
+                min-height: 100vh;
+                overflow: hidden;
+                top: 0;
+                left: 0;
+                z-index: -1;
+                width: 100vw;
+            }
+
+            .box {
+                left: 0;
+                top: 0;
+                transform: rotate(80deg);
+                position: absolute;
+            }
+
+            .wave {
+                animation: drift 7000ms infinite linear;
+                background: #0af;
+                border-radius: 43%;
+                height: 1300px;
+                left: 0;
+                left: 10%;
+                margin-left: -150px;
+                margin-top: -250px;
+                opacity: .4;
+                position: fixed;
+                position: absolute;
+                top: 0;
+                top: 3%;
+                transform-origin: 50% 48%;
+                width: 1500px;
+            }
+
+            .wave.-three {
+                animation: drift 7500ms infinite linear;
+                background-color: #77daff;
+                position: fixed;
+            }
+
+            .wave.-two {
+                animation: drift 3000ms infinite linear;
+                background: black;
+                opacity: .1;
+                position: fixed;
+            }
+
+            .box:after {
+                content: '';
+                display: block;
+                height: 100%;
+                left: 0;
+                top: 0;
+                transform: translate3d(0, 0, 0);
+                width: 100%;
+                z-index: 11;
+            }
+
+            @keyframes drift {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                from {
+                    transform: rotate(360deg);
+                }
+            }
             #button-container>.container{
                 margin: 0.5em;
             }
@@ -169,30 +238,14 @@ if (window.location.href.match(/Web\/Secure\//g) && options.enableLoginPageMod) 
                 text-decoration: none;
                 color: #eee;
             }
-            @-webkit-keyframes GradientBackground {
-                0%{background-position:0% 50%}
-                50%{background-position:100% 51%}
-                100%{background-position:0% 50%}
-            }
-            @-moz-keyframes GradientBackground {
-                0%{background-position:0% 50%}
-                50%{background-position:100% 51%}
-                100%{background-position:0% 50%}
-            }
-            @keyframes GradientBackground {
-                0%{background-position:0% 50%}
-                50%{background-position:100% 51%}
-                100%{background-position:0% 50%}
-            }
             body{
-                background: linear-gradient(270deg, #641143, #3B1255, #251758);
-                background-size: 400% 400%;
-                animation: GradientBackground 60s ease infinite;
                 color: #ddd;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei UI', 'Microsoft JhengHei';
             }
         `
     }));
+    let overlay = make({ el: 'div', class: 'overlay', html: `<div id="overlay-wave" class="box"><div class="wave -one"></div><div class="wave -two"></div><div class="wave -three"></div></div>` });
+    document.body.appendChild(overlay);
     let widthDummy = document.querySelector("#LoginDefault_txtScreenWidth");
     if (widthDummy) {
         widthDummy.style.display = "none";
@@ -261,7 +314,7 @@ frameElement.onload = function () {
     injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
     injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
     injectStyle(mainWindow.document.head, customCss);
-    if (currentPage.name == "Form1"){
+    if (currentPage.name == "Form1") {
         log('Detected sidebar; returning after style injection...');
         return;
     }
@@ -323,7 +376,7 @@ frameElement.onload = function () {
     setupClipboard(contentBody);
 
     // Experimental features
-    if (options.enableExperimental) {}
+    if (options.enableExperimental) { }
 };
 
 function injectCheckInHelper(contentBody) {
@@ -386,7 +439,7 @@ function injectCheckInHelper(contentBody) {
 
 function getChineseYear(date = undefined) {
     date = date === undefined ? new Date() : date;
-    return `${date.getFullYear()-1911}/${(date.getMonth() + 1).pad(2)}/${date.getDate().pad(2)}`;
+    return `${date.getFullYear() - 1911}/${(date.getMonth() + 1).pad(2)}/${date.getDate().pad(2)}`;
 }
 
 function makeChipText(text) {
@@ -812,6 +865,7 @@ function tableFix(contentBody) {
         x.style.position = 'sticky';
         x.style.left = 0;
         x.style.background = 'rgba(100,200,100,0.9)';
+        x.style.zIndex = 100;
     })
     let tableRows = dataContent.querySelectorAll('tr');
     if (tableRows) {
