@@ -415,10 +415,13 @@ if (isHomepage(document)) {
             }
         }
     }
+    if (options.enableButtonReplacement) {
+        buttonReplacement(contentBody);
+    }
+    if (options.enableCustomExport) {
+        printFix(contentBody);
+    }
     frameElement.onload = function () {
-        if (options.enableCustomExport) {
-            printFix(contentBody);
-        }
         if (options.tableFixWhitelist.includes(currentPage.name)) {
             tableFix(contentBody);
             if (options.enableClassroomAutofillOnSelect) {
@@ -438,9 +441,6 @@ if (isHomepage(document)) {
         }
         if (currentPage.name === "B4002SPage") {
             injectCheckInHelper(contentBody);
-        }
-        if (options.enableButtonReplacement) {
-            buttonReplacement(contentBody);
         }
         organizeCourseList(contentBody);
         setupClipboard(contentBody);
