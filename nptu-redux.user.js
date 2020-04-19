@@ -614,7 +614,7 @@ function injectHeader(contentBody) {
     if (oldHome) {
         newHeaderHtml += `
                 <span for="home-button" class="mdl-tooltip mdl-tooltip--large">首頁</span>
-                <label id="home-button" for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
+                <label id="home-button" for=${oldHome.id} class='btn hoverable' onclick='toggleOverlay(this.getRootNode()); this.nextElementSibling.click();'>home</label>
                 <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
     newHeaderHtml += `</div><div class="sub container" id="module-info">`;
@@ -1328,11 +1328,11 @@ function make(obj) {
 function toggleOverlay(document) {
     let overlay = getOrCreateLoadingOverlay(document);
     if (overlay.classList.contains('popOut')) {
+        document.querySelector('body').style.overflow = 'hidden';
         overlay.classList.replace('popOut', 'popIn');
     } else if (overlay.classList.contains('popIn')) {
+        document.querySelector('body').style.overflow = null;
         overlay.classList.replace('popIn', 'popOut');
-    } else {
-        overlay.classList.add('popIn');
     }
 }
 
