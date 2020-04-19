@@ -919,13 +919,21 @@ function tableFix(contentBody) {
         node.style.right = null;
         node.style.bottom = null;
     })
-    let subjectColumns = dataContent.querySelectorAll('td:nth-child(6)');
-    subjectColumns.forEach(x => {
-        x.style.position = 'sticky';
-        x.style.left = 0;
-        x.style.background = 'rgba(100,200,100,0.9)';
-        x.style.zIndex = 100;
-    })
+    let subjectHeaderCell = contentBody.ownerDocument.evaluate(`//table[@class="DgTable"]//div[contains(.,"科目")]`, contentBody.ownerDocument).iterateNext();
+    if (subjectHeaderCell){
+        let parentTd = subjectHeaderCell.parentNode;
+        let parentTr = parentTd.parentNode;
+        let index = Array.prototype.indexOf.call(parentTr.children, parentTd) + 1;
+        let subjectColumns = dataContent.querySelectorAll(`td:nth-child(${index})`);
+        subjectColumns.forEach(x => {
+            x.style.position = 'sticky';
+            x.style.left = 0;
+            x.style.background = 'rgba(100,200,100,0.9)';
+            x.style.zIndex = 100;
+        })
+    }else{
+        log('Unable to locate the subject header cell, skipping column sticky.');
+    }
     let tableRows = dataContent.querySelectorAll('tr');
     if (tableRows) {
         tableRows.forEach(x => {
