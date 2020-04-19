@@ -117,7 +117,7 @@ let instructorShortcuts = {
     金大衛: '200010027',
     余慧珠: '200010033',
     項偉恩: '200009296',
-    梁愷:   '200008819',
+    梁愷: '200008819',
     梁中行: '200009049',
     王彩姿: '200008861',
     楊昕昕: '200008862',
@@ -190,7 +190,7 @@ const buttonTypes = {
         color: 'alt',
         baseId: 'Save'
     },
-    CHANGE_SEM:{
+    CHANGE_SEM: {
         icon: 'event',
         label: '切換學期',
         color: 'alt',
@@ -615,7 +615,8 @@ function injectHeader(contentBody) {
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
         newHeaderHtml += `
-                <label for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
+                <label id="home-button" for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
+                <span for="home-button" class="mdl-tooltip mdl-tooltip--large">首頁</span>
                 <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
     //  #endregion
@@ -678,7 +679,8 @@ function injectHeader(contentBody) {
     let oldPwdBtn = contentBody.querySelector('#CommonHeader_ibtChgPwd');
     if (oldPwdBtn) {
         newHeaderHtml += `
-                <label for=${oldPwdBtn.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
+                <label for=${oldPwdBtn.id} id="change-pw-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
+                <span for="change-pw-button" class="mdl-tooltip mdl-tooltip--large">更改密碼</span>
                 <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldPwdBtn.name} name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
     }
     //    #endregion
@@ -686,7 +688,8 @@ function injectHeader(contentBody) {
     let oldLogout = contentBody.querySelector('#CommonHeader_ibtLogOut');
     if (oldLogout) {
         newHeaderHtml += `
-                <label for=${oldLogout.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
+                <label for=${oldLogout.id} id="logout-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
+                <span for="logout-button" class="mdl-tooltip mdl-tooltip--large">登出</span>
                 <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
     //  #endregion
@@ -926,7 +929,7 @@ function tableFix(contentBody) {
         node.style.bottom = null;
     })
     let subjectHeaderCell = contentBody.ownerDocument.evaluate(`//table[@class="DgTable"]//div[contains(.,"科目")]`, contentBody.ownerDocument).iterateNext();
-    if (subjectHeaderCell){
+    if (subjectHeaderCell) {
         let parentTd = subjectHeaderCell.parentNode;
         let parentTr = parentTd.parentNode;
         let index = Array.prototype.indexOf.call(parentTr.children, parentTd) + 1;
@@ -937,7 +940,7 @@ function tableFix(contentBody) {
             x.style.background = 'rgba(100,200,100,0.9)';
             x.style.zIndex = 100;
         })
-    }else{
+    } else {
         log('Unable to locate the subject header cell, skipping column sticky.');
     }
     let tableRows = dataContent.querySelectorAll('tr');
@@ -975,7 +978,7 @@ function injectTableAutoFillByClassroomType(contentBody) {
                 this.options[this.selectedIndex].text.includes('視聽教室')) {
                 targetValue = 60
             }
-            if (targetValue > 0){
+            if (targetValue > 0) {
                 maxStudentInput.value = targetValue;
                 maxStudentInput.style.backgroundColor = 'antiquewhite';
                 maxStudentInput.title = "已依照教室類別自動更改人數";
@@ -1142,7 +1145,7 @@ function organizeCourseList(contentBody) {
                 }
             }
         });
-        if (incompleteText.innerText.length > 0){
+        if (incompleteText.innerText.length > 0) {
             GM_notification("您有尚未排課之課程！");
         }
         completeGroup.appendChild(completeText);
