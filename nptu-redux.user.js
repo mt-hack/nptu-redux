@@ -353,6 +353,10 @@ if (isHomepage(document)) {
             if (captchaField) {
                 oldLoginBtn.appendAfter(captchaField);
             }
+            let captchaTextField = mainElement.querySelector('[id$="txtCheckCode"]');
+            if (captchaTextField) {
+                captchaTextField.autocomplete = "off";
+            }
             let newLoginBtn = createShortcutButton('登入', 'vpn_key', 'colored');
             newLoginBtn.addEventListener('click', function (e) {
                 this.nextElementSibling.click();
