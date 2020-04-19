@@ -56,6 +56,8 @@ let options = {
     isFlexRowWhitelist: ["A0428S3Page", "B4002SPage", "A0428S1Page", "A0428S2Page", "A0428SPage"]
 };
 
+// Replace the subject groups with your own if you are an employee
+
 let subjectGroups = {
     ENG1001: 30,
     ENG1003: 60,
@@ -64,25 +66,44 @@ let subjectGroups = {
     ENG2002: 30,
     ENG2003: 60,
     ENG2005: 60,
+    ENG2009: 60,
+    ENG2015: 60,
     ENG2027: 30,
     ENG3001: 30,
     ENG3005: 60,
+    ENG3007: 8,
+    ENG3008: 45,
+    ENG3019: 45,
+    ENG3040: 60,
     ENG3032: 30,
-    ENG4001: 30,
-    ENG4002: 60,
-    ENG2008: 49,
+    ENG2008: 45,
     ENG2028: 30,
     ENG2031: 60,
-    ENG2032: 49,
-    ENG2033: 49,
-    ENG3004: 49,
+    ENG2032: 45,
+    ENG2033: 45,
+    ENG2034: 45,
+    ENG3004: 45,
     ENG3009: 60,
     ENG3039: 60,
+    ENG3040: 60,
+    ENG4001: 30,
+    ENG4002: 60,
     ENG4008: 60,
-    ENG4014: 49,
-    ENG4036: 49,
+    ENG4014: 45,
+    ENG4024: 15,
+    ENG4036: 45,
     ENG4037: 30,
-    ENG4041: 30,
+    ENG4041: 25,
+    ENI0001: 8,
+    ENI0005: 25,
+    ENI0007: 15,
+    ENI1001: 25,
+    ENI1007: 25,
+    ENI1011: 25,
+    ENI1117: 25,
+    ENI1135: 25,
+    ENI1137: 25,
+    ENI1302: 25,
 }
 
 let locationShortcuts = {
@@ -91,16 +112,18 @@ let locationShortcuts = {
     人文館二討: 'G212',
     五育樓5F視聽: 'I500'
 }
+
 let instructorShortcuts = {
     金大衛: '200010027',
     余慧珠: '200010033',
     項偉恩: '200009296',
-    梁愷: '200008819',
+    梁愷:   '200008819',
     梁中行: '200009049',
     王彩姿: '200008861',
     楊昕昕: '200008862',
     李惠敏: '200008812',
     楊琇琇: '200008724',
+    張淑英: '200008978',
     張理宏: '200008741'
 }
 
