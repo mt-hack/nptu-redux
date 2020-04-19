@@ -13,7 +13,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.2.4
+// @version 1.3.0
 // ==/UserScript==
 
 /* 
@@ -111,18 +111,111 @@ DO NOT TOUCH THE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
 =========================================================
 */
 
+// Button definitions
+const buttonTypes = {
+    SEARCH: {
+        icon: 'search',
+        label: '查詢',
+        color: 'alt',
+        baseId: 'Query'
+    },
+    SEARCH_AGAIN: {
+        icon: 'search',
+        label: '重新查詢',
+        color: 'alt',
+        baseId: 'BackQuery'
+    },
+    BACK: {
+        icon: 'arrow_back',
+        label: '回上層',
+        color: 'flat',
+        baseId: 'Back'
+    },
+    PRINT: {
+        icon: 'print',
+        label: '產生報表',
+        color: 'alt',
+        baseId: 'Print'
+    },
+    CANCEL: {
+        icon: 'cancel',
+        label: '取消',
+        color: 'colored',
+        baseId: 'Cancel'
+    },
+    DELETE: {
+        icon: 'delete',
+        label: '刪除',
+        color: 'colored',
+        baseId: 'Delete'
+    },
+    LOOKUP: {
+        icon: 'pageview',
+        label: '帶出',
+        color: 'colored',
+        baseId: 'LookUp'
+    },
+    ADD: {
+        icon: 'add',
+        label: '新增',
+        color: 'alt',
+        baseId: 'Add'
+    },
+    SAVE: {
+        icon: 'save',
+        label: '存檔',
+        color: 'alt',
+        baseId: 'Save'
+    }
+}
+
 /*
-MAIN INIT
+Prototype helper methods
 */
 
+Element.prototype.replaceElement = function (targetElementName = undefined, targetElementClass = undefined) {
+    let newElement = document.createElement(targetElementName || "span");
+    newElement.innerHTML = this.innerHTML;
+    if (targetElementClass) {
+        newElement.classList = targetElementClass;
+    } else {
+        newElement.classList = this.classList;
+    }
+    return newElement;
+}
+
+Element.prototype.appendAfter = function (element) {
+    element.parentNode.insertBefore(this, element.nextSibling);
+}, false;
+
+Element.prototype.appendBefore = function (element) {
+    element.parentNode.insertBefore(this, element);
+}, false;
+
+// modified from https://stackoverflow.com/a/10073788
+Number.prototype.pad = function (width, z) {
+    z = z || '0';
+    let n = this + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
 let emptyImage = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
-let customCss = 'https://cdn.jsdelivr.net/gh/mt-hack/nptu-redux/nptu-redux.min.css';
 let raisedButtonClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent';
 let raisedButtonAltClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored';
 let raisedButtonFlatClassnames = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect';
 let mainElement = document.querySelector('frame') || document.querySelector('form');
+if (!mainElement) {
+    log('Main frame/form not detected; assuming unknown page.');
+    return;
+}
 let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultView;
 let frameElement = mainWindow.frameElement || mainWindow;
+let contentWindow = frameElement.contentWindow || frameElement;
+if (contentWindow.WebForm_OnSubmit) {
+    contentWindow.WebForm_OnSubmit = function () {
+        toggleOverlay(mainWindow.document);
+    }
+}
 
 /*
 ===================
@@ -139,112 +232,30 @@ images.forEach(img => {
 })
 
 /*
+===================
+CSS Injection
+===================
+*/
+
+injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
+injectCustomCss(mainWindow.document.head);
+
+/*
 ====================
 Homepage Injection
 ====================
 */
 
-if (window.location.href.match(/Web\/Secure\//g) && options.enableLoginPageMod) {
-    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
-    document.querySelector('form').appendChild(make({
-        el: 'style',
-        html: `    
-            .overlay {
-                background: #141827;
-                position: absolute;
-                min-height: 100vh;
-                overflow: hidden;
-                top: 0;
-                left: 0;
-                z-index: -1;
-                width: 100vw;
-            }
-
-            .box {
-                left: 0;
-                top: 0;
-                transform: rotate(80deg);
-                position: absolute;
-            }
-
-            .wave {
-                animation: drift 7000ms infinite linear;
-                background: #0af;
-                border-radius: 43%;
-                height: 1300px;
-                left: 0;
-                left: 10%;
-                margin-left: -150px;
-                margin-top: -250px;
-                opacity: .4;
-                position: fixed;
-                position: absolute;
-                top: 0;
-                top: 3%;
-                transform-origin: 50% 48%;
-                width: 1500px;
-            }
-
-            .wave.-three {
-                animation: drift 7500ms infinite linear;
-                background-color: #77daff;
-                position: fixed;
-            }
-
-            .wave.-two {
-                animation: drift 3000ms infinite linear;
-                background: black;
-                opacity: .1;
-                position: fixed;
-            }
-
-            .box:after {
-                content: '';
-                display: block;
-                height: 100%;
-                left: 0;
-                top: 0;
-                transform: translate3d(0, 0, 0);
-                width: 100%;
-                z-index: 11;
-            }
-
-            @keyframes drift {
-                from {
-                    transform: rotate(0deg);
-                }
-
-                from {
-                    transform: rotate(360deg);
-                }
-            }
-            #button-container>.container{
-                margin: 0.5em;
-            }
-            #button-container{
-                display: grid;
-                grid: auto-flow dense/repeat(3,auto);
-                padding-bottom: 4em;
-                max-width: 60vh;
-            }
-            #nptu-redux-header{
-                height: 15vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            #nptu-redux-header>.header-text{
-                font-size: 3em;
-                text-decoration: none;
-                color: #eee;
-            }
-            body{
-                color: #ddd;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei UI', 'Microsoft JhengHei';
-            }
-        `
-    }));
-    let overlay = make({ el: 'div', class: 'overlay', html: `<div id="overlay-wave" class="box"><div class="wave -one"></div><div class="wave -two"></div><div class="wave -three"></div></div>` });
+if (isHomepage(document)) {
+    if (!options.enableLoginPageMod) {
+        return;
+    }
+    let overlay = make({
+        el: 'div',
+        class: 'overlay',
+        html: `<div id="overlay-wave" class="box"><div class="wave -one"></div><div class="wave -two"></div><div class="wave -three"></div></div>`
+    });
     document.body.appendChild(overlay);
     let widthDummy = document.querySelector("#LoginDefault_txtScreenWidth");
     if (widthDummy) {
@@ -267,7 +278,12 @@ if (window.location.href.match(/Web\/Secure\//g) && options.enableLoginPageMod) 
             id: 'nptu-redux-header',
             html: "<a class='header-text' href='https://webap.nptu.edu.tw'>🏫 國立屏東大學 (NPTU-Redux)</span>"
         })
-        headerImage.parentNode.replaceChild(newHeader, headerImage);
+        document.body.prepend(newHeader);
+        headerImage.remove();
+    }
+    let javaNote = document.querySelector('a[href*="java.com"]');
+    if (javaNote) {
+        javaNote.remove();
     }
     let loginButtons = document.querySelectorAll("input[id^=LoginDefault]");
     let mainTable = document.querySelector("#TableMain");
@@ -288,22 +304,45 @@ if (window.location.href.match(/Web\/Secure\//g) && options.enableLoginPageMod) 
         })
         mainTable.parentNode.replaceChild(newButtonContainer, mainTable);
     }
-    return;
-}
-
-/*
-===================
-Main Page Injection
-===================
-*/
-frameElement.onload = function () {
-    let contentWindow = frameElement.contentWindow || frameElement;
-    if (contentWindow.WebForm_OnSubmit) {
-        contentWindow.WebForm_OnSubmit = function () {
-            toggleOverlay(mainWindow.document);
+    if (isLoginPage(document)) {
+        let loginForm = document.querySelector('table.style1');
+        if (!loginForm) {
+            return;
+        }
+        let loginFormContainer = make({
+            el: 'section',
+            class: 'container',
+            id: 'login-container'
+        });
+        loginForm = loginForm.replaceElement('div', 'login-form');
+        loginFormContainer.appendChild(loginForm);
+        mainElement.appendChild(loginFormContainer);
+        mainElement.querySelector('table').remove();
+        let oldLoginBtn = mainElement.querySelector('input[id$=ibtLogin]');
+        if (oldLoginBtn) {
+            let captchaField = mainElement.querySelector('[id$="rfvCheckCode"]');
+            if (captchaField) {
+                oldLoginBtn.appendAfter(captchaField);
+            }
+            let newLoginBtn = createShortcutButton('登入', 'vpn_key', 'colored');
+            newLoginBtn.addEventListener('click', function (e) {
+                this.nextElementSibling.click();
+            })
+            newLoginBtn.appendBefore(oldLoginBtn);
+            oldLoginBtn.style.display = 'none';
+        }
+        let captchaImage = mainElement.querySelector('#imgCaptcha');
+        if (captchaImage) {
+            captchaImage.addEventListener('click', function (e) {
+                this.src = `../Modules/CaptchaCreator.aspx?${Math.random()}`
+            })
         }
     }
-
+} else {
+    if (!frameElement) {
+        log('Frame element cannot be detected; assuming unknown page.');
+        return;
+    }
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
     if (!currentPage) {
@@ -311,9 +350,6 @@ frameElement.onload = function () {
         return;
     }
     log(`Current page: ${currentPage.name}`)
-    injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-    injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
-    injectStyle(mainWindow.document.head, customCss);
     if (currentPage.name == "Form1") {
         log('Detected sidebar; returning after style injection...');
         return;
@@ -376,7 +412,7 @@ frameElement.onload = function () {
     setupClipboard(contentBody);
 
     // Experimental features
-    if (options.enableExperimental) { }
+    if (options.enableExperimental) {}
 };
 
 function injectCheckInHelper(contentBody) {
@@ -634,7 +670,6 @@ function injectHeader(contentBody) {
         html: newHeaderHtml
     });
     componentHandler.upgradeElement(newHeader);
-
     let mainForm = mainWindow.document.body.querySelector('body>form');
     mainForm.prepend(newHeader);
     oldHeader.remove();
@@ -1217,10 +1252,21 @@ function createShortcutButton(text, icon = undefined, style = "colored") {
     }
     button.appendChild(make({
         el: 'span',
-        html: text
+        html: text,
+        attr: {
+            style: 'font-family: var(--msft-fonts);'
+        }
     }));
     componentHandler.upgradeElement(button);
     return button;
+}
+
+function injectCustomCss(head) {
+    let newStyle = make({
+        el: 'style',
+        html: `#login-container{display:flex;flex-direction:column;justify-content:center;align-items:center}.login-form{display:flex;flex-direction:column;align-items:center;background:#353535b5;padding:2em;min-width:25vw;max-width:50vw;border:#59595991 2px solid;border-radius:15px;color:#eee}.overlay{background:#141827;position:absolute;min-height:100vh;overflow:hidden;top:0;left:0;z-index:-1;width:100vw}.box{left:0;top:0;transform:rotate(80deg);position:absolute}.wave{animation:drift 7000ms infinite linear;background:#e80c69;border-radius:45%;height:calc(100vw*0.85);margin-left:-150px;margin-top:-250px;opacity:.4;transform-origin:50% 48%;width:100vw}.wave.-two{animation:drift 3000ms infinite linear;background:#000;opacity:.1;position:fixed}.wave.-three{animation:drift 7500ms infinite linear;background-color:#ff77ca;position:fixed}.box:after{content:'';display:block;height:100%;left:0;top:0;transform:translate3d(0,0,0);width:100%;z-index:11}@keyframes drift{from{transform:rotate(0deg)}from{transform:rotate(360deg)}}#button-container>.container{margin:0.5em}#button-container{display:grid;grid:auto-flow dense/repeat(3,auto);padding-bottom:4em;max-width:60vh}#nptu-redux-header{height:15vh;display:flex;justify-content:center;align-items:center}#nptu-redux-header>.header-text{font-size:3em;text-decoration:none;color:#eee}:root{--msft-fonts:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif,'Microsoft YaHei','Microsoft JhengHei';--main-color:#003e38}body{font-family:var(--msft-fonts)}@media screen{body{font-size:calc(0.75em + 1vmin)}}@media screen and (min-width:75em){body{font-size:1em}}.text.clickable,.copyable{font-size:1em;text-decoration:none;transition:text-shadow .3s,text-decoration .3s,font-size .4s}.text.clickable:hover,.copyable:hover{font-size:1.2em;vertical-align:top;text-decoration:underline;text-shadow:1px 1px 1px rgba(0,0,0,0.35);cursor:pointer}#module-info{text-align:right;padding-right:.5em}#user-info{text-align:left;padding-left:.5em}.top.header.container .container{display:inline-flex}.top.header.container .container div{display:inline;vertical-align:top}.top.header.container .btn{text-shadow:1px 1px 1px #000;padding-top:.25em}.btn{font:3em "Material Icons",sans-serif;cursor:pointer;background:none;border:none;color:#fff;padding-right:.1em}.btn.hoverable{transition:text-shadow .25s}.btn.hoverable:hover{text-shadow:0 8px 17px rgba(0,0,0,0.2),0 6px 20px rgba(0,0,0,0.19)}.export-link,.export-link:hover,.export-link:active,.export-link:focus,.export-link:focus-within{text-decoration:none}.container:not(.top){margin:.5em}.header.container{display:flex;background-color:var(--main-color);color:#fff;border-radius:15px;font-size:1.35em;padding:.5em;-webkit-box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2)}.header.container:nth-of-type(2n):not(.top){background-color:#b71c1c}.header.container:nth-of-type(3n):not(.top){background-color:#154648}.main.container{margin:1em;display:flex;flex-direction:row;flex-wrap:wrap}.sub.container{flex-direction:column;flex:2.5}.menu.container{display:flex;flex-direction:column}.menu.container,.alt.container{flex:1}.alt.buttons.container.right{justify-content:flex-end}.alt.buttons.container.left{justify-content:flex-start}.print.container{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}.export-section{padding:1em 2em}.help .text.container{border:solid 1px var(--main-color)}.text.container{white-space:pre-wrap;padding:1em;border-radius:6px;margin:0 1em}.inline-frame{border:none}.tbl-btn{display:block}.TRHeaderStyle{font-family:"inherit!important";background:var(--main-color)}.TDItemStyle{font-family:"inherit!important";min-width:3em}.DgTable{transition:box-shadow .3s;box-shadow:rgba(0,0,0,0.14) 0 4px 5px 0,rgba(0,0,0,0.12) 0 1px 10px 0,rgba(0,0,0,0.3) 0 2px 4px -1px}.DgTable:hover{box-shadow:0 8px 17px 2px rgba(0,0,0,0.14),0 3px 14px 2px rgba(0,0,0,0.12),0 5px 5px -3px rgba(0,0,0,0.2)}.title-with-icon.left{margin-left:.5em}.title-with-icon.right{margin-right:.5em}.class-option{cursor:pointer}`
+    })
+    head.appendChild(newStyle);
 }
 
 /* Helper Method */
@@ -1332,6 +1378,14 @@ function isSafeToDelete(element) {
     return true;
 }
 
+function isLoginPage(document) {
+    return (document.querySelector('input[src$="Enter_M.png"]') ? true : false);
+}
+
+function isHomepage(document) {
+    return (document.querySelector('body>form[action$="default.aspx"]') ? true : false);
+}
+
 // not using GM_addstyle since we need to access various frame heads
 function injectStyle(head, style) {
     let css = document.createElement('link');
@@ -1350,77 +1404,4 @@ function injectScript(head, script) {
 
 function log(msg) {
     console.log(`[NPTU Redux] ${msg}`);
-}
-
-// https://stackoverflow.com/a/32135318
-Element.prototype.appendAfter = function (element) {
-    element.parentNode.insertBefore(this, element.nextSibling);
-}, false;
-Element.prototype.appendBefore = function (element) {
-    element.parentNode.insertBefore(this, element);
-}, false;
-
-// modified from https://stackoverflow.com/a/10073788
-Number.prototype.pad = function (width, z) {
-    z = z || '0';
-    let n = this + '';
-    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-}
-
-// Define button types (why doesn't JS support enum reeeee)
-const buttonTypes = {
-    SEARCH: {
-        icon: 'search',
-        label: '查詢',
-        color: 'alt',
-        baseId: 'Query'
-    },
-    SEARCH_AGAIN: {
-        icon: 'search',
-        label: '重新查詢',
-        color: 'alt',
-        baseId: 'BackQuery'
-    },
-    BACK: {
-        icon: 'arrow_back',
-        label: '回上層',
-        color: 'flat',
-        baseId: 'Back'
-    },
-    PRINT: {
-        icon: 'print',
-        label: '產生報表',
-        color: 'alt',
-        baseId: 'Print'
-    },
-    CANCEL: {
-        icon: 'cancel',
-        label: '取消',
-        color: 'colored',
-        baseId: 'Cancel'
-    },
-    DELETE: {
-        icon: 'delete',
-        label: '刪除',
-        color: 'colored',
-        baseId: 'Delete'
-    },
-    LOOKUP: {
-        icon: 'pageview',
-        label: '帶出',
-        color: 'colored',
-        baseId: 'LookUp'
-    },
-    ADD: {
-        icon: 'add',
-        label: '新增',
-        color: 'alt',
-        baseId: 'Add'
-    },
-    SAVE: {
-        icon: 'save',
-        label: '存檔',
-        color: 'alt',
-        baseId: 'Save'
-    }
 }
