@@ -618,48 +618,51 @@ function injectHeader(contentBody) {
                 <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
     newHeaderHtml += `</div><div class="sub container" id="module-info">`;
-    let moduleName = contentBody.querySelector('#CommonHeader_lblModule').innerText;
+    let moduleName = contentBody.querySelector('#CommonHeader_lblModule')
     if (moduleName) {
         newHeaderHtml += `
                 <div>
                     <i class="material-icons">dashboard</i>
                     <div class="hoverable" id="page-name">
-                        ${moduleName}
+                        ${moduleName.innerText}
                     </div>
                 </div>`;
     }
-    let semesterName = contentBody.querySelector('#CommonHeader_lblYSC').innerText.replace(/[:：]/g, '');
-    let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
-    if (semesterName) {
-        newHeaderHtml += `<div><i class="material-icons">event</i>`;
+    let semesterElement = contentBody.querySelector('#CommonHeader_lblYSC');
+    if (semesterElement){
+        let semesterName = semesterElement.innerText.replace(/[:：]/g, '');
+        let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
+        if (semesterName) {
+            newHeaderHtml += `<div><i class="material-icons">event</i>`;
+        }
+        if (oldSemSwitch) {
+            newHeaderHtml += `
+                    <span for="semester-name" class="mdl-tooltip mdl-tooltip--large">切換學期</span>
+                    <label id="semester-name" class="text clickable" onclick='this.nextElementSibling.click();'>${semesterName}</label>
+                    <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
+        } else {
+            newHeaderHtml += `<div class="hoverable" id="semester-name">${semesterName}</div>`;
+        }
+        newHeaderHtml += `</div>`;
     }
-    if (oldSemSwitch) {
-        newHeaderHtml += `
-                <span for="semester-name" class="mdl-tooltip mdl-tooltip--large">切換學期</span>
-                <label id="semester-name" class="text clickable" onclick='this.nextElementSibling.click();'>${semesterName}</label>
-                <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
-    } else {
-        newHeaderHtml += `<div class="hoverable" id="semester-name">${semesterName}</div>`;
-    }
-    newHeaderHtml += `</div>`;
     newHeaderHtml += `</div><div class="sub container" id="user-info">`;
-    let loginName = contentBody.querySelector('#CommonHeader_lblName').innerText;
+    let loginName = contentBody.querySelector('#CommonHeader_lblName');
     if (loginName) {
         newHeaderHtml += `
                 <div>
                     <i class="material-icons">person</i>
                     <div class="hoverable" id="user-name">
-                        ${loginName}
+                        ${loginName.innerText}
                     </div>
                 </div>`;
     }
-    let onlineUsers = contentBody.querySelector('.CommomHeadstyle2 font').innerText;
+    let onlineUsers = contentBody.querySelector('.CommomHeadstyle2 font');
     if (onlineUsers) {
         newHeaderHtml += `
                 <div>
                     <i class="material-icons">people</i>
                     <div class="hoverable" id="user-count">
-                        ${onlineUsers}
+                        ${onlineUsers.innerText}
                     </div>
                 </div>`;
     }
