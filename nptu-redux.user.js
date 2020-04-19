@@ -609,19 +609,15 @@ function checkAllInput(contentBody, id) {
 
 function injectHeader(contentBody) {
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
-    //  #region [HTML Declaration]
     let newHeaderHtml = `<div class="top header container"><div class="alt buttons container left">`;
-    //    #region [Button] Home
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
         newHeaderHtml += `
-                <label id="home-button" for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
                 <span for="home-button" class="mdl-tooltip mdl-tooltip--large">首頁</span>
+                <label id="home-button" for=${oldHome.id} class='btn hoverable' onclick='this.nextElementSibling.click();'>home</label>
                 <input id=${oldHome.id} src=${emptyImage} style='display: none;' value='' type="image" name=${oldHome.name} alt=${oldHome.alt} title=${oldHome.title}>`;
     }
-    //  #endregion
     newHeaderHtml += `</div><div class="sub container" id="module-info">`;
-    //    #region [Display] Page Name
     let moduleName = contentBody.querySelector('#CommonHeader_lblModule').innerText;
     if (moduleName) {
         newHeaderHtml += `
@@ -632,8 +628,6 @@ function injectHeader(contentBody) {
                     </div>
                 </div>`;
     }
-    //  #endregion
-    //    #region [Display] Semester
     let semesterName = contentBody.querySelector('#CommonHeader_lblYSC').innerText.replace(/[:：]/g, '');
     let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
     if (semesterName) {
@@ -641,15 +635,14 @@ function injectHeader(contentBody) {
     }
     if (oldSemSwitch) {
         newHeaderHtml += `
-                <label class="text clickable" id="semester-name" onclick='this.nextElementSibling.click();'>${semesterName}</label>
+                <span for="semester-name" class="mdl-tooltip mdl-tooltip--large">切換學期</span>
+                <label id="semester-name" class="text clickable" onclick='this.nextElementSibling.click();'>${semesterName}</label>
                 <input id=${oldSemSwitch.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldSemSwitch.name} name=${oldSemSwitch.name} title=${oldSemSwitch.title}>`;
     } else {
         newHeaderHtml += `<div class="hoverable" id="semester-name">${semesterName}</div>`;
     }
     newHeaderHtml += `</div>`;
-    //  #endregion
     newHeaderHtml += `</div><div class="sub container" id="user-info">`;
-    //    #region [Display] Username
     let loginName = contentBody.querySelector('#CommonHeader_lblName').innerText;
     if (loginName) {
         newHeaderHtml += `
@@ -660,8 +653,6 @@ function injectHeader(contentBody) {
                     </div>
                 </div>`;
     }
-    //  #endregion
-    //    #region [Display] Online User Count
     let onlineUsers = contentBody.querySelector('.CommomHeadstyle2 font').innerText;
     if (onlineUsers) {
         newHeaderHtml += `
@@ -672,34 +663,27 @@ function injectHeader(contentBody) {
                     </div>
                 </div>`;
     }
-    //  #endregion
     newHeaderHtml += `</div><div class="alt buttons container right">`;
-    //    #endregion
-    //    #region [Button] Password Change
     let oldPwdBtn = contentBody.querySelector('#CommonHeader_ibtChgPwd');
     if (oldPwdBtn) {
         newHeaderHtml += `
-                <label for=${oldPwdBtn.id} id="change-pw-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
                 <span for="change-pw-button" class="mdl-tooltip mdl-tooltip--large">更改密碼</span>
+                <label for=${oldPwdBtn.id} id="change-pw-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>lock</label>
                 <input id=${oldPwdBtn.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldPwdBtn.name} name=${oldPwdBtn.name} title=${oldPwdBtn.title}>`;
     }
-    //    #endregion
-    //    #region [Button] Logout
     let oldLogout = contentBody.querySelector('#CommonHeader_ibtLogOut');
     if (oldLogout) {
         newHeaderHtml += `
-                <label for=${oldLogout.id} id="logout-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
                 <span for="logout-button" class="mdl-tooltip mdl-tooltip--large">登出</span>
+                <label for=${oldLogout.id} id="logout-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
                 <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
-    //  #endregion
     // For some reason they're using this for print detection? What the hell guys
     let textUsedDummy = contentBody.querySelector('#CommonHeader_txtUsed');
     if (textUsedDummy) {
         newHeaderHtml += textUsedDummy.outerHTML;
     }
     newHeaderHtml += `</div></div>`;
-    //  #endregion
     let newHeader = make({
         el: "header",
         html: newHeaderHtml
@@ -1307,7 +1291,7 @@ function createShortcutButton(text, icon = undefined, style = "colored") {
 function injectCustomCss(head) {
     let newStyle = make({
         el: 'style',
-        html: `#login-container{display:flex;flex-direction:column;justify-content:center;align-items:center}.login-form{display:flex;flex-direction:column;align-items:center;background:#353535b5;padding:2em;min-width:25vw;max-width:50vw;border:#59595991 2px solid;border-radius:15px;color:#eee}.overlay{background:#141827;position:absolute;min-height:100vh;overflow:hidden;top:0;left:0;z-index:-1;width:100vw}.box{left:0;top:0;transform:rotate(80deg);position:absolute}.wave{animation:drift 7000ms infinite linear;background:#e80c69;border-radius:45%;height:calc(100vw*0.85);margin-left:-150px;margin-top:-250px;opacity:.4;transform-origin:50% 48%;width:100vw}.wave.-two{animation:drift 3000ms infinite linear;background:#000;opacity:.1;position:fixed}.wave.-three{animation:drift 7500ms infinite linear;background-color:#ff77ca;position:fixed}.box:after{content:'';display:block;height:100%;left:0;top:0;transform:translate3d(0,0,0);width:100%;z-index:11}@keyframes drift{from{transform:rotate(0deg)}from{transform:rotate(360deg)}}#button-container>.container{margin:0.5em}#button-container{display:grid;grid:auto-flow dense/repeat(3,auto);padding-bottom:4em;max-width:60vh}#nptu-redux-header{height:15vh;display:flex;justify-content:center;align-items:center}#nptu-redux-header>.header-text{font-size:3em;text-decoration:none;color:#eee}:root{--mod-fonts:"Segoe UI",'Helvetica Neue',Helvetica,Arial,"文泉驛正黑","WenQuanYi Zen Hei","儷黑 Pro","LiHei Pro","Microsoft YaHei UI","Microsoft JhengHei UI","標楷體",DFKai-SB,sans-serif;--main-color:#003e38}body{font-family:var(--mod-fonts)}@media screen{body{font-size:calc(0.75em + 1vmin)}}@media screen and (min-width:75em){body{font-size:1em}}.text.clickable,.copyable{font-size:1em;text-decoration:none;transition:text-shadow .3s,text-decoration .3s,font-size .4s}.text.clickable:hover,.copyable:hover{font-size:1.2em;vertical-align:top;text-decoration:underline;text-shadow:1px 1px 1px rgba(0,0,0,0.35);cursor:pointer}.top.header.container>.sub.container{display:flex;justify-content:center}.top.header.container>.sub.container:nth-child(odd){align-items:flex-start}.top.header.container>.sub.container:nth-child(even){align-items:flex-end}.top.header.container>.sub.container>div{display:inline-flex;align-items:center;justify-content:center}.top.header.container>.sub.container>div:nth-child(odd){margin-bottom:0.25em}.top.header.container>.buttons>.btn:nth-last-of-type(n+2){margin-right:0.25em}.top.header.container>.buttons>.btn{box-shadow:0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);background:#005669;border-radius:10px;padding:5px}.top.header.container>.buttons>.btn.hoverable{transition:transform .25s}.top.header.container>.buttons>.btn.hoverable:hover{transform:scale(1.05)}.btn{font:3em "Material Icons",sans-serif;cursor:pointer;background:none;border:none;color:#fff}.export-link,.export-link:hover,.export-link:active,.export-link:focus,.export-link:focus-within{text-decoration:none}.container:not(.top){margin:.5em}.header.container{display:flex;background-color:var(--main-color);color:#fff;font-size:1.35em;padding:.5em;-webkit-box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2)}.header.container:nth-of-type(2n):not(.top){background-color:#b71c1c}.header.container:nth-of-type(3n):not(.top){background-color:#154648}.main.container{margin:1em;display:flex;flex-direction:row;flex-wrap:wrap}.sub.container{flex-direction:column;flex:2.5}.menu.container{display:flex;flex-direction:column}.menu.container,.alt.container{flex:1}.alt.buttons.container.right{display:flex;justify-content:flex-end}.alt.buttons.container.left{display:flex;justify-content:flex-start}.print.container{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}.export-section{padding:1em 2em}.help .text.container{border:solid 1px var(--main-color)}.text.container{white-space:pre-wrap;padding:1em;border-radius:6px;margin:0 1em}.inline-frame{border:none}.tbl-btn{display:block}tr.TRHeaderStyle{font-family:var(--mod-fonts);background:var(--main-color)!important}td.TDItemStyle{font-family:var(--mod-fonts);min-width:3em}.title-with-icon.left{margin-left:.5em}.title-with-icon.right{margin-right:.5em}.class-option{cursor:pointer}#overlay-spinner{width:12em;height:12em}.redux-overlay{background:#000;height:100vh;width:100vw;position:absolute;top:0;left:0;justify-content:center;align-items:center;flex-direction:column;z-index:999;display:flex}.redux-overlay>.text{color:#fff;padding:1em 0;font-size:24pt}.popIn{opacity:0.8!important;pointer-events:auto!important}.popOut{opacity:0!important;pointer-events:none!important}.quick-selection{display:grid;grid:auto-flow dense/repeat(3,auto)}`
+        html: `#login-container{display:flex;flex-direction:column;justify-content:center;align-items:center}.login-form{display:flex;flex-direction:column;align-items:center;background:#353535b5;padding:2em;min-width:25vw;max-width:50vw;border:#59595991 2px solid;border-radius:15px;color:#eee}.overlay{background:#141827;position:absolute;min-height:100vh;overflow:hidden;top:0;left:0;z-index:-1;width:100vw}.box{left:0;top:0;transform:rotate(80deg);position:absolute}.wave{animation:drift 7000ms infinite linear;background:#e80c69;border-radius:45%;height:calc(100vw*0.85);margin-left:-150px;margin-top:-250px;opacity:.4;transform-origin:50% 48%;width:100vw}.wave.-two{animation:drift 3000ms infinite linear;background:#000;opacity:.1;position:fixed}.wave.-three{animation:drift 7500ms infinite linear;background-color:#ff77ca;position:fixed}.box:after{content:'';display:block;height:100%;left:0;top:0;transform:translate3d(0,0,0);width:100%;z-index:11}@keyframes drift{from{transform:rotate(0deg)}from{transform:rotate(360deg)}}#button-container>.container{margin:0.5em}#button-container{display:grid;grid:auto-flow dense/repeat(3,auto);padding-bottom:4em;max-width:60vh}#nptu-redux-header{height:15vh;display:flex;justify-content:center;align-items:center}#nptu-redux-header>.header-text{font-size:3em;text-decoration:none;color:#eee}:root{--mod-fonts:"Segoe UI",'Helvetica Neue',Helvetica,Arial,"文泉驛正黑","WenQuanYi Zen Hei","儷黑 Pro","LiHei Pro","Microsoft YaHei UI","Microsoft JhengHei UI","標楷體",DFKai-SB,sans-serif;--main-color:#003e38}body{font-family:var(--mod-fonts)}@media screen{body{font-size:calc(0.75em + 1vmin)}}@media screen and (min-width:75em){body{font-size:1em}}.text.clickable,.copyable{font-size:1em;text-decoration:none;transition:text-shadow .3s,text-decoration .3s,font-size .4s;font-weight:bold}.text.clickable:hover,.copyable:hover{font-size:1.2em;vertical-align:top;text-decoration:underline;text-shadow:1px 1px 1px rgba(0,0,0,0.35);cursor:pointer}.top.header.container>.sub.container{display:flex;justify-content:center}.top.header.container>.sub.container:nth-child(odd){align-items:flex-start}.top.header.container>.sub.container:nth-child(even){align-items:flex-end}.top.header.container>.sub.container>div{display:inline-flex;align-items:center;justify-content:center}.top.header.container>.sub.container>div:nth-child(odd){margin-bottom:0.25em}.top.header.container>.buttons>.btn:nth-last-of-type(n+2){margin-right:0.25em}.top.header.container>.buttons>.btn{box-shadow:0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);background:#005669;border-radius:10px;padding:5px}.top.header.container>.buttons>.btn.hoverable{transition:transform .25s}.top.header.container>.buttons>.btn.hoverable:hover{transform:scale(1.05)}.btn{font:3em "Material Icons",sans-serif;cursor:pointer;background:none;border:none;color:#fff}.export-link,.export-link:hover,.export-link:active,.export-link:focus,.export-link:focus-within{text-decoration:none}.container:not(.top){margin:.5em}.header.container{display:flex;background-color:var(--main-color);color:#fff;font-size:1.35em;padding:.5em;-webkit-box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2)}.header.container:nth-of-type(2n):not(.top){background-color:#b71c1c}.header.container:nth-of-type(3n):not(.top){background-color:#154648}.main.container{margin:1em;display:flex;flex-direction:row;flex-wrap:wrap}.sub.container{flex-direction:column;flex:2.5}.menu.container{display:flex;flex-direction:column}.menu.container,.alt.container{flex:1}.alt.buttons.container.right{display:flex;justify-content:flex-end}.alt.buttons.container.left{display:flex;justify-content:flex-start}.print.container{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}.export-section{padding:1em 2em}.help .text.container{border:solid 1px var(--main-color)}.text.container{white-space:pre-wrap;padding:1em;border-radius:6px;margin:0 1em}.inline-frame{border:none}.tbl-btn{display:block}tr.TRHeaderStyle{font-family:var(--mod-fonts);background:var(--main-color)!important}td.TDItemStyle{font-family:var(--mod-fonts);min-width:3em}.title-with-icon.left{margin-left:.5em}.title-with-icon.right{margin-right:.5em}.class-option{cursor:pointer}#overlay-spinner{width:12em;height:12em}.redux-overlay{background:#000;height:100vh;width:100vw;position:absolute;top:0;left:0;justify-content:center;align-items:center;flex-direction:column;z-index:999;display:flex}.redux-overlay>.text{color:#fff;padding:1em 0;font-size:24pt}.popIn{opacity:0.8!important;pointer-events:auto!important}.popOut{opacity:0!important;pointer-events:none!important}.quick-selection{display:grid;grid:auto-flow dense/repeat(3,auto)}`
     })
     head.appendChild(newStyle);
 }

@@ -132,7 +132,8 @@ body {
 .copyable {
     font-size: 1em;
     text-decoration: none;
-    transition: text-shadow .3s, text-decoration .3s, font-size .4s
+    transition: text-shadow .3s, text-decoration .3s, font-size .4s;
+    font-weight: bold;
 }
 
 .text.clickable:hover,
