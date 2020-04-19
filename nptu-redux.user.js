@@ -953,6 +953,7 @@ function injectTableAutoFillByClassroomType(contentBody) {
     let selectGroups = contentBody.querySelectorAll('select[id*=ddlROOM_GROUP]');
     selectGroups.forEach(selectElement => {
         selectElement.addEventListener('change', function () {
+            let targetValue = -1;
             let parentRow = this.parentNode.parentNode;
             if (!parentRow) {
                 throw "Parent row cannot be found"
@@ -962,13 +963,16 @@ function injectTableAutoFillByClassroomType(contentBody) {
                 throw "Max student input cannot be found"
             }
             if (this.options[this.selectedIndex].text.includes('普通教室')) {
-                maxStudentInput.value = 49
-                maxStudentInput.style.backgroundColor = 'antiquewhite'
+                targetValue = 49
             }
             if (this.options[this.selectedIndex].text.includes('大教室') ||
                 this.options[this.selectedIndex].text.includes('視聽教室')) {
-                maxStudentInput.value = 60
-                maxStudentInput.style.backgroundColor = 'antiquewhite'
+                targetValue = 60
+            }
+            if (targetValue > 0){
+                maxStudentInput.value = targetValue;
+                maxStudentInput.style.backgroundColor = 'antiquewhite';
+                maxStudentInput.title = "已依照教室類別自動更改人數";
             }
         })
     })
@@ -986,16 +990,17 @@ function injectTableAutofillBySubjectId(contentBody, subjectId, studentsInSubjec
     nodes.forEach(n => {
         let parentRow = n.parentNode.parentNode;
         if (!parentRow) {
-            log("Parent row not found")
+            log("Parent row not found");
             return;
         }
         let maxStudentInput = parentRow.querySelector('input[id*=txtSTD_MAX]');
         if (!maxStudentInput) {
-            log("Max student input cannot be found")
+            log("Max student input cannot be found");
             return;
         }
-        maxStudentInput.value = studentsInSubject
-        maxStudentInput.style.backgroundColor = 'green'
+        maxStudentInput.value = studentsInSubject;
+        maxStudentInput.style.backgroundColor = 'orange';
+        maxStudentInput.title = "已依照科目類別自動更改人數";
     });
 }
 
