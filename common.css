@@ -108,12 +108,12 @@
 
 
 :root {
-    --msft-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'Microsoft JhengHei';
+    --mod-fonts: "Segoe UI", 'Helvetica Neue', Helvetica, Arial, "文泉驛正黑", "WenQuanYi Zen Hei", "儷黑 Pro", "LiHei Pro", "Microsoft YaHei UI", "Microsoft JhengHei UI", "標楷體", DFKai-SB, sans-serif;
     --main-color: #003e38
 }
 
 body {
-    font-family: var(--msft-fonts);
+    font-family: var(--mod-fonts);
 }
 
 @media screen {
@@ -278,12 +278,12 @@ body {
 }
 
 tr.TRHeaderStyle {
-    font-family: var(--msft-fonts);
+    font-family: var(--mod-fonts);
     background: var(--main-color) !important;
 }
 
 td.TDItemStyle {
-    font-family: var(--msft-fonts);
+    font-family: var(--mod-fonts);
     min-width: 3em
 }
 
@@ -306,4 +306,44 @@ table.DgTable:hover {
 
 .class-option {
     cursor: pointer
+}
+
+#overlay-spinner {
+    width: 12em;
+    height: 12em;
+}
+
+.redux-overlay {
+    background: black;
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 99;
+    display: flex;
+}
+
+.redux-overlay>.text {
+    color: white;
+    padding: 1em 0;
+    font-size: 24pt;
+}
+
+.popIn {
+    opacity: 0.8 !important;
+    pointer-events: auto !important;
+}
+
+.popOut {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.quick-selection {
+    display: grid;
+    grid: auto-flow dense/repeat(3, auto);
 }
