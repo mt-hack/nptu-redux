@@ -388,7 +388,7 @@ if (isHomepage(document)) {
             }
         }
     }
-    frameElement.onload = function(){
+    frameElement.onload = function () {
         if (options.enableCustomExport) {
             printFix(contentBody);
         }
@@ -538,8 +538,8 @@ function timeButtonFactory(body, hour, min) {
 }
 
 function injectFillAllOptions(contentBody) {
-    let surveyAnswerInputs = contentBody.querySelectorAll("input[id*='rblANSWER']")
-    let surveyTable = contentBody.querySelector('#A1007A_dgData') || contentBody.querySelector('#A1014A_dgData');
+    let surveyAnswerInputs = contentBody.querySelectorAll("input[id*='rblANSWER']");
+    let surveyTable = contentBody.querySelector('#A1007A_dgData, #A1014A_dgData');
     if (surveyAnswerInputs.length != 0 && surveyTable) {
         let buttonContainer = make({
             el: "div",
@@ -1100,6 +1100,9 @@ function organizeCourseList(contentBody) {
                 }
             }
         });
+        if (incompleteText.innerText.length > 0){
+            GM_notification("您有尚未排課之課程！");
+        }
         completeGroup.appendChild(completeText);
         incompleteGroup.appendChild(incompleteText);
         let menuContainer = contentBody.querySelector('.menu.container');
@@ -1161,10 +1164,7 @@ function createInstructorShortcut(contentBody) {
     }
     let selectionContainer = make({
         el: 'div',
-        class: 'quick-selection container',
-        attr: {
-            'style': 'display: grid; grid: auto-flow dense/repeat(3, auto);'
-        }
+        class: 'quick-selection container'
     });
     for (var key in instructorShortcuts) {
         let button = createShortcutButton(key);
@@ -1195,10 +1195,7 @@ function createQuickLocationSelection(contentBody) {
     }
     let selectionContainer = make({
         el: 'div',
-        class: 'quick-selection container',
-        attr: {
-            'style': 'display: grid; grid: auto-flow dense/repeat(3, auto);'
-        }
+        class: 'quick-selection container'
     });
     for (var key in locationShortcuts) {
         let button = createShortcutButton(key);
@@ -1301,38 +1298,30 @@ function make(obj) {
 
 function toggleOverlay(document) {
     let overlay = getOrCreateLoadingOverlay(document);
-    if (overlay.style.display === 'none') {
-        overlay.style.opacity = 0.75;
-        overlay.style.display = 'flex';
+    if (overlay.classList.contains('popOut')) {
+        overlay.classList.replace('popOut', 'popIn');
+    } else if (overlay.classList.contains('popIn')) {
+        overlay.classList.replace('popIn', 'popOut');
     } else {
-        overlay.style.opacity = 0;
-        overlay.style.display = 'none';
+        overlay.classList.add('popIn');
     }
 }
 
 function getOrCreateLoadingOverlay(document) {
-    let overlay = document.querySelector('.redux.overlay');
+    let overlay = document.querySelector('.redux-overlay');
     if (!overlay) {
         overlay = make({
             el: 'div',
-            class: 'redux overlay',
-            attr: {
-                style: 'background: black;height: 100%;width: 100%;position: absolute;top: 0;left: 0;opacity: 0;display: none;justify-content: center;align-items: center; transition: opacity 0.5s; flex-direction: column;z-index: 99;'
-            }
+            class: 'redux-overlay popOut'
         });
         let spinner = make({
             el: 'div',
             class: 'mdl-spinner mdl-js-spinner is-active',
-            attr: {
-                style: 'width: 12em; height: 12em;'
-            }
+            id: 'overlay-spinner'
         });
         let loadTxt = make({
             el: 'div',
-            class: 'white text',
-            attr: {
-                style: 'color: white; padding: 1em 0; font-size: 24pt;'
-            }
+            class: 'text'
         });
         loadTxt.appendChild(document.createTextNode('載入中...'));
         componentHandler.upgradeElement(spinner);
