@@ -429,7 +429,7 @@ if (isHomepage(document)) {
             }
         }
         options.tableExportWhitelist.forEach(x => {
-            contentBody.querySelectorAll(`table[id*=${x}], div[id*=${x}]`).forEach(table => {
+            contentBody.querySelectorAll(`table[id*=${x}]:not(.injected-frame), div[id*=${x}]:not(.injected-frame)`).forEach(table => {
                 injectTableDownload(table);
             })
         })
@@ -846,6 +846,7 @@ function injectAbsenceTable(contentBody) {
                 style: 'display: flex; flex-direction: column; align-items: center;'
             }
         });
+        absenceTable.classList.add("injected-frame");
         enableCellWrap(absenceTable);
         absenceDiv.appendChild(absenceTable);
         frameBody.replaceChild(absenceDiv, frameBody.querySelector('form'));
@@ -882,6 +883,7 @@ function injectGradesTable(contentBody) {
                 style: 'display: flex; flex-direction: column; align-items: center;'
             }
         });
+        gradesTable.classList.add("injected-frame");
         enableCellWrap(gradesTable);
         gradesDiv.appendChild(gradesInfo);
         gradesDiv.appendChild(gradesTable);
