@@ -166,6 +166,12 @@ const buttonTypes = {
         label: '存檔',
         color: 'alt',
         baseId: 'Save'
+    },
+    CHANGE_SEM:{
+        icon: 'event',
+        label: '切換學期',
+        color: 'alt',
+        baseId: 'GsTerm'
     }
 }
 
