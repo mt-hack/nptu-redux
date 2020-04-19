@@ -144,28 +144,46 @@ body {
     cursor: pointer
 }
 
-#module-info {
-    text-align: right;
-    padding-right: .5em
+.top.header.container>.sub.container {
+    display: flex; 
+    justify-content: center;
 }
 
-#user-info {
-    text-align: left;
-    padding-left: .5em
+.top.header.container>.sub.container:nth-child(odd) {
+    align-items: flex-start;
 }
 
-.top.header.container .container {
-    display: inline-flex
+.top.header.container>.sub.container:nth-child(even) {
+    align-items: flex-end;
 }
 
-.top.header.container .container div {
-    display: inline;
-    vertical-align: top
+.top.header.container>.sub.container>div {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.top.header.container .btn {
-    text-shadow: 1px 1px 1px #000;
-    padding-top: .25em
+.top.header.container>.sub.container>div:nth-child(odd) {
+    margin-bottom: 0.25em;
+}
+
+.top.header.container>.buttons>.btn:nth-last-of-type(n+2) {
+    margin-right: 0.25em;
+}
+
+.top.header.container>.buttons>.btn {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+    background: #005669;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.top.header.container>.buttons>.btn.hoverable {
+    transition: transform .25s
+}
+
+.top.header.container>.buttons>.btn.hoverable:hover {
+    transform: scale(1.05);
 }
 
 .btn {
@@ -174,15 +192,6 @@ body {
     background: none;
     border: none;
     color: #fff;
-    padding-right: .1em
-}
-
-.btn.hoverable {
-    transition: text-shadow .25s
-}
-
-.btn.hoverable:hover {
-    text-shadow: 0 8px 17px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19)
 }
 
 .export-link,
@@ -201,7 +210,6 @@ body {
     display: flex;
     background-color: var(--main-color);
     color: #fff;
-    border-radius: 15px;
     font-size: 1.35em;
     padding: .5em;
     -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
@@ -239,10 +247,12 @@ body {
 }
 
 .alt.buttons.container.right {
+    display: flex;
     justify-content: flex-end
 }
 
 .alt.buttons.container.left {
+    display: flex;
     justify-content: flex-start
 }
 
@@ -285,15 +295,6 @@ tr.TRHeaderStyle {
 td.TDItemStyle {
     font-family: var(--mod-fonts);
     min-width: 3em
-}
-
-table.DgTable {
-    transition: box-shadow .3s;
-    box-shadow: rgba(0, 0, 0, 0.14) 0 4px 5px 0, rgba(0, 0, 0, 0.12) 0 1px 10px 0, rgba(0, 0, 0, 0.3) 0 2px 4px -1px
-}
-
-table.DgTable:hover {
-    box-shadow: 0 8px 17px 2px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2)
 }
 
 .title-with-icon.left {
