@@ -121,16 +121,21 @@
     }
 }
 
+#button-container input {
+    transition: 0.25s ease-in-out;
+}
+
 #button-container>.container {
     margin: 0.5em
 }
 
 #button-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     grid-gap: 1em;
     padding-bottom: 4em;
     max-width: 60vw;
+    transition: 0.25s cubic-bezier(.17, .67, .83, .67)
 }
 
 #nptu-redux-header {
@@ -155,17 +160,16 @@
 
 body {
     font-family: var(--mod-fonts);
+    transition: font-size 0.25s cubic-bezier(.17, .67, .83, .67);
+    font-size: 1em;
 }
 
-@media screen {
+@media screen and (max-width:65em) {
+    #button-container input {
+        min-width: 50vw;
+    }
     body {
         font-size: calc(0.75em + 1vmin);
-    }
-}
-
-@media screen and (min-width:75em) {
-    body {
-        font-size: 1em;
     }
 }
 
