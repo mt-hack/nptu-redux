@@ -1,3 +1,43 @@
+.redux-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: black;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+}
+
+.redux-settings>.buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.settings-card {
+    height: 80vh;
+    width: 80vw;
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    color: white;
+    flex-direction: column;
+}
+
+.settings-card h1,
+.settings-card h2,
+.settings-card h3 {
+    font-family: var(--mod-fonts);
+}
+
+.settings.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
 #login-container {
     display: flex;
     flex-direction: column;
@@ -76,7 +116,6 @@
     from {
         transform: rotate(0deg)
     }
-
     from {
         transform: rotate(360deg)
     }
@@ -105,7 +144,6 @@
     text-decoration: none;
     color: #eee
 }
-
 
 :root {
     --mod-fonts: "Segoe UI", 'Helvetica Neue', Helvetica, Arial, "文泉驛正黑", "WenQuanYi Zen Hei", "儷黑 Pro", "LiHei Pro", "Microsoft YaHei UI", "Microsoft JhengHei UI", "標楷體", DFKai-SB, sans-serif;
@@ -146,7 +184,7 @@ body {
 }
 
 .top.header.container>.sub.container {
-    display: flex; 
+    display: flex;
     justify-content: center;
 }
 

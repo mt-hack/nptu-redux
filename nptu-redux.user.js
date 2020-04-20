@@ -5,6 +5,8 @@
 // @author MT.Hack
 // @grant GM_setClipboard
 // @grant GM_download
+// @grant GM_getValue
+// @grant GM_setValue
 // @grant GM_notification
 // @inject-into auto
 // @require https://cdn.jsdelivr.net/npm/clipboard-polyfill@2.8.6/dist/clipboard-polyfill.js
@@ -24,19 +26,17 @@ User configurable options
 
 let options = {
     // Beautifies login page (WIP)
-    enableLoginPageMod: true,
+    enableLoginPageMod: GM_getValue('enable-login-mod', true),
     // Enables button replacement (design WIP)
-    enableButtonReplacement: true,
+    enableButtonReplacement: GM_getValue('enable-new-buttons', true),
     // Enables grade widget (Student accounts only)
-    enableGradeOnHome: true,
+    enableGradeOnHome: GM_getValue('enable-grades-widget', true),
     // Enables absence widget (Student accounts only)
-    enableAbsenceOnHome: true,
-    // Shows the old header in case of component breakage
-    enableMaterialHeader: true,
+    enableAbsenceOnHome: GM_getValue('enable-absence-widget', true),
     // Enables custom export options for printing
-    enableCustomExport: true,
+    enableCustomExport: GM_getValue('enable-custom-exports', true),
     // Enables max student number autofill based on classroom selection (Employee accounts only)
-    enableClassroomAutofillOnSelect: true,
+    enableClassroomAutofillOnSelect: GM_getValue('enable-classroom-autofill', true),
     // Enables classroom shortcut  (Employee accounts only)
     enableClassroomShortcut: true,
     // Enables instructor shortcut (Employee accounts only)
@@ -202,7 +202,7 @@ const buttonTypes = {
 Prototype helper methods
 */
 
-Element.prototype.replaceElement = function (targetElementName = undefined, targetElementClass = undefined) {
+Element.prototype.replaceElement = function(targetElementName = undefined, targetElementClass = undefined) {
     let newElement = document.createElement(targetElementName || "span");
     newElement.innerHTML = this.innerHTML;
     if (targetElementClass) {
@@ -213,16 +213,16 @@ Element.prototype.replaceElement = function (targetElementName = undefined, targ
     return newElement;
 }
 
-Element.prototype.appendAfter = function (element) {
+Element.prototype.appendAfter = function(element) {
     element.parentNode.insertBefore(this, element.nextSibling);
 }, false;
 
-Element.prototype.appendBefore = function (element) {
+Element.prototype.appendBefore = function(element) {
     element.parentNode.insertBefore(this, element);
 }, false;
 
 // modified from https://stackoverflow.com/a/10073788
-Number.prototype.pad = function (width, z) {
+Number.prototype.pad = function(width, z) {
     z = z || '0';
     let n = this + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
@@ -241,7 +241,7 @@ let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultV
 let frameElement = mainWindow.frameElement || mainWindow;
 let contentWindow = frameElement.contentWindow || frameElement;
 if (contentWindow.WebForm_OnSubmit) {
-    contentWindow.WebForm_OnSubmit = function () {
+    contentWindow.WebForm_OnSubmit = function() {
         toggleOverlay(mainWindow.document);
     }
 }
@@ -254,7 +254,7 @@ Image Fix Injection
 
 let images = document.querySelectorAll('*[src*="_EN"]')
 images.forEach(img => {
-    img.addEventListener('error', function () {
+    img.addEventListener('error', function() {
         let englishSuffixRegex = new RegExp(/_en/gi);
         this.src = this.src.replace(englishSuffixRegex, '');
     })
@@ -358,7 +358,7 @@ if (isHomepage(document)) {
                 captchaTextField.autocomplete = "off";
             }
             let newLoginBtn = createShortcutButton('登入', 'vpn_key', 'colored');
-            newLoginBtn.addEventListener('click', function (e) {
+            newLoginBtn.addEventListener('click', function(e) {
                 this.nextElementSibling.click();
             })
             newLoginBtn.appendBefore(oldLoginBtn);
@@ -366,7 +366,7 @@ if (isHomepage(document)) {
         }
         let captchaImage = mainElement.querySelector('#imgCaptcha');
         if (captchaImage) {
-            captchaImage.addEventListener('click', function (e) {
+            captchaImage.addEventListener('click', function(e) {
                 this.src = `../Modules/CaptchaCreator.aspx?${Math.random()}`
             })
         }
@@ -399,9 +399,8 @@ if (isHomepage(document)) {
         }
         return;
     }
-    if (options.enableMaterialHeader) {
-        injectHeader(contentBody);
-    }
+    injectHeader(contentBody);
+
     pageCleanup(contentBody, options.isFlexRowWhitelist.includes(currentPage.name));
     if (/Main.aspx/g.test(currentPage.action)) {
         // Check for the semester change button; if one doesn't exist, likely student
@@ -421,7 +420,7 @@ if (isHomepage(document)) {
     if (options.enableCustomExport) {
         printFix(contentBody);
     }
-    frameElement.onload = function () {
+    frameElement.onload = function() {
         if (options.tableFixWhitelist.includes(currentPage.name)) {
             tableFix(contentBody);
             if (options.enableClassroomAutofillOnSelect) {
@@ -607,6 +606,7 @@ function checkAllInput(contentBody, id) {
     });
 }
 
+// todo: should refactor when possible - it's a mess to navigate through
 function injectHeader(contentBody) {
     let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
     let newHeaderHtml = `<div class="top header container"><div class="alt buttons container left">`;
@@ -629,7 +629,7 @@ function injectHeader(contentBody) {
                 </div>`;
     }
     let semesterElement = contentBody.querySelector('#CommonHeader_lblYSC');
-    if (semesterElement){
+    if (semesterElement) {
         let semesterName = semesterElement.innerText.replace(/[:：]/g, '');
         let oldSemSwitch = contentBody.querySelector('#CommonHeader_ibtChgSYearSeme');
         if (semesterName) {
@@ -689,10 +689,21 @@ function injectHeader(contentBody) {
     newHeaderHtml += `</div></div>`;
     let newHeader = make({
         el: "header",
-        html: newHeaderHtml
+        html: newHeaderHtml,
+        class: 'redux-header'
     });
-    componentHandler.upgradeElement(newHeader);
     let mainForm = mainWindow.document.body.querySelector('body>form');
+    let righthandButtons = newHeader.querySelector('.alt.buttons.container.right');
+
+    let settingsTooltip = make({ el: 'span', text: 'Redux 設定', attr: { for: 'settings-button' }, class: 'mdl-tooltip mdl-tooltip--large' });
+    let settingsBtn = make({ el: 'label', id: 'settings-button', class: 'btn hoverable', text: 'settings' });
+    settingsBtn.addEventListener('click', function() {
+        let settingsOverlay = getOrCreateSettingsLayer(mainForm);
+        toggleVisibility(settingsOverlay);
+    })
+    righthandButtons.prepend(settingsTooltip);
+    righthandButtons.prepend(settingsBtn);
+    componentHandler.upgradeElement(newHeader);
     mainForm.prepend(newHeader);
     oldHeader.remove();
 }
@@ -799,7 +810,7 @@ function buttonReplacement(contentBody) {
             oldButtons.forEach(oldBtn => {
                 let newBtn = createShortcutButton(buttonType.label, buttonType.icon, buttonType.color);
                 oldBtn.style.display = "none";
-                newBtn.addEventListener('click', function (e) {
+                newBtn.addEventListener('click', function(e) {
                     this.nextElementSibling.click();
                 })
                 newBtn.appendBefore(oldBtn);
@@ -826,7 +837,7 @@ function injectAbsenceTable(contentBody) {
         },
     });
     infoDiv.appendChild(absenceFrame);
-    absenceFrame.addEventListener('load', function () {
+    absenceFrame.addEventListener('load', function() {
         // remove irrelevant elements
         let frameBody = absenceFrame.contentDocument.body;
         let absenceTable = frameBody.querySelector('table[id*=dgData]');
@@ -862,7 +873,7 @@ function injectGradesTable(contentBody) {
         },
     });
     infoDiv.appendChild(gradesFrame);
-    gradesFrame.addEventListener('load', function () {
+    gradesFrame.addEventListener('load', function() {
         // remove irrelevant elements
         let frameBody = gradesFrame.contentDocument.body;
         let gradesTable = frameBody.querySelector('table[id*=dgData]');
@@ -934,7 +945,7 @@ function tableFix(contentBody) {
     if (tableRows) {
         tableRows.forEach(x => {
             x.removeAttribute('onclick');
-            x.addEventListener('click', function () {
+            x.addEventListener('click', function() {
                 if (this.style.backgroundColor === 'rgb(221, 238, 242)') {
                     this.style.backgroundColor = '#fff'
                 } else {
@@ -948,7 +959,7 @@ function tableFix(contentBody) {
 function injectTableAutoFillByClassroomType(contentBody) {
     let selectGroups = contentBody.querySelectorAll('select[id*=ddlROOM_GROUP]');
     selectGroups.forEach(selectElement => {
-        selectElement.addEventListener('change', function () {
+        selectElement.addEventListener('change', function() {
             let targetValue = -1;
             let parentRow = this.parentNode.parentNode;
             if (!parentRow) {
@@ -1118,7 +1129,7 @@ function organizeCourseList(contentBody) {
                 class: 'class-option'
             });
             textElement.innerText = option.innerText;
-            textElement.addEventListener('click', function () {
+            textElement.addEventListener('click', function() {
                 option.parentNode.selectedIndex = option.index;
                 option.parentNode.onchange();
             });
@@ -1161,17 +1172,17 @@ function injectTableDownload(table) {
     table.parentNode.replaceChild(newTableContainer, table);
     // define table again
     table = newTableContainer.querySelector('table');
-    pngDownloadBtn.addEventListener('click', function () {
+    pngDownloadBtn.addEventListener('click', function() {
         toggleOverlay(table.getRootNode());
-        domtoimage.toPng(table).then(function (url) {
+        domtoimage.toPng(table).then(function(url) {
             let outputName = `${table.id || "image"}.png`
             GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
         });
     });
-    svgDownloadBtn.addEventListener('click', function () {
+    svgDownloadBtn.addEventListener('click', function() {
         toggleOverlay(table.getRootNode());
-        domtoimage.toSvg(table).then(function (url) {
+        domtoimage.toSvg(table).then(function(url) {
             let outputName = `${table.id || "image"}.svg`
             GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
@@ -1182,7 +1193,7 @@ function injectTableDownload(table) {
 function setupClipboard(contentBody) {
     // Clipboard
     contentBody.querySelectorAll('.copyable').forEach(element => {
-        element.addEventListener('click', function () {
+        element.addEventListener('click', function() {
             clipboard.writeText(this.innerText);
             GM_notification(this.innerText, "已複製至剪貼簿中！");
         });
@@ -1203,7 +1214,7 @@ function createInstructorShortcut(contentBody) {
         button.key = key;
         button.keyValue = instructorShortcuts[key];
         button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
-        button.addEventListener('click', function (event) {
+        button.addEventListener('click', function(event) {
             let ddlEmployeeSelection = contentBody.querySelector('select[id*=ddlEMP_ID]');
             if (!ddlEmployeeSelection) {
                 throw "Failed to the obtain employee selection dropdown menu."
@@ -1234,7 +1245,7 @@ function createQuickLocationSelection(contentBody) {
         button.key = key;
         button.keyValue = locationShortcuts[key];
         button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
-        button.addEventListener('click', function (event) {
+        button.addEventListener('click', function(event) {
             let ddlRoomSelection = contentBody.querySelector('select[id*=ddlROOM_ID]');
             if (!ddlRoomSelection) {
                 throw "Failed to the obtain room selection dropdown menu."
@@ -1294,7 +1305,7 @@ function createShortcutButton(text, icon = undefined, style = "colored") {
 function injectCustomCss(head) {
     let newStyle = make({
         el: 'style',
-        html: `#login-container{display:flex;flex-direction:column;justify-content:center;align-items:center}.login-form{display:flex;flex-direction:column;align-items:center;background:#353535b5;padding:2em;min-width:25vw;max-width:50vw;border:#59595991 2px solid;border-radius:15px;color:#eee}.overlay{background:#141827;position:absolute;min-height:100vh;overflow:hidden;top:0;left:0;z-index:-1;width:100vw}.box{left:0;top:0;transform:rotate(80deg);position:absolute}.wave{animation:drift 7000ms infinite linear;background:#e80c69;border-radius:45%;height:calc(100vw*0.85);margin-left:-150px;margin-top:-250px;opacity:.4;transform-origin:50% 48%;width:100vw}.wave.-two{animation:drift 3000ms infinite linear;background:#000;opacity:.1;position:fixed}.wave.-three{animation:drift 7500ms infinite linear;background-color:#ff77ca;position:fixed}.box:after{content:'';display:block;height:100%;left:0;top:0;transform:translate3d(0,0,0);width:100%;z-index:11}@keyframes drift{from{transform:rotate(0deg)}from{transform:rotate(360deg)}}#button-container>.container{margin:0.5em}#button-container{display:grid;grid:auto-flow dense/repeat(3,auto);padding-bottom:4em;max-width:60vh}#nptu-redux-header{height:15vh;display:flex;justify-content:center;align-items:center}#nptu-redux-header>.header-text{font-size:3em;text-decoration:none;color:#eee}:root{--mod-fonts:"Segoe UI",'Helvetica Neue',Helvetica,Arial,"文泉驛正黑","WenQuanYi Zen Hei","儷黑 Pro","LiHei Pro","Microsoft YaHei UI","Microsoft JhengHei UI","標楷體",DFKai-SB,sans-serif;--main-color:#003e38}body{font-family:var(--mod-fonts)}@media screen{body{font-size:calc(0.75em + 1vmin)}}@media screen and (min-width:75em){body{font-size:1em}}.text.clickable,.copyable{font-size:1em;text-decoration:none;transition:text-shadow .3s,text-decoration .3s,font-size .4s;font-weight:bold}.text.clickable:hover,.copyable:hover{font-size:1.2em;vertical-align:top;text-decoration:underline;text-shadow:1px 1px 1px rgba(0,0,0,0.35);cursor:pointer}.top.header.container>.sub.container{display:flex;justify-content:center}.top.header.container>.sub.container:nth-child(odd){align-items:flex-start}.top.header.container>.sub.container:nth-child(even){align-items:flex-end}.top.header.container>.sub.container>div{display:inline-flex;align-items:center;justify-content:center}.top.header.container>.sub.container>div:nth-child(odd){margin-bottom:0.25em}.top.header.container>.buttons>.btn:nth-last-of-type(n+2){margin-right:0.25em}.top.header.container>.buttons>.btn{box-shadow:0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);background:#005669;border-radius:10px;padding:5px}.top.header.container>.buttons>.btn.hoverable{transition:transform .25s}.top.header.container>.buttons>.btn.hoverable:hover{transform:scale(1.05)}.btn{font:3em "Material Icons",sans-serif;cursor:pointer;background:none;border:none;color:#fff}.export-link,.export-link:hover,.export-link:active,.export-link:focus,.export-link:focus-within{text-decoration:none}.container:not(.top){margin:.5em}.header.container{display:flex;background-color:var(--main-color);color:#fff;font-size:1.35em;padding:.5em;-webkit-box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2)}.header.container:nth-of-type(2n):not(.top){background-color:#b71c1c}.header.container:nth-of-type(3n):not(.top){background-color:#154648}.main.container{margin:1em;display:flex;flex-direction:row;flex-wrap:wrap}.sub.container{flex-direction:column;flex:2.5}.menu.container{display:flex;flex-direction:column}.menu.container,.alt.container{flex:1}.alt.buttons.container.right{display:flex;justify-content:flex-end}.alt.buttons.container.left{display:flex;justify-content:flex-start}.print.container{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}.export-section{padding:1em 2em}.help .text.container{border:solid 1px var(--main-color)}.text.container{white-space:pre-wrap;padding:1em;border-radius:6px;margin:0 1em}.inline-frame{border:none}.tbl-btn{display:block}tr.TRHeaderStyle{font-family:var(--mod-fonts);background:var(--main-color)!important}td.TDItemStyle{font-family:var(--mod-fonts);min-width:3em}.title-with-icon.left{margin-left:.5em}.title-with-icon.right{margin-right:.5em}.class-option{cursor:pointer}#overlay-spinner{width:12em;height:12em}.redux-overlay{background:#000;height:100vh;width:100vw;position:absolute;top:0;left:0;justify-content:center;align-items:center;flex-direction:column;z-index:999;display:flex}.redux-overlay>.text{color:#fff;padding:1em 0;font-size:24pt}.popIn{opacity:0.8!important;pointer-events:auto!important}.popOut{opacity:0!important;pointer-events:none!important}.quick-selection{display:grid;grid:auto-flow dense/repeat(3,auto)}`
+        html: `.redux-settings{display:flex;align-items:center;justify-content:center;background:#000;width:100vw;height:100vh;position:absolute;top:0}.redux-settings>.buttons{position:absolute;top:0;right:0}.settings-card{height:80vh;width:80vw;position:fixed;top:0;display:flex;justify-content:center;z-index:1000;color:#fff;flex-direction:column}.settings-card h1,.settings-card h2,.settings-card h3{font-family:var(--mod-fonts)}.settings.container{display:grid;grid-template-columns:1fr 1fr 1fr}#login-container{display:flex;flex-direction:column;justify-content:center;align-items:center}.login-form{display:flex;flex-direction:column;align-items:center;background:#353535b5;padding:2em;min-width:25vw;max-width:50vw;border:#59595991 2px solid;border-radius:15px;color:#eee}.overlay{background:#141827;position:absolute;min-height:100vh;overflow:hidden;top:0;left:0;z-index:-1;width:100vw}.box{left:0;top:0;transform:rotate(80deg);position:absolute}.wave{animation:drift 7000ms infinite linear;background:#e80c69;border-radius:45%;height:calc(100vw*0.85);margin-left:-150px;margin-top:-250px;opacity:.4;transform-origin:50% 48%;width:100vw}.wave.-two{animation:drift 3000ms infinite linear;background:#000;opacity:.1;position:fixed}.wave.-three{animation:drift 7500ms infinite linear;background-color:#ff77ca;position:fixed}.box:after{content:'';display:block;height:100%;left:0;top:0;transform:translate3d(0,0,0);width:100%;z-index:11}@keyframes drift{from{transform:rotate(0deg)}from{transform:rotate(360deg)}}#button-container>.container{margin:0.5em}#button-container{display:grid;grid:auto-flow dense/repeat(3,auto);padding-bottom:4em;max-width:60vh}#nptu-redux-header{height:15vh;display:flex;justify-content:center;align-items:center}#nptu-redux-header>.header-text{font-size:3em;text-decoration:none;color:#eee}:root{--mod-fonts:"Segoe UI",'Helvetica Neue',Helvetica,Arial,"文泉驛正黑","WenQuanYi Zen Hei","儷黑 Pro","LiHei Pro","Microsoft YaHei UI","Microsoft JhengHei UI","標楷體",DFKai-SB,sans-serif;--main-color:#003e38}body{font-family:var(--mod-fonts)}@media screen{body{font-size:calc(0.75em + 1vmin)}}@media screen and (min-width:75em){body{font-size:1em}}.text.clickable,.copyable{font-size:1em;text-decoration:none;transition:text-shadow .3s,text-decoration .3s,font-size .4s;font-weight:bold}.text.clickable:hover,.copyable:hover{font-size:1.2em;vertical-align:top;text-decoration:underline;text-shadow:1px 1px 1px rgba(0,0,0,0.35);cursor:pointer}.top.header.container>.sub.container{display:flex;justify-content:center}.top.header.container>.sub.container:nth-child(odd){align-items:flex-start}.top.header.container>.sub.container:nth-child(even){align-items:flex-end}.top.header.container>.sub.container>div{display:inline-flex;align-items:center;justify-content:center}.top.header.container>.sub.container>div:nth-child(odd){margin-bottom:0.25em}.top.header.container>.buttons>.btn:nth-last-of-type(n+2){margin-right:0.25em}.top.header.container>.buttons>.btn{box-shadow:0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);background:#005669;border-radius:10px;padding:5px}.top.header.container>.buttons>.btn.hoverable{transition:transform .25s}.top.header.container>.buttons>.btn.hoverable:hover{transform:scale(1.05)}.btn{font:3em "Material Icons",sans-serif;cursor:pointer;background:none;border:none;color:#fff}.export-link,.export-link:hover,.export-link:active,.export-link:focus,.export-link:focus-within{text-decoration:none}.container:not(.top){margin:.5em}.header.container{display:flex;background-color:var(--main-color);color:#fff;font-size:1.35em;padding:.5em;-webkit-box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);box-shadow:0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2)}.header.container:nth-of-type(2n):not(.top){background-color:#b71c1c}.header.container:nth-of-type(3n):not(.top){background-color:#154648}.main.container{margin:1em;display:flex;flex-direction:row;flex-wrap:wrap}.sub.container{flex-direction:column;flex:2.5}.menu.container{display:flex;flex-direction:column}.menu.container,.alt.container{flex:1}.alt.buttons.container.right{display:flex;justify-content:flex-end}.alt.buttons.container.left{display:flex;justify-content:flex-start}.print.container{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}.export-section{padding:1em 2em}.help .text.container{border:solid 1px var(--main-color)}.text.container{white-space:pre-wrap;padding:1em;border-radius:6px;margin:0 1em}.inline-frame{border:none}.tbl-btn{display:block}tr.TRHeaderStyle{font-family:var(--mod-fonts);background:var(--main-color)!important}td.TDItemStyle{font-family:var(--mod-fonts);min-width:3em}.title-with-icon.left{margin-left:.5em}.title-with-icon.right{margin-right:.5em}.class-option{cursor:pointer}#overlay-spinner{width:12em;height:12em}.redux-overlay{background:#000;height:100vh;width:100vw;position:absolute;top:0;left:0;justify-content:center;align-items:center;flex-direction:column;z-index:999;display:flex}.redux-overlay>.text{color:#fff;padding:1em 0;font-size:24pt}.popIn{opacity:0.8!important;pointer-events:auto!important}.popOut{opacity:0!important;pointer-events:none!important}.quick-selection{display:grid;grid:auto-flow dense/repeat(3,auto)}`
     })
     head.appendChild(newStyle);
 }
@@ -1312,6 +1323,10 @@ function make(obj) {
     if (obj.class) {
         el.className = obj.class;
     }
+    if (obj.text) {
+        let textnode = document.createTextNode(obj.text);
+        el.appendChild(textnode);
+    }
     if (obj.html) {
         el.innerHTML = obj.html;
     }
@@ -1323,20 +1338,24 @@ function make(obj) {
         }
     }
     if (obj.appendTo) {
-        $(obj.appendTo).appendChild(el);
+        (obj.appendTo).appendChild(el);
     }
     return el;
 }
 
+function toggleVisibility(element) {
+    if (element.classList.contains('popOut')) {
+        document.querySelector('body').style.overflow = 'hidden';
+        element.classList.replace('popOut', 'popIn');
+    } else if (element.classList.contains('popIn')) {
+        document.querySelector('body').style.overflow = null;
+        element.classList.replace('popIn', 'popOut');
+    }
+}
+
 function toggleOverlay(document) {
     let overlay = getOrCreateLoadingOverlay(document);
-    if (overlay.classList.contains('popOut')) {
-        document.querySelector('body').style.overflow = 'hidden';
-        overlay.classList.replace('popOut', 'popIn');
-    } else if (overlay.classList.contains('popIn')) {
-        document.querySelector('body').style.overflow = null;
-        overlay.classList.replace('popIn', 'popOut');
-    }
+    toggleVisibility(overlay);
 }
 
 function getOrCreateLoadingOverlay(document) {
@@ -1426,4 +1445,60 @@ function injectScript(head, script) {
 
 function log(msg) {
     console.log(`[NPTU Redux] ${msg}`);
+}
+
+function getOrCreateSettingsLayer(baseNode) {
+    let settingsLayer = baseNode.querySelector('.redux-settings')
+    if (settingsLayer) {
+        return settingsLayer;
+    }
+    let reduxSettings = make({ el: 'section', class: 'redux-settings popOut' });
+    let topButtonsContainer = make({ el: 'div', class: 'container buttons', appendTo: reduxSettings });
+    let closeButton = make({ el: 'label', class: 'btn', appendTo: topButtonsContainer, text: 'close' });
+    closeButton.addEventListener('click', function() {
+        toggleVisibility(reduxSettings);
+    })
+    let settingsCard = make({ el: 'div', class: 'settings-card container', html: '<h1>Redux 設定</h1>', appendTo: reduxSettings });
+    let outerGenSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>主要設定</h2>', appendTo: settingsCard });
+    let innerGenSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerGenSettingsContainer })
+    let outerStudentSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>學生設定</h2>', appendTo: settingsCard });
+    let innerStudentSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerStudentSettingsContainer })
+    let outerEmployeeSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>教職員設定</h2>', appendTo: settingsCard });
+    let innerEmployeeSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerEmployeeSettingsContainer })
+
+    appendSettings(innerGenSettingsContainer, 'enable-login-mod', "啟用首頁美化", "套用新的首頁樣式");
+    appendSettings(innerGenSettingsContainer, 'enable-new-buttons', "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
+    appendSettings(innerGenSettingsContainer, 'enable-custom-exports', "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
+    appendSettings(innerStudentSettingsContainer, 'enable-grades-widget', "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
+    appendSettings(innerStudentSettingsContainer, 'enable-absence-widget', "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
+    appendSettings(innerEmployeeSettingsContainer, 'enable-classroom-autofill', '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
+
+    settingsCard.querySelectorAll('.settings-input').forEach(input => {
+        if (!input.id) {
+            return;
+        }
+        let storedValue = GM_getValue(input.id, undefined);
+        if (storedValue === undefined) {
+            input.checked = true;
+            GM_setValue(input.id, true);
+        } else {
+            input.checked = storedValue;
+        }
+        input.addEventListener('change', function(e) {
+            GM_setValue(input.id, this.checked);
+        })
+    });
+    baseNode.appendChild(reduxSettings);
+    componentHandler.upgradeAllRegistered();
+    return reduxSettings;
+}
+
+function appendSettings(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
+    let settingsContainer = make({ el: 'div', class: 'individual-settings', appendTo: parentNode });
+    let outerLabel = make({ el: 'label', appendTo: settingsContainer, attr: { for: settingsId }, id: `${settingsId}-label`, class: 'mdl-switch mdl-js-switch mdl-js-ripple-effect' });
+    let innerInput = make({ el: 'input', attr: { type: 'checkbox' }, id: settingsId, class: 'settings-input mdl-switch__input', appendTo: outerLabel });
+    let innerLabel = make({ el: 'span', class: 'mdl-switch__label', appendTo: outerLabel, text: settingsLabel });
+    if (settingsDescription) {
+        make({ el: 'span', class: 'mdl-tooltip mdl-tooltip--large', appendTo: settingsContainer, text: settingsDescription, attr: { for: `${settingsId}-label` } });
+    }
 }
