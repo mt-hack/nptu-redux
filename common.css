@@ -127,9 +127,10 @@
 
 #button-container {
     display: grid;
-    grid: auto-flow dense/repeat(3, auto);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-gap: 1em;
     padding-bottom: 4em;
-    max-width: 60vh
+    max-width: 60vw;
 }
 
 #nptu-redux-header {
@@ -142,7 +143,9 @@
 #nptu-redux-header>.header-text {
     font-size: 3em;
     text-decoration: none;
-    color: #eee
+    color: #eee;
+    line-height: 1.25em;
+    text-align: center;
 }
 
 :root {
