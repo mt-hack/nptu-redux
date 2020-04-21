@@ -24,27 +24,43 @@ User configurable options
 =========================================================
 */
 
+const optionIds = {
+    STYLIZED_LOGIN: 'enable-login-mod',
+    BUTTON_REPLACEMENT: 'enable-new-buttons',
+    GRADES_WIDGET: 'enable-grades-widget',
+    ABSENCE_WIDGET: 'enable-absence-widget',
+    CUSTOM_EXPORTS: 'enable-custom-exports',
+    CLASSROOM_AUTOFILL: 'enable-classroom-autofill',
+    SURVEY_AUTOFILL: 'enable-survey-autofill',
+    CHECKIN_HELPER: 'enable-checkin-helper',
+    TABLE_EXPORT: 'enable-table-exports'
+}
+
 let options = {
     // Beautifies login page (WIP)
-    enableLoginPageMod: GM_getValue('enable-login-mod', true),
+    enableLoginPageMod: GM_getValue(optionIds.STYLIZED_LOGIN, true),
     // Enables button replacement (design WIP)
-    enableButtonReplacement: GM_getValue('enable-new-buttons', true),
+    enableButtonReplacement: GM_getValue(optionIds.BUTTON_REPLACEMENT, true),
     // Enables grade widget (Student accounts only)
-    enableGradeOnHome: GM_getValue('enable-grades-widget', true),
+    enableGradeOnHome: GM_getValue(optionIds.GRADES_WIDGET, true),
     // Enables absence widget (Student accounts only)
-    enableAbsenceOnHome: GM_getValue('enable-absence-widget', true),
+    enableAbsenceOnHome: GM_getValue(optionIds.ABSENCE_WIDGET, true),
     // Enables custom export options for printing
-    enableCustomExport: GM_getValue('enable-custom-exports', true),
+    enableCustomExport: GM_getValue(optionIds.CUSTOM_EXPORTS, true),
     // Enables max student number autofill based on classroom selection (Employee accounts only)
-    enableClassroomAutofillOnSelect: GM_getValue('enable-classroom-autofill', true),
+    enableClassroomAutofillOnSelect: GM_getValue(optionIds.CLASSROOM_AUTOFILL, true),
+    // Adds buttons that help auto-fill all options in opinion surveys
+    enableSurveyAutoFill: GM_getValue(optionIds.SURVEY_AUTOFILL, true),
+    // Adds buttons that help speed up the process of checking in
+    enableCheckInHelper: GM_getValue(optionIds.CHECKIN_HELPER, true),
+    // Enables saving specific tables as images
+    enableTableExports: GM_getValue(optionIds.TABLE_EXPORT, true),
     // Enables classroom shortcut  (Employee accounts only)
     enableClassroomShortcut: true,
     // Enables instructor shortcut (Employee accounts only)
     enableInstructorShortcut: true,
     // Enables shortcut auto submit (Employee accounts only)
     enableShortcutAutoSubmit: true,
-    // Enables experimental features (use at your own risk!)
-    enableExperimental: true,
     // Disables custom exports for problematic pages
     customExportBlacklist: ["A0551RPage"],
     // Pages whose tables need to be fixed; works like a whitelist
@@ -430,16 +446,22 @@ if (isHomepage(document)) {
                 injectTableAutofillBySubjectId(contentBody, key, subjectGroups[key]);
             }
         }
-        options.tableExportWhitelist.forEach(x => {
-            contentBody.querySelectorAll(`table[id*=${x}]:not(.injected-frame), div[id*=${x}]:not(.injected-frame)`).forEach(table => {
-                injectTableDownload(table);
+        if (options.enableTableExports) {
+            options.tableExportWhitelist.forEach(x => {
+                contentBody.querySelectorAll(`table[id*=${x}]:not(.injected-frame), div[id*=${x}]:not(.injected-frame)`).forEach(table => {
+                    injectTableDownload(table);
+                })
             })
-        })
-        if (currentPage.name === "A1007SPage" || currentPage.name === "A1014SPage") {
-            injectFillAllOptions(contentBody);
         }
-        if (currentPage.name === "B4002SPage") {
-            injectCheckInHelper(contentBody);
+        if (options.enableSurveyAutoFill) {
+            if (currentPage.name === "A1007SPage" || currentPage.name === "A1014SPage") {
+                injectFillAllOptions(contentBody);
+            }
+        }
+        if (options.enableCheckInHelper) {
+            if (currentPage.name === "B4002SPage") {
+                injectCheckInHelper(contentBody);
+            }
         }
         organizeCourseList(contentBody);
         setupClipboard(contentBody);
@@ -681,17 +703,21 @@ function injectHeader(contentBody) {
                 <label for=${oldLogout.id} id="logout-button" class='btn hoverable' onclick='this.nextElementSibling.click();'>exit_to_app</label>
                 <input id=${oldLogout.id} src=${emptyImage} style='display: none;' value='' type="image" alt=${oldLogout.name} name=${oldLogout.name} title=${oldLogout.title}>`;
     }
-    // For some reason they're using this for print detection? What the hell guys
-    let textUsedDummy = contentBody.querySelector('#CommonHeader_txtUsed');
-    if (textUsedDummy) {
-        newHeaderHtml += textUsedDummy.outerHTML;
-    }
     newHeaderHtml += `</div></div>`;
     let newHeader = make({
         el: "header",
         html: newHeaderHtml,
         class: 'redux-header'
     });
+    // For some reason they're using this for print detection? What the hell guys
+    let textUsedDummy = contentBody.querySelector('#CommonHeader_txtUsed');
+    if (textUsedDummy) {
+        textUsedDummy.style.opacity = 0;
+        textUsedDummy.style.position = 'absolute';
+        textUsedDummy.style.left = '-1px';
+        textUsedDummy.style.top = '-1px';
+        newHeader.appendChild(textUsedDummy);
+    }
     let mainForm = mainWindow.document.body.querySelector('body>form');
     let righthandButtons = newHeader.querySelector('.alt.buttons.container.right');
 
@@ -1466,12 +1492,15 @@ function getOrCreateSettingsLayer(baseNode) {
     let outerEmployeeSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>教職員設定</h2>', appendTo: settingsCard });
     let innerEmployeeSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerEmployeeSettingsContainer })
 
-    appendSettings(innerGenSettingsContainer, 'enable-login-mod', "啟用首頁美化", "套用新的首頁樣式");
-    appendSettings(innerGenSettingsContainer, 'enable-new-buttons', "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
-    appendSettings(innerGenSettingsContainer, 'enable-custom-exports', "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
-    appendSettings(innerStudentSettingsContainer, 'enable-grades-widget', "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
-    appendSettings(innerStudentSettingsContainer, 'enable-absence-widget', "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
-    appendSettings(innerEmployeeSettingsContainer, 'enable-classroom-autofill', '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
+    appendSettings(innerGenSettingsContainer, optionIds.STYLIZED_LOGIN, "啟用首頁美化", "套用新的首頁樣式");
+    appendSettings(innerGenSettingsContainer, optionIds.BUTTON_REPLACEMENT, "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
+    appendSettings(innerGenSettingsContainer, optionIds.CUSTOM_EXPORTS, "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
+    appendSettings(innerGenSettingsContainer, optionIds.TABLE_EXPORT, "啟用表單圖檔下載", "於在白名單內的表格上新增「存成圖檔」的按鈕；方便用於課表下載")
+    appendSettings(innerStudentSettingsContainer, optionIds.GRADES_WIDGET, "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
+    appendSettings(innerStudentSettingsContainer, optionIds.ABSENCE_WIDGET, "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
+    appendSettings(innerStudentSettingsContainer, optionIds.SURVEY_AUTOFILL, "新增期中期末評量自動填入", "於期中期末評量問卷中加入一次勾選「非常同意」...等按鈕")
+    appendSettings(innerStudentSettingsContainer, optionIds.CHECKIN_HELPER, "新增補打卡幫手", "新增常用時間、常用工作原因、常用補打卡原因按鈕於補打卡頁面")
+    appendSettings(innerEmployeeSettingsContainer, optionIds.CLASSROOM_AUTOFILL, '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
 
     settingsCard.querySelectorAll('.settings-input').forEach(input => {
         if (!input.id) {
