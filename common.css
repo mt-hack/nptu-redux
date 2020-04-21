@@ -35,6 +35,7 @@
 
 .settings.container {
     display: grid;
+    row-gap: 2em;
     grid-template-columns: 1fr 1fr 1fr;
 }
 
