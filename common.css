@@ -124,6 +124,7 @@
 
 #button-container input {
     transition: 0.25s ease-in-out;
+    width: 100%;
 }
 
 #button-container>.container {
