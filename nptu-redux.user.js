@@ -9,7 +9,6 @@
 // @grant GM_setValue
 // @grant GM_notification
 // @inject-into auto
-// @require https://cdn.jsdelivr.net/npm/clipboard-polyfill@2.8.6/dist/clipboard-polyfill.js
 // @require https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/dist/dom-to-image-more.min.js
 // @require https://code.getmdl.io/1.3.0/material.min.js
 // @match *://webap*.nptu.edu.tw/*
@@ -1217,10 +1216,9 @@ function injectTableDownload(table) {
 }
 
 function setupClipboard(contentBody) {
-    // Clipboard
     contentBody.querySelectorAll('.copyable').forEach(element => {
         element.addEventListener('click', function() {
-            clipboard.writeText(this.innerText);
+            GM_setClipboard(this.innerText);
             GM_notification(this.innerText, "已複製至剪貼簿中！");
         });
     });
