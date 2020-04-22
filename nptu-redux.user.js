@@ -492,6 +492,22 @@ if (isHomepage(document)) {
     }
 };
 
+// it's 2020, who still uses frameset??
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frameset
+if (document.querySelector('frameset')) {
+    let frames = document.querySelectorAll('frame');
+    frames.forEach(x => {
+        let newInlineFrame = document.createElement('iframe');
+        cloneAttributes(newInlineFrame, x);
+        x.replaceWith(newInlineFrame);
+    });
+    let frameset = document.querySelector('frameset');
+    let newBody = document.createElement('body');
+    newBody.classList.add('redux-patched-body');
+    newBody.innerHTML = frameset.innerHTML;
+    frameset.replaceWith(newBody);
+}
+
 function injectCheckInHelper(contentBody) {
     let tabs = contentBody.querySelector('[id*=htbMenu]');
     let punchInField = contentBody.querySelector('input[id*=txtPUNCH_TM]');
