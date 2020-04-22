@@ -217,7 +217,7 @@ const buttonTypes = {
 Prototype helper methods
 */
 
-Element.prototype.replaceElement = function(targetElementName = undefined, targetElementClass = undefined) {
+Element.prototype.cloneElement = function(targetElementName = undefined, targetElementClass = undefined) {
     let newElement = document.createElement(targetElementName || "span");
     newElement.innerHTML = this.innerHTML;
     if (targetElementClass) {
@@ -226,6 +226,14 @@ Element.prototype.replaceElement = function(targetElementName = undefined, targe
         newElement.classList = this.classList;
     }
     return newElement;
+}
+
+Element.prototype.replaceElement = function(newElementType = undefined) {
+    let newElement = document.createElement(newElementType || "span");
+    this.childNodes.forEach(x => {
+        newElement.appendChild(x);
+    })
+    this.replaceWith(newElement);
 }
 
 Element.prototype.appendAfter = function(element) {
@@ -281,9 +289,9 @@ CSS Injection
 ===================
 */
 
-injectStyle(mainWindow.document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
-injectStyle(mainWindow.document.head, 'https://code.getmdl.io/1.3.0/material.teal-pink.min.css');
-injectCustomCss(mainWindow.document.head);
+injectStyle(document.head, 'https://fonts.googleapis.com/icon?family=Material+Icons');
+injectStyle(document.head, 'https://code.getmdl.io/1.3.0/material.indigo-blue.min.css');
+injectCustomCss(document.head);
 
 /*
 ====================
@@ -383,7 +391,7 @@ if (isHomepage(document)) {
             class: 'container',
             id: 'login-container'
         });
-        loginForm = loginForm.replaceElement('div', 'login-form');
+        loginForm = loginForm.cloneElement('div', 'login-form');
         loginFormContainer.appendChild(loginForm);
         mainElement.appendChild(loginFormContainer);
         mainElement.querySelector('table').remove();
@@ -411,15 +419,14 @@ if (isHomepage(document)) {
             })
         }
     }
-} else {
-    if (!frameElement) {
-        log('Frame element cannot be detected; assuming unknown page.');
-        return;
-    }
+}
+
+// post-login frame
+if (document.querySelector('body>form') && !isHomepage(document)) {
     let contentBody = mainWindow.document.body;
     let currentPage = contentBody.querySelector('body>form');
-    if (!currentPage) {
-        log("Current page cannot be detected; assuming injected frame.");
+    if (!frameElement) {
+        log('Frame element cannot be detected; assuming unknown page.');
         return;
     }
     log(`Current page: ${currentPage.name}`)
@@ -706,7 +713,11 @@ function checkAllInput(contentBody, id) {
 
 // todo: should refactor when possible - it's a mess to navigate through
 function injectHeader(contentBody) {
-    let oldHeader = contentBody.querySelector('.TableCommonHeader').parentNode.parentNode;
+    let oldInnerHeader = contentBody.querySelector('.TableCommonHeader');
+    if (!oldInnerHeader) {
+        return;
+    }
+    let oldHeader = oldInnerHeader.parentNode.parentNode;
     let newHeaderHtml = `<div class="top header container"><div class="alt buttons container left">`;
     let oldHome = contentBody.querySelector('#CommonHeader_ibtBackHome');
     if (oldHome) {
@@ -1610,5 +1621,22 @@ function appendSettings(parentNode, settingsId, settingsLabel, settingsDescripti
     let innerLabel = make({ el: 'span', class: 'mdl-switch__label', appendTo: outerLabel, text: settingsLabel });
     if (settingsDescription) {
         make({ el: 'span', class: 'mdl-tooltip mdl-tooltip--large', appendTo: settingsContainer, text: settingsDescription, attr: { for: `${settingsId}-label` } });
+    }
+}
+
+function cloneAttributes(element, sourceNode) {
+    let attr;
+    let attributes = Array.prototype.slice.call(sourceNode.attributes);
+    while (attr = attributes.pop()) {
+        element.setAttribute(attr.nodeName, attr.nodeValue);
+    }
+}
+
+function _try(func, fallbackValue) {
+    try {
+        var value = func();
+        return (value === null || value === undefined) ? fallbackValue : value;
+    } catch (e) {
+        return fallbackValue;
     }
 }
