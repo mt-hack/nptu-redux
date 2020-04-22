@@ -440,7 +440,6 @@ if (isHomepage(document)) {
         return;
     }
     injectHeader(contentBody);
-
     pageCleanup(contentBody, options.isFlexRowWhitelist.includes(currentPage.name));
     if (/Main.aspx/g.test(currentPage.action)) {
         // Check for the semester change button; if one doesn't exist, likely student
@@ -489,8 +488,9 @@ if (isHomepage(document)) {
         }
         organizeCourseList(contentBody);
         setupClipboard(contentBody);
+        upgradeSelect(contentBody);
     }
-};
+}
 
 // it's 2020, who still uses frameset??
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frameset
@@ -506,6 +506,39 @@ if (document.querySelector('frameset')) {
     newBody.classList.add('redux-patched-body');
     newBody.innerHTML = frameset.innerHTML;
     frameset.replaceWith(newBody);
+}
+
+
+function upgradeSelect(contentBody) {
+    function makeInputContainer() {
+        return make({
+            el: 'div',
+            class: 'mdl-textfield mdl-js-textfield mdl-textfield--floating-label',
+            id: 'material-select',
+            attr: {
+                style: 'width: auto;'
+            }
+        });
+    }
+    contentBody.querySelectorAll('select, input[type="text"]').forEach(selectNode => {
+        if (selectNode.style.opacity === "0" || selectNode.style.visibility === 'hidden' || selectNode.style.display === 'none' ||
+            selectNode.parentNode.classList.contains('is-upgraded')) {
+            return;
+        }
+        // stop hardcoding width reeeeeeee
+        selectNode.style.width = "auto";
+        let selectContainer = makeInputContainer();
+        let selectNodeParent = selectNode.parentNode;
+        let previousSibling = _try(() => selectNode.previousSibling.data.trim()) || selectNode.previousElementSibling || selectNode.parentNode.previousElementSibling
+        selectNode.classList.add('mdl-textfield__input');
+        selectNodeParent.replaceChild(selectContainer, selectNode);
+        selectContainer.appendChild(selectNode);
+        if (previousSibling && previousSibling.innerText) {
+            let placeholderText = make({ el: 'label', text: previousSibling.innerText.replace(/[:：]/g, ''), class: 'mdl-textfield__label' })
+            selectContainer.appendChild(placeholderText);
+        }
+        componentHandler.upgradeElement(selectContainer);
+    })
 }
 
 function injectCheckInHelper(contentBody) {
