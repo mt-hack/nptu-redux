@@ -361,6 +361,18 @@ if (isHomepage(document)) {
         })
         mainTable.parentNode.replaceChild(newButtonContainer, mainTable);
     }
+    let copyrightDiv = document.evaluate(`//div[contains(., 'Copyright')]`, document).iterateNext();
+    if (copyrightDiv) {
+        copyrightDiv.innerHTML = `
+        <span>
+            <a href="https://github.com/mt-hack/nptu-redux">GitHub</a>
+        </span>
+        <br>
+        <span style="filter: invert(1)">
+            Copyright© ${new Date().getFullYear()} by MT.Hack (Still Hsu and its Contributors)
+        </span>
+        `;
+    }
     if (isLoginPage(document)) {
         let loginForm = document.querySelector('table.style1');
         if (!loginForm) {
