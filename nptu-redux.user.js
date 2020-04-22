@@ -1124,16 +1124,17 @@ function printFix(contentBody) {
             }
             // create outer div for export options
             let exportMenuDiv = document.createElement("div");
-            exportMenuDiv.className = "export-section";
+            exportMenuDiv.className = "export-section mdl-textfield mdl-js-textfield mdl-textfield--floating-label";
 
             // create export label
             let exportLabel = document.createElement("label");
             exportLabel.appendChild(document.createTextNode('匯出選項：'));
+            exportLabel.className = "mdl-textfield__label";
 
             // prepare export menu
             let exportMenu = make({
                 el: 'select',
-                class: 'export-menu',
+                class: 'export-menu mdl-textfield__input',
                 html: `
                         <option value="pdf">PDF (Adobe PDF)</option>
                         <option value="xls">XLS (97-2003 Excel 表格)</option>
@@ -1194,6 +1195,7 @@ function printFix(contentBody) {
             printButton.parentNode.replaceChild(exportDiv, printButton);
             // update button on load
             updatePrint();
+            componentHandler.upgradeElement(exportDiv);
         });
     }
 }
