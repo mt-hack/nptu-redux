@@ -311,7 +311,7 @@ if (isHomepage(document)) {
     let overlay = make({
         el: 'div',
         class: 'overlay',
-        html: `<div id="overlay-wave" class="box"><div class="wave -one"></div><div class="wave -two"></div><div class="wave -three"></div></div>`
+        html: `<div id="overlay-wave"><div class="wave -one"></div><div class="wave -two"></div><div class="wave -three"></div></div>`
     });
     document.body.appendChild(overlay);
     let widthDummy = document.querySelector("#LoginDefault_txtScreenWidth");
