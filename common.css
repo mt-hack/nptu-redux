@@ -1,3 +1,65 @@
+:root {
+    --mod-fonts: "Segoe UI", 'Helvetica Neue', Helvetica, Arial, "文泉驛正黑", "WenQuanYi Zen Hei", "儷黑 Pro", "LiHei Pro", "Microsoft YaHei UI", "Microsoft JhengHei UI", "標楷體", DFKai-SB, sans-serif;
+    --main-color: #003e38
+}
+
+body,
+td.UnUse,
+.mdl-button,
+.mdl-snackbar,
+select {
+    font-family: var(--mod-fonts);
+    transition: font-size 0.25s cubic-bezier(.17, .67, .83, .67)
+}
+
+@media screen and (max-width:65em) {
+    #button-container input {
+        min-width: 50vw
+    }
+    /* todo: this makes text way too stupid in post-login view, will fix later */
+    /* body,
+    .mdl-button {
+        font-size: calc(1em + 1vmin);
+    } */
+    .login-form {
+        min-width: 50vw;
+        max-width: 75vw;
+    }
+    .login-form input[type="text"],
+    .login-form input[type="password"],
+    .login-form>#imgCaptcha {
+        width: 75% !important;
+        padding: 1em;
+        margin: 0.5em;
+    }
+    .login-form>.mdl-button {
+        width: 75%;
+        padding: 1em;
+    }
+}
+
+iframe[name="MAIN"],
+iframe[name="MENU"] {
+    min-width: 0;
+}
+
+iframe[name="MENU"] {
+    flex: 1;
+}
+
+iframe[name="MAIN"] {
+    flex: 4;
+}
+
+.redux-patched-body {
+    display: flex;
+}
+
+#AgreeClaim,
+#AgreeRule {
+    overflow: scroll;
+}
+
 .redux-settings {
     display: flex;
     align-items: center;
@@ -27,9 +89,7 @@
     flex-direction: column
 }
 
-.settings-card h1,
-.settings-card h2,
-.settings-card h3 {
+.settings-card * {
     font-family: var(--mod-fonts)
 }
 
@@ -70,14 +130,14 @@
     width: 100vw
 }
 
-.box {
+#overlay-wave {
     left: 0;
     top: 0;
     transform: rotate(80deg);
     position: absolute
 }
 
-.wave {
+#overlay-wave>.wave {
     animation: drift 7000ms infinite linear;
     background: #e80c69;
     border-radius: 45%;
@@ -89,20 +149,20 @@
     width: 100vw
 }
 
-.wave.-two {
+#overlay-wave>.wave.-two {
     animation: drift 3000ms infinite linear;
     background: #000;
     opacity: .1;
     position: fixed
 }
 
-.wave.-three {
+#overlay-wave>.wave.-three {
     animation: drift 7500ms infinite linear;
     background-color: #ff77ca;
     position: fixed
 }
 
-.box:after {
+#overlay-wave:after {
     content: '';
     display: block;
     height: 100%;
@@ -144,7 +204,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-bottom: 2em;
+    padding: 2em 0;
 }
 
 #nptu-redux-header>.header-text {
@@ -153,42 +213,6 @@
     color: #eee;
     line-height: 1.25em;
     text-align: center
-}
-
- :root {
-    --mod-fonts: "Segoe UI", 'Helvetica Neue', Helvetica, Arial, "文泉驛正黑", "WenQuanYi Zen Hei", "儷黑 Pro", "LiHei Pro", "Microsoft YaHei UI", "Microsoft JhengHei UI", "標楷體", DFKai-SB, sans-serif;
-    --main-color: #003e38
-}
-
-body {
-    font: 1em var(--mod-fonts);
-    transition: font-size 0.25s cubic-bezier(.17, .67, .83, .67)
-}
-
-@media screen and (max-width:65em) {
-    #button-container input {
-        min-width: 50vw
-    }
-    body,
-    .mdl-button {
-        font-size: calc(1em + 2vmin);
-        font-family: var(--mod-fonts);
-    }
-    .login-form {
-        min-width: 50vw;
-        max-width: 75vw;
-    }
-    .login-form input[type="text"],
-    .login-form input[type="password"],
-    .login-form>#imgCaptcha {
-        width: 75% !important;
-        padding: 1em;
-        margin: 0.5em;
-    }
-    .login-form>.mdl-button {
-        width: 75%;
-        padding: 1em;
-    }
 }
 
 .text.clickable,
@@ -239,7 +263,9 @@ body {
     box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
     background: #005669;
     border-radius: 10px;
-    padding: 5px
+    padding: 5px;
+    max-height: 1em;
+    max-width: 1em;
 }
 
 .top.header.container>.buttons>.btn.hoverable {
@@ -328,10 +354,6 @@ body {
     justify-content: center
 }
 
-.export-section {
-    padding: 1em 2em
-}
-
 .help .text.container {
     border: solid 1px var(--main-color)
 }
@@ -378,17 +400,20 @@ td.TDItemStyle {
     height: 12em
 }
 
+#redux-overlay-container {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
 .redux-overlay {
     background: #000;
     height: 100vh;
     width: 100vw;
-    position: absolute;
-    top: 0;
-    left: 0;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    z-index: 999;
     display: flex
 }
 
