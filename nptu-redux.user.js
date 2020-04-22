@@ -508,6 +508,9 @@ if (document.querySelector('frameset')) {
     frameset.replaceWith(newBody);
 }
 
+// injection at base window-level, meaning this will be injected at the top frame
+// this will allow us to inject top-body-level content, even if the content is opened as a new frame tab
+getOrCreateSettingsLayer(window.parent.document.body);
 
 function upgradeSelect(contentBody) {
     function makeInputContainer() {
@@ -797,7 +800,7 @@ function injectHeader(contentBody) {
     let settingsTooltip = make({ el: 'span', text: 'Redux 設定', attr: { for: 'settings-button' }, class: 'mdl-tooltip mdl-tooltip--large' });
     let settingsBtn = make({ el: 'label', id: 'settings-button', class: 'btn hoverable', text: 'settings' });
     settingsBtn.addEventListener('click', function() {
-        let settingsOverlay = getOrCreateSettingsLayer(mainForm);
+        let settingsOverlay = getOrCreateSettingsLayer(window.parent.document.body);
         toggleVisibility(settingsOverlay);
     })
     righthandButtons.prepend(settingsTooltip);
@@ -1478,7 +1481,52 @@ function getOrCreateLoadingOverlay(document) {
         overlay.appendChild(loadTxt);
         document.body.prepend(overlay);
     }
-    return overlay;
+
+function getOrCreateSettingsLayer(baseNode) {
+    let settingsLayer = baseNode.querySelector('.redux-settings')
+    if (settingsLayer) {
+        return settingsLayer;
+    }
+    let reduxSettings = make({ el: 'section', class: 'redux-settings popOut' });
+    let topButtonsContainer = make({ el: 'div', class: 'container buttons', appendTo: reduxSettings });
+    let closeButton = make({ el: 'label', class: 'btn', appendTo: topButtonsContainer, text: 'close' });
+    closeButton.addEventListener('click', function() {
+        toggleVisibility(reduxSettings);
+    })
+    let settingsCard = make({ el: 'div', class: 'settings-card container', html: '<h1>Redux 設定</h1>', appendTo: reduxSettings });
+    let outerGenSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>主要設定</h2>', appendTo: settingsCard });
+    let innerGenSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerGenSettingsContainer })
+    let outerStudentSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>學生設定</h2>', appendTo: settingsCard });
+    let innerStudentSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerStudentSettingsContainer })
+    let outerEmployeeSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>教職員設定</h2>', appendTo: settingsCard });
+    let innerEmployeeSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerEmployeeSettingsContainer })
+
+    appendSettings(innerGenSettingsContainer, optionIds.STYLIZED_LOGIN, "啟用首頁美化", "套用新的首頁樣式");
+    appendSettings(innerGenSettingsContainer, optionIds.BUTTON_REPLACEMENT, "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
+    appendSettings(innerGenSettingsContainer, optionIds.CUSTOM_EXPORTS, "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
+    appendSettings(innerGenSettingsContainer, optionIds.TABLE_EXPORT, "啟用表單圖檔下載", "於在白名單內的表格上新增「存成圖檔」的按鈕；方便用於課表下載")
+        // appendSettings(innerGenSettingsContainer, optionIds.MATERIAL_TABLE, "啟用表格美化 (🧪)", "套用 Material Design 至表格外表中 (實驗性階段)")
+    appendSettings(innerStudentSettingsContainer, optionIds.GRADES_WIDGET, "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
+    appendSettings(innerStudentSettingsContainer, optionIds.ABSENCE_WIDGET, "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
+    appendSettings(innerStudentSettingsContainer, optionIds.SURVEY_AUTOFILL, "新增期中期末評量自動填入", "於期中期末評量問卷中加入一次勾選「非常同意」...等按鈕")
+    appendSettings(innerStudentSettingsContainer, optionIds.CHECKIN_HELPER, "新增補打卡幫手", "新增常用時間、常用工作原因、常用補打卡原因按鈕於補打卡頁面")
+    appendSettings(innerEmployeeSettingsContainer, optionIds.CLASSROOM_AUTOFILL, '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
+
+    settingsCard.querySelectorAll('.settings-input').forEach(input => {
+        if (!input.id) {
+            return;
+        }
+        let storedValue = GM_getValue(input.id, undefined);
+        input.addEventListener('change', function(e) {
+            GM_setValue(input.id, this.checked);
+        });
+        let isEnabled = storedValue === undefined ? true : storedValue;
+        input.checked = isEnabled;
+        GM_setValue(input.id, isEnabled);
+    });
+    baseNode.prepend(reduxSettings);
+    componentHandler.upgradeElement(reduxSettings);
+    return reduxSettings;
 }
 
 function isNullOrWhitespace(input) {
@@ -1543,55 +1591,6 @@ function injectScript(head, script) {
 
 function log(msg) {
     console.log(`[NPTU Redux] ${msg}`);
-}
-
-function getOrCreateSettingsLayer(baseNode) {
-    let settingsLayer = baseNode.querySelector('.redux-settings')
-    if (settingsLayer) {
-        return settingsLayer;
-    }
-    let reduxSettings = make({ el: 'section', class: 'redux-settings popOut' });
-    let topButtonsContainer = make({ el: 'div', class: 'container buttons', appendTo: reduxSettings });
-    let closeButton = make({ el: 'label', class: 'btn', appendTo: topButtonsContainer, text: 'close' });
-    closeButton.addEventListener('click', function() {
-        toggleVisibility(reduxSettings);
-    })
-    let settingsCard = make({ el: 'div', class: 'settings-card container', html: '<h1>Redux 設定</h1>', appendTo: reduxSettings });
-    let outerGenSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>主要設定</h2>', appendTo: settingsCard });
-    let innerGenSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerGenSettingsContainer })
-    let outerStudentSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>學生設定</h2>', appendTo: settingsCard });
-    let innerStudentSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerStudentSettingsContainer })
-    let outerEmployeeSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>教職員設定</h2>', appendTo: settingsCard });
-    let innerEmployeeSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerEmployeeSettingsContainer })
-
-    appendSettings(innerGenSettingsContainer, optionIds.STYLIZED_LOGIN, "啟用首頁美化", "套用新的首頁樣式");
-    appendSettings(innerGenSettingsContainer, optionIds.BUTTON_REPLACEMENT, "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
-    appendSettings(innerGenSettingsContainer, optionIds.CUSTOM_EXPORTS, "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
-    appendSettings(innerGenSettingsContainer, optionIds.TABLE_EXPORT, "啟用表單圖檔下載", "於在白名單內的表格上新增「存成圖檔」的按鈕；方便用於課表下載")
-    appendSettings(innerStudentSettingsContainer, optionIds.GRADES_WIDGET, "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
-    appendSettings(innerStudentSettingsContainer, optionIds.ABSENCE_WIDGET, "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
-    appendSettings(innerStudentSettingsContainer, optionIds.SURVEY_AUTOFILL, "新增期中期末評量自動填入", "於期中期末評量問卷中加入一次勾選「非常同意」...等按鈕")
-    appendSettings(innerStudentSettingsContainer, optionIds.CHECKIN_HELPER, "新增補打卡幫手", "新增常用時間、常用工作原因、常用補打卡原因按鈕於補打卡頁面")
-    appendSettings(innerEmployeeSettingsContainer, optionIds.CLASSROOM_AUTOFILL, '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
-
-    settingsCard.querySelectorAll('.settings-input').forEach(input => {
-        if (!input.id) {
-            return;
-        }
-        let storedValue = GM_getValue(input.id, undefined);
-        if (storedValue === undefined) {
-            input.checked = true;
-            GM_setValue(input.id, true);
-        } else {
-            input.checked = storedValue;
-        }
-        input.addEventListener('change', function(e) {
-            GM_setValue(input.id, this.checked);
-        })
-    });
-    baseNode.appendChild(reduxSettings);
-    componentHandler.upgradeAllRegistered();
-    return reduxSettings;
 }
 
 function appendSettings(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
