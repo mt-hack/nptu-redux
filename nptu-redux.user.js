@@ -291,6 +291,19 @@ Homepage Injection
 ====================
 */
 
+// fix alertify
+if (document.querySelector('.alertify-log')) {
+    document.querySelectorAll('.alertify-log').forEach(x => {
+        let data = { message: x.innerText, timeout: 100000 };
+        x.remove();
+        let snackBar = make({ el: 'div', class: 'mdl-js-snackbar mdl-snackbar', id: 'material-alertify', html: '<div class="mdl-snackbar__text"></div><button type="button" class="mdl-snackbar__action"></button>' });
+        document.body.appendChild(snackBar);
+        componentHandler.upgradeElement(snackBar);
+        snackBar.MaterialSnackbar.showSnackbar(data);
+    })
+}
+
+// homepage
 if (isHomepage(document)) {
     if (!options.enableLoginPageMod) {
         return;
