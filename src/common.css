@@ -77,6 +77,17 @@ iframe[name="MAIN"] {
     right: 0
 }
 
+.individual-input {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.individual-input>label {
+    font-size: 16px;
+    line-height: 24px;
+}
+
 .settings-card {
     height: 80vh;
     width: 80vw;
@@ -89,7 +100,7 @@ iframe[name="MAIN"] {
     flex-direction: column
 }
 
-.settings-card * {
+.settings-card *:not(.material-icons) {
     font-family: var(--mod-fonts)
 }
 

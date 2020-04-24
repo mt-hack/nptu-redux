@@ -32,7 +32,8 @@ const optionIds = {
     CLASSROOM_AUTOFILL: 'enable-classroom-autofill',
     SURVEY_AUTOFILL: 'enable-survey-autofill',
     CHECKIN_HELPER: 'enable-checkin-helper',
-    TABLE_EXPORT: 'enable-table-exports'
+    TABLE_EXPORT: 'enable-table-exports',
+    WORK_DESCRIPTIONS: 'work-descriptions'
 }
 
 let options = {
@@ -60,8 +61,6 @@ let options = {
     enableInstructorShortcut: true,
     // Enables shortcut auto submit (Employee accounts only)
     enableShortcutAutoSubmit: true,
-    // Disables custom exports for problematic pages
-    customExportBlacklist: ["A0551RPage"],
     // Pages whose tables need to be fixed; works like a whitelist
     tableFixWhitelist: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
@@ -475,6 +474,8 @@ if (document.querySelector('body>form') && !isHomepage(document)) {
             for (var key in subjectGroups) {
                 injectTableAutofillBySubjectId(contentBody, key, subjectGroups[key]);
             }
+        } else {
+            upgradeSelect(contentBody);
         }
         if (options.enableTableExports) {
             options.tableExportWhitelist.forEach(x => {
@@ -495,7 +496,7 @@ if (document.querySelector('body>form') && !isHomepage(document)) {
         }
         organizeCourseList(contentBody);
         setupClipboard(contentBody);
-        upgradeSelect(contentBody);
+
     }
 }
 
@@ -581,7 +582,6 @@ function injectCheckInHelper(contentBody) {
     timeHelperContainer.appendChild(makeChipText("插入常用時間"));
     timeHelperContainer.appendChild(insertTodayButton);
     timeHelperContainer.appendChild(timeButtonFactory(contentBody, 8, 0));
-    timeHelperContainer.appendChild(timeButtonFactory(contentBody, 8, 0));
     timeHelperContainer.appendChild(timeButtonFactory(contentBody, 10, 0));
     timeHelperContainer.appendChild(timeButtonFactory(contentBody, 12, 0));
     timeHelperContainer.appendChild(timeButtonFactory(contentBody, 13, 30));
@@ -596,13 +596,15 @@ function injectCheckInHelper(contentBody) {
     lateCheckinContainer.appendChild(excuseFactory(contentBody, "忘記"));
     buttonsContainer.appendChild(lateCheckinContainer);
 
-    let workDescriptionContainer = makeGenericContainer();
-    workDescriptionContainer.appendChild(makeChipText("插入工作內容"));
-    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "‍文書處理"));
-    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "資料彙整"));
-    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "‍剪輯影片"));
-    workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, "‍照片處理"));
-    buttonsContainer.appendChild(workDescriptionContainer);
+    let workDescriptions = GM_getValue(optionIds.WORK_DESCRIPTIONS, []);
+    if (workDescriptions.length !== 0) {
+        let workDescriptionContainer = makeGenericContainer();
+        workDescriptionContainer.appendChild(makeChipText("插入工作內容"));
+        workDescriptions.forEach(x => {
+            workDescriptionContainer.appendChild(workDescriptionButtonFactory(contentBody, x));
+        })
+        buttonsContainer.appendChild(workDescriptionContainer);
+    }
 
     toolsContainer.appendChild(toolsHeader);
     toolsContainer.appendChild(buttonsContainer);
@@ -1514,18 +1516,18 @@ function getOrCreateSettingsLayer(baseNode) {
     let outerEmployeeSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>教職員設定</h2>', appendTo: settingsCard });
     let innerEmployeeSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerEmployeeSettingsContainer })
 
-    appendSettings(innerGenSettingsContainer, optionIds.STYLIZED_LOGIN, "啟用首頁美化", "套用新的首頁樣式");
-    appendSettings(innerGenSettingsContainer, optionIds.BUTTON_REPLACEMENT, "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
-    appendSettings(innerGenSettingsContainer, optionIds.CUSTOM_EXPORTS, "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
-    appendSettings(innerGenSettingsContainer, optionIds.TABLE_EXPORT, "啟用表單圖檔下載", "於在白名單內的表格上新增「存成圖檔」的按鈕；方便用於課表下載")
-        // appendSettings(innerGenSettingsContainer, optionIds.MATERIAL_TABLE, "啟用表格美化 (🧪)", "套用 Material Design 至表格外表中 (實驗性階段)")
-    appendSettings(innerStudentSettingsContainer, optionIds.GRADES_WIDGET, "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
-    appendSettings(innerStudentSettingsContainer, optionIds.ABSENCE_WIDGET, "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
-    appendSettings(innerStudentSettingsContainer, optionIds.SURVEY_AUTOFILL, "新增期中期末評量自動填入", "於期中期末評量問卷中加入一次勾選「非常同意」...等按鈕")
-    appendSettings(innerStudentSettingsContainer, optionIds.CHECKIN_HELPER, "新增補打卡幫手", "新增常用時間、常用工作原因、常用補打卡原因按鈕於補打卡頁面")
-    appendSettings(innerEmployeeSettingsContainer, optionIds.CLASSROOM_AUTOFILL, '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
+    appendSwitch(innerGenSettingsContainer, optionIds.STYLIZED_LOGIN, "啟用首頁美化", "套用新的首頁樣式");
+    appendSwitch(innerGenSettingsContainer, optionIds.BUTTON_REPLACEMENT, "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
+    appendSwitch(innerGenSettingsContainer, optionIds.CUSTOM_EXPORTS, "啟用自訂報表輸出", "替報表系統產生自訂輸出選項，如 PDF, Excel (.xls), 純文字 (.txt) 等...")
+    appendSwitch(innerGenSettingsContainer, optionIds.TABLE_EXPORT, "啟用表單圖檔下載", "於在白名單內的表格上新增「存成圖檔」的按鈕；方便用於課表下載")
+    appendSwitch(innerStudentSettingsContainer, optionIds.GRADES_WIDGET, "啟用歷年成績小工具", "將上學期科目及成績插入於首頁中以便檢視");
+    appendSwitch(innerStudentSettingsContainer, optionIds.ABSENCE_WIDGET, "啟用缺曠課小工具", "將本學期缺曠紀錄插入於首頁中以便檢視");
+    appendSwitch(innerStudentSettingsContainer, optionIds.SURVEY_AUTOFILL, "新增期中期末評量自動填入", "於期中期末評量問卷中加入一次勾選「非常同意」...等按鈕")
+    appendSwitch(innerStudentSettingsContainer, optionIds.CHECKIN_HELPER, "新增補打卡幫手", "新增常用時間、常用工作原因、常用補打卡原因按鈕於補打卡頁面")
+    appendInput(innerStudentSettingsContainer, optionIds.WORK_DESCRIPTIONS, "工作內容快捷", "於聘雇打卡中快速加入以下工作內容")
+    appendSwitch(innerEmployeeSettingsContainer, optionIds.CLASSROOM_AUTOFILL, '依教室類別自動填寫人數', "依教室類別自動填寫課程人數 (e.g. 五育樓大教室 = 60 人)。透過本插件自動填寫的欄位將以米白色呈現。");
 
-    settingsCard.querySelectorAll('.settings-input').forEach(input => {
+    settingsCard.querySelectorAll('.settings-input[type="checkbox"]').forEach(input => {
         if (!input.id) {
             return;
         }
@@ -1606,7 +1608,46 @@ function log(msg) {
     console.log(`[NPTU Redux] ${msg}`);
 }
 
-function appendSettings(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
+function appendSettingsChip(parentNode, settingsId, settingsLabel, isCancelleable = false) {
+    let chip = make({ el: 'span', class: 'mdl-chip mdl-chip--deletable', appendTo: parentNode, id: settingsId });
+    make({ el: 'span', class: 'mdl-chip__text', text: settingsLabel, appendTo: chip });
+    if (isCancelleable) {
+        let cancelButton = make({ el: 'button', class: 'mdl-chip__action', html: `<i class="material-icons">cancel</i></button>`, appendTo: chip })
+        cancelButton.addEventListener('click', x => {
+            let existingValues = GM_getValue(settingsId, []);
+            existingValues = existingValues.filter(item => item !== settingsLabel)
+            GM_setValue(settingsId, existingValues);
+            chip.remove();
+        })
+    }
+}
+
+function appendInput(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
+    let settingsContainer = make({ el: 'div', class: 'individual-input', appendTo: parentNode });
+    let topLabel = make({ el: 'label', appendTo: settingsContainer, text: settingsLabel })
+    let outerLabel = make({ el: 'div', appendTo: settingsContainer, attr: { for: settingsId }, id: `${settingsId}-label`, class: 'mdl-textfield mdl-js-textfield mdl-textfield--floating-label' });
+    let innerInput = make({ el: 'input', attr: { type: 'text' }, id: settingsId, class: 'settings-input mdl-textfield__input', appendTo: outerLabel });
+    innerInput.addEventListener('keyup', function(e) {
+        if (event.key === "Enter") {
+            let existingValues = GM_getValue(settingsId, []);
+            existingValues.push(this.value);
+            GM_setValue(settingsId, existingValues);
+            appendSettingsChip(settingsContainer, settingsId, this.value, true);
+            this.value = null;
+        }
+    });
+    let innerLabel = make({ el: 'label', class: 'mdl-textfield__label', appendTo: outerLabel, text: settingsLabel });
+    let chipContainer = make({ el: 'div', class: 'chips', id: settingsId, appendTo: settingsContainer })
+    let chipsValue = GM_getValue(settingsId, []);
+    chipsValue.forEach(x => {
+        appendSettingsChip(chipContainer, settingsId, x, true);
+    })
+    if (settingsDescription) {
+        make({ el: 'span', class: 'mdl-tooltip mdl-tooltip--large', appendTo: settingsContainer, text: settingsDescription, attr: { for: `${settingsId}-label` } });
+    }
+}
+
+function appendSwitch(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
     let settingsContainer = make({ el: 'div', class: 'individual-settings', appendTo: parentNode });
     let outerLabel = make({ el: 'label', appendTo: settingsContainer, attr: { for: settingsId }, id: `${settingsId}-label`, class: 'mdl-switch mdl-js-switch mdl-js-ripple-effect' });
     let innerInput = make({ el: 'input', attr: { type: 'checkbox' }, id: settingsId, class: 'settings-input mdl-switch__input', appendTo: outerLabel });
