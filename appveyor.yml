@@ -1,0 +1,6 @@
+version: 1.0.{build}
+image: Ubuntu
+install:
+- pwsh: npm install css-purge -g
+build_script:
+- pwsh: ./Build.ps1
