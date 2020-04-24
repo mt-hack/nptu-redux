@@ -1591,7 +1591,7 @@ function isLoginPage(document) {
 }
 
 function isHomepage(document) {
-    return (document.querySelector('body>form[action$="default.aspx"]') ? true : false);
+    return (document.querySelector('body>form[action^="default.aspx"]') ? true : false);
 }
 
 // not using GM_addstyle since we need to access various frame heads
