@@ -12,9 +12,9 @@
 // @require https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/dist/dom-to-image-more.min.js
 // @require https://code.getmdl.io/1.3.0/material.min.js
 // @match *://webap*.nptu.edu.tw/*
-// @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/dist/nptu-redux-dist.user.js
-// @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/dist/nptu-redux-dist.user.js
-// @version 2.0.0
+// @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
+// @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
+// @version 1.6.0
 // ==/UserScript==
 
 /* 

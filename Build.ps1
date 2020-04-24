@@ -8,14 +8,10 @@ $srcDir = [System.IO.Path]::Join($baseDir, 'src')
 if (!(Test-Path $srcDir)) {
     throw [System.IO.DirectoryNotFoundException]::new("Source directory not found.")
 }
-$distDir = [System.IO.Path]::Join($baseDir, 'dist')
-if (!(Test-Path $distDir)) {
-    New-Item -ItemType Directory $distDir -Force > $null
-}
 $targetCss = [System.IO.Path]::Join($srcDir, 'common.css')
 $targetJs = [System.IO.Path]::Join($srcDir, 'nptu-redux.js')
 $cssConfig = [System.IO.Path]::Join($srcDir, 'config_css.json')
-$outputCss = [System.IO.Path]::Join($distDir, 'common.min.css')
+$outputCss = [System.IO.Path]::Join($baseDir, 'common.min.css')
 function Start-Build {
     begin {
         $cssPurgeExecutable = Get-Command "css-purge" -ErrorAction SilentlyContinue
@@ -38,8 +34,8 @@ function Start-Build {
         Write-Information "Minifying CSS with args '$args'..."
         Invoke-Expression "$cssPurgeExecutable $args"
         $minifiedCss = Get-Content $outputCss
-        $newJsName = [System.IO.Path]::GetFileNameWithoutExtension($targetJs) + "-dist.user" + [System.IO.Path]::GetExtension($targetJs)
-        $outputFile = [System.IO.Path]::Join($distDir, $newJsName)
+        $newJsName = [System.IO.Path]::GetFileNameWithoutExtension($targetJs) + ".user" + [System.IO.Path]::GetExtension($targetJs)
+        $outputFile = [System.IO.Path]::Join($baseDir, $newJsName)
         Copy-Item -LiteralPath $targetJs -Destination $outputFile
         Write-Information "Injecting 'injectCustomCss' to $targetJs..."
 @"
