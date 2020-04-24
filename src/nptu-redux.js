@@ -14,7 +14,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.6.1
+// @version 1.6.2
 // ==/UserScript==
 
 /* 
@@ -534,14 +534,16 @@ getOrCreateSettingsLayer(window.parent.document.body);
 function injectNukeAll(contentBody) {
     let delAllBtn = createShortcutButton('全選刪除', "delete", "colored");
     let panel = contentBody.querySelector('[id$="pnlButtonUp"]');
-    panel.prepend(delAllBtn);
-    delAllBtn.addEventListener('click', function (e) {
-        let chkDels = this.ownerDocument.body.querySelectorAll('[id$="chkDel"]');
-        chkDels.forEach(x => {
-            x.checked = true;
+    if (panel) {
+        panel.prepend(delAllBtn);
+        delAllBtn.addEventListener('click', function (e) {
+            let chkDels = this.ownerDocument.body.querySelectorAll('[id$="chkDel"]');
+            chkDels.forEach(x => {
+                x.checked = true;
+            })
+            this.ownerDocument.body.querySelector('input[name*=Delete]').click();
         })
-        this.ownerDocument.body.querySelector('input[name*=Delete]').click();
-    })
+    }
 }
 
 function upgradeSelect(contentBody) {
@@ -1083,9 +1085,7 @@ function tableFix(contentBody) {
     })
     let subjectHeaderCell = contentBody.ownerDocument.evaluate(`//table[@class="DgTable"]//div[contains(.,"科目")]`, contentBody.ownerDocument).iterateNext();
     if (subjectHeaderCell) {
-        let parentTd = subjectHeaderCell.parentNode;
-        let parentTr = parentTd.parentNode;
-        let index = Array.prototype.indexOf.call(parentTr.children, parentTd) + 1;
+        let index = getParentRowIndex(subjectHeaderCell);
         let subjectColumns = dataContent.querySelectorAll(`td:nth-child(${index})`);
         subjectColumns.forEach(x => {
             x.style.position = 'sticky';
@@ -1109,6 +1109,28 @@ function tableFix(contentBody) {
             });
         });
     }
+    if (contentBody.querySelector('form').name === 'A0432SPage') {
+        let rows = dataContent.querySelectorAll('tbody > tr')
+        for (let index = 1; index < rows.length; index++) {
+            let parentRow = rows[index];
+            let firstSemesterCell = contentBody.ownerDocument.evaluate(`//table[@class="DgTable"]//div[contains(.,"學年")]`, contentBody.ownerDocument).iterateNext();
+            let firstSemesterNth = getParentRowIndex(firstSemesterCell);
+            let firstSemesterMatch = parentRow.querySelector(`td:nth-of-type(${firstSemesterNth})`);
+            let secondSemesterCell = contentBody.ownerDocument.evaluate(`//table[@class="DgTable"]//div[contains(.,"入學學年")]`, contentBody.ownerDocument).iterateNext();
+            let secondSemesterNth = getParentRowIndex(secondSemesterCell);
+            let secondSemesterMatch = parentRow.querySelector(`td:nth-of-type(${secondSemesterNth})`);
+            if (firstSemesterMatch.innerText !== secondSemesterMatch.innerText) {
+                parentRow.style.backgroundColor = '#ff6347';
+                parentRow.title = "此科目入學學年級目前學年制不同，請注意！"
+            }
+        }
+    }
+}
+
+function getParentRowIndex(element) {
+    let parentTd = element.parentNode;
+    let parentTr = parentTd.parentNode;
+    return Array.prototype.indexOf.call(parentTr.children, parentTd) + 1;
 }
 
 function injectTableAutoFillByClassroomType(contentBody) {
@@ -1300,9 +1322,6 @@ function organizeCourseList(contentBody) {
                 }
             }
         });
-        if (incompleteText.innerText.length > 0) {
-            GM_notification("您有尚未排課之課程！");
-        }
         completeGroup.appendChild(completeText);
         incompleteGroup.appendChild(incompleteText);
         let menuContainer = contentBody.querySelector('.menu.container');
