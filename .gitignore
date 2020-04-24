@@ -2,3 +2,5 @@
 codealike\.json
 
 \.idea/
+
+dist/common.min.css
