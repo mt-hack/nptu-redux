@@ -14,7 +14,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/dist/nptu-redux-dist.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/dist/nptu-redux-dist.user.js
-// @version 1.5.2
+// @version 2.0.0
 // ==/UserScript==
 
 /* 
