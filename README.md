@@ -1,67 +1,40 @@
-# nptu-redux
+<h1 align="center">Welcome to nptu-redux 👋</h1>
+<p>
+  <a href="https://github.com/mt-hack/nptu-redux/blob/master/LICENSE" target="_blank">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+  </a>
+  <a href="https://twitter.com/StillAzureH" target="_blank">
+    <img alt="Twitter: StillAzureH (Lead Developer)" src="https://img.shields.io/twitter/follow/StillAzureH.svg?style=social" />
+  </a>
+</p>
 
-[![](https://data.jsdelivr.com/v1/package/gh/mt-hack/nptu-redux/badge)](https://www.jsdelivr.com/package/gh/mt-hack/nptu-redux)
+> 一套為了改進台灣國立屏東大學介面及使用性而寫的 UserScript 插件
 
-> 請注意！本插件仍在早期設計階段中，若有任何問題，請將其插件關閉並回報於 Issues 中。
+## Usage
 
-一套為了改進某學校系統介面及使用性而寫的 GreaseMonkey 插件。
-
-## 安裝
-
-1. 依照您的瀏覽器安裝 ViolentMonkey 或 TamperMonkey
-    * [Edge](https://www.microsoft.com/en-us/p/tampermonkey/9nblggh5162s)
+1. 依照您的瀏覽器安裝 ViolentMonkey
+    * [Edge (新版)](https://microsoftedge.microsoft.com/addons/detail/eeagobfjdenkkddmbclomhiblgggliao)
     * [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
     * [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 2. [點此安裝 NPTU-Redux](https://github.com/mt-hack/nptu-redux/raw/master/nptu-redux.user.js)
 3. 大功告成！享受新版平台吧！
 
-## 功能
+## Author
 
-* 以 Google 的 [Material Design](https://material.io) 設計為基底
-* 改進整體頁面 HTML
-* 支援學生/教職員用戶端 (推廣教育及校友資訊尚未測試)
-* 支援 i-net 報表各項匯出功能 (不必再安裝 Java 然後再去開IE啦！)
+👤 **MT.Hack**
 
-### 學生端功能
+* Twitter: [@StillAzureH](https://twitter.com/StillAzureH) (主開發人員)
+* Github: [@mt-hack](https://github.com/mt-hack)
 
-* 首頁新增小工具
-    * 近學期缺席
-    * 近學期成績
+## 🤝 Contributing
 
-### 教職員端功能
+歡迎提交PR或提出任何關於本插劍之相關問題！<br />Feel free to check [issues page](https://github.com/mt-hack/nptu-redux/issues). 
 
-* 自動整理排課及未排課群組
+## Show your support
 
-## 設定
+Give a ⭐️ if this project helped you!
 
-本插件的設計可讓使用者自行決定要開啟及關閉哪些功能，但目前還是得透過手動編輯程式碼的方式設定這些功能。
+## 📝 License
 
-步驟：
-
-1. 於 ViolentMonkey 或 TamperMonkey 中開啟並編輯「NPTU Redux」
-2. 您將會看到如下的一段程式碼：
-
-    ```js
-    let options = {
-        // Enables grade widget
-        enableGradeOnHome: true,
-        // Enables absence widget
-        enableAbsenceOnHome: true,
-        // Shows the old header in case of component breakage
-        enableMaterialHeader: true,
-        // Enables custom export options for printing
-        enableCustomExport: true,
-        // Enables experimental features (use at your own risk!)
-        enableExperimental: false,
-        // Pages whose tables need to be fixed; works like a whitelist
-        tableFixApplication: ["A0432SPage", "A0433SPage"],
-    };
-    ```
-
-3. 每一項 `true` 及 `false` 代表各項功能的開關設定，如將其設定為 `true` 會將該功能開啟
-4. 於編輯後存檔並關閉
-
-## 已知問題
-
-* CSS 需 fallback 支援 (如 404 或MIME type mismatch 時應用舊版)
-* 目前 Javascript 急需整理
+Copyright © 2020 [MT.Hack (Still Hsu)](https://github.com/mt-hack).<br />
+This project is [MIT](https://github.com/mt-hack/nptu-redux/blob/master/LICENSE) licensed.
