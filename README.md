@@ -28,7 +28,7 @@
 
 ## 🤝 Contributing
 
-歡迎提交PR或提出任何關於本插劍之相關問題！<br />Feel free to check [issues page](https://github.com/mt-hack/nptu-redux/issues). 
+歡迎提交PR或提出任何關於本插件之相關問題！<br />Feel free to check [issues page](https://github.com/mt-hack/nptu-redux/issues). 
 
 ## Show your support
 
