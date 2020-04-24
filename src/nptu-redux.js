@@ -14,7 +14,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.6.0
+// @version 1.6.1
 // ==/UserScript==
 
 /* 
@@ -216,7 +216,7 @@ const buttonTypes = {
 Prototype helper methods
 */
 
-Element.prototype.cloneElement = function(targetElementName = undefined, targetElementClass = undefined) {
+Element.prototype.cloneElement = function (targetElementName = undefined, targetElementClass = undefined) {
     let newElement = document.createElement(targetElementName || "span");
     newElement.innerHTML = this.innerHTML;
     if (targetElementClass) {
@@ -227,7 +227,7 @@ Element.prototype.cloneElement = function(targetElementName = undefined, targetE
     return newElement;
 }
 
-Element.prototype.replaceElement = function(newElementType = undefined) {
+Element.prototype.replaceElement = function (newElementType = undefined) {
     let newElement = document.createElement(newElementType || "span");
     this.childNodes.forEach(x => {
         newElement.appendChild(x);
@@ -235,16 +235,16 @@ Element.prototype.replaceElement = function(newElementType = undefined) {
     this.replaceWith(newElement);
 }
 
-Element.prototype.appendAfter = function(element) {
+Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
 }, false;
 
-Element.prototype.appendBefore = function(element) {
+Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
 }, false;
 
 // modified from https://stackoverflow.com/a/10073788
-Number.prototype.pad = function(width, z) {
+Number.prototype.pad = function (width, z) {
     z = z || '0';
     let n = this + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
@@ -263,7 +263,7 @@ let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultV
 let frameElement = mainWindow.frameElement || mainWindow;
 let contentWindow = frameElement.contentWindow || frameElement;
 if (contentWindow.WebForm_OnSubmit) {
-    contentWindow.WebForm_OnSubmit = function() {
+    contentWindow.WebForm_OnSubmit = function () {
         toggleOverlay(mainWindow.document);
     }
 }
@@ -276,7 +276,7 @@ Image Fix Injection
 
 let images = document.querySelectorAll('*[src*="_EN"]')
 images.forEach(img => {
-    img.addEventListener('error', function() {
+    img.addEventListener('error', function () {
         let englishSuffixRegex = new RegExp(/_en/gi);
         this.src = this.src.replace(englishSuffixRegex, '');
     })
@@ -301,9 +301,17 @@ Homepage Injection
 // fix alertify
 if (document.querySelector('.alertify-log')) {
     document.querySelectorAll('.alertify-log').forEach(x => {
-        let data = { message: x.innerText, timeout: 100000 };
+        let data = {
+            message: x.innerText,
+            timeout: 100000
+        };
         x.remove();
-        let snackBar = make({ el: 'div', class: 'mdl-js-snackbar mdl-snackbar', id: 'material-alertify', html: '<div class="mdl-snackbar__text"></div><button type="button" class="mdl-snackbar__action"></button>' });
+        let snackBar = make({
+            el: 'div',
+            class: 'mdl-js-snackbar mdl-snackbar',
+            id: 'material-alertify',
+            html: '<div class="mdl-snackbar__text"></div><button type="button" class="mdl-snackbar__action"></button>'
+        });
         document.body.appendChild(snackBar);
         componentHandler.upgradeElement(snackBar);
         snackBar.MaterialSnackbar.showSnackbar(data);
@@ -405,7 +413,7 @@ if (isHomepage(document)) {
                 captchaTextField.autocomplete = "off";
             }
             let newLoginBtn = createShortcutButton('登入', 'vpn_key', 'colored');
-            newLoginBtn.addEventListener('click', function(e) {
+            newLoginBtn.addEventListener('click', function (e) {
                 this.nextElementSibling.click();
             })
             newLoginBtn.appendBefore(oldLoginBtn);
@@ -413,7 +421,7 @@ if (isHomepage(document)) {
         }
         let captchaImage = mainElement.querySelector('#imgCaptcha');
         if (captchaImage) {
-            captchaImage.addEventListener('click', function(e) {
+            captchaImage.addEventListener('click', function (e) {
                 this.src = `../Modules/CaptchaCreator.aspx?${Math.random()}`
             })
         }
@@ -465,7 +473,10 @@ if (document.querySelector('body>form') && !isHomepage(document)) {
     if (options.enableCustomExport) {
         printFix(contentBody);
     }
-    frameElement.onload = function() {
+    frameElement.onload = function () {
+        if (currentPage.name === "A0433SPage") {
+            injectNukeAll(contentBody);
+        }
         if (options.tableFixWhitelist.includes(currentPage.name)) {
             tableFix(contentBody);
             if (options.enableClassroomAutofillOnSelect) {
@@ -520,6 +531,19 @@ if (document.querySelector('frameset')) {
 // this will allow us to inject top-body-level content, even if the content is opened as a new frame tab
 getOrCreateSettingsLayer(window.parent.document.body);
 
+function injectNukeAll(contentBody) {
+    let delAllBtn = createShortcutButton('全選刪除', "delete", "colored");
+    let panel = contentBody.querySelector('[id$="pnlButtonUp"]');
+    panel.prepend(delAllBtn);
+    delAllBtn.addEventListener('click', function (e) {
+        let chkDels = this.ownerDocument.body.querySelectorAll('[id$="chkDel"]');
+        chkDels.forEach(x => {
+            x.checked = true;
+        })
+        this.ownerDocument.body.querySelector('input[name*=Delete]').click();
+    })
+}
+
 function upgradeSelect(contentBody) {
     function makeInputContainer() {
         return make({
@@ -545,7 +569,11 @@ function upgradeSelect(contentBody) {
         selectNodeParent.replaceChild(selectContainer, selectNode);
         selectContainer.appendChild(selectNode);
         if (previousSibling && previousSibling.innerText) {
-            let placeholderText = make({ el: 'label', text: previousSibling.innerText.replace(/[:：]/g, ''), class: 'mdl-textfield__label' })
+            let placeholderText = make({
+                el: 'label',
+                text: previousSibling.innerText.replace(/[:：]/g, ''),
+                class: 'mdl-textfield__label'
+            })
             selectContainer.appendChild(placeholderText);
         }
         componentHandler.upgradeElement(selectContainer);
@@ -810,9 +838,21 @@ function injectHeader(contentBody) {
     let mainForm = mainWindow.document.body.querySelector('body>form');
     let righthandButtons = newHeader.querySelector('.alt.buttons.container.right');
 
-    let settingsTooltip = make({ el: 'span', text: 'Redux 設定', attr: { for: 'settings-button' }, class: 'mdl-tooltip mdl-tooltip--large' });
-    let settingsBtn = make({ el: 'label', id: 'settings-button', class: 'btn hoverable', text: 'settings' });
-    settingsBtn.addEventListener('click', function() {
+    let settingsTooltip = make({
+        el: 'span',
+        text: 'Redux 設定',
+        attr: {
+            for: 'settings-button'
+        },
+        class: 'mdl-tooltip mdl-tooltip--large'
+    });
+    let settingsBtn = make({
+        el: 'label',
+        id: 'settings-button',
+        class: 'btn hoverable',
+        text: 'settings'
+    });
+    settingsBtn.addEventListener('click', function () {
         let settingsOverlay = getOrCreateSettingsLayer(window.parent.document.body);
         toggleVisibility(settingsOverlay);
     })
@@ -925,7 +965,7 @@ function buttonReplacement(contentBody) {
             oldButtons.forEach(oldBtn => {
                 let newBtn = createShortcutButton(buttonType.label, buttonType.icon, buttonType.color);
                 oldBtn.style.display = "none";
-                newBtn.addEventListener('click', function(e) {
+                newBtn.addEventListener('click', function (e) {
                     this.nextElementSibling.click();
                 })
                 newBtn.appendBefore(oldBtn);
@@ -952,7 +992,7 @@ function injectAbsenceTable(contentBody) {
         },
     });
     infoDiv.appendChild(absenceFrame);
-    absenceFrame.addEventListener('load', function() {
+    absenceFrame.addEventListener('load', function () {
         // remove irrelevant elements
         let frameBody = absenceFrame.contentDocument.body;
         let absenceTable = frameBody.querySelector('table[id*=dgData]');
@@ -988,7 +1028,7 @@ function injectGradesTable(contentBody) {
         },
     });
     infoDiv.appendChild(gradesFrame);
-    gradesFrame.addEventListener('load', function() {
+    gradesFrame.addEventListener('load', function () {
         // remove irrelevant elements
         let frameBody = gradesFrame.contentDocument.body;
         let gradesTable = frameBody.querySelector('table[id*=dgData]');
@@ -1060,7 +1100,7 @@ function tableFix(contentBody) {
     if (tableRows) {
         tableRows.forEach(x => {
             x.removeAttribute('onclick');
-            x.addEventListener('click', function() {
+            x.addEventListener('click', function () {
                 if (this.style.backgroundColor === 'rgb(221, 238, 242)') {
                     this.style.backgroundColor = '#fff'
                 } else {
@@ -1074,7 +1114,7 @@ function tableFix(contentBody) {
 function injectTableAutoFillByClassroomType(contentBody) {
     let selectGroups = contentBody.querySelectorAll('select[id*=ddlROOM_GROUP]');
     selectGroups.forEach(selectElement => {
-        selectElement.addEventListener('change', function() {
+        selectElement.addEventListener('change', function () {
             let targetValue = -1;
             let parentRow = this.parentNode.parentNode;
             if (!parentRow) {
@@ -1246,7 +1286,7 @@ function organizeCourseList(contentBody) {
                 class: 'class-option'
             });
             textElement.innerText = option.innerText;
-            textElement.addEventListener('click', function() {
+            textElement.addEventListener('click', function () {
                 option.parentNode.selectedIndex = option.index;
                 option.parentNode.onchange();
             });
@@ -1289,17 +1329,17 @@ function injectTableDownload(table) {
     table.parentNode.replaceChild(newTableContainer, table);
     // define table again
     table = newTableContainer.querySelector('table');
-    pngDownloadBtn.addEventListener('click', function() {
+    pngDownloadBtn.addEventListener('click', function () {
         toggleOverlay(table.getRootNode());
-        domtoimage.toPng(table).then(function(url) {
+        domtoimage.toPng(table).then(function (url) {
             let outputName = `${table.id || "image"}.png`
             GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
         });
     });
-    svgDownloadBtn.addEventListener('click', function() {
+    svgDownloadBtn.addEventListener('click', function () {
         toggleOverlay(table.getRootNode());
-        domtoimage.toSvg(table).then(function(url) {
+        domtoimage.toSvg(table).then(function (url) {
             let outputName = `${table.id || "image"}.svg`
             GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
@@ -1309,7 +1349,7 @@ function injectTableDownload(table) {
 
 function setupClipboard(contentBody) {
     contentBody.querySelectorAll('.copyable').forEach(element => {
-        element.addEventListener('click', function() {
+        element.addEventListener('click', function () {
             GM_setClipboard(this.innerText);
             GM_notification(this.innerText, "已複製至剪貼簿中！");
         });
@@ -1330,7 +1370,7 @@ function createInstructorShortcut(contentBody) {
         button.key = key;
         button.keyValue = instructorShortcuts[key];
         button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
-        button.addEventListener('click', function(event) {
+        button.addEventListener('click', function (event) {
             let ddlEmployeeSelection = contentBody.querySelector('select[id*=ddlEMP_ID]');
             if (!ddlEmployeeSelection) {
                 throw "Failed to the obtain employee selection dropdown menu."
@@ -1361,7 +1401,7 @@ function createQuickLocationSelection(contentBody) {
         button.key = key;
         button.keyValue = locationShortcuts[key];
         button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
-        button.addEventListener('click', function(event) {
+        button.addEventListener('click', function (event) {
             let ddlRoomSelection = contentBody.querySelector('select[id*=ddlROOM_ID]');
             if (!ddlRoomSelection) {
                 throw "Failed to the obtain room selection dropdown menu."
@@ -1502,19 +1542,63 @@ function getOrCreateSettingsLayer(baseNode) {
     if (settingsLayer) {
         return settingsLayer;
     }
-    let reduxSettings = make({ el: 'section', class: 'redux-settings popOut' });
-    let topButtonsContainer = make({ el: 'div', class: 'container buttons', appendTo: reduxSettings });
-    let closeButton = make({ el: 'label', class: 'btn', appendTo: topButtonsContainer, text: 'close' });
-    closeButton.addEventListener('click', function() {
+    let reduxSettings = make({
+        el: 'section',
+        class: 'redux-settings popOut'
+    });
+    let topButtonsContainer = make({
+        el: 'div',
+        class: 'container buttons',
+        appendTo: reduxSettings
+    });
+    let closeButton = make({
+        el: 'label',
+        class: 'btn',
+        appendTo: topButtonsContainer,
+        text: 'close'
+    });
+    closeButton.addEventListener('click', function () {
         toggleVisibility(reduxSettings);
     })
-    let settingsCard = make({ el: 'div', class: 'settings-card container', html: '<h1>Redux 設定</h1>', appendTo: reduxSettings });
-    let outerGenSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>主要設定</h2>', appendTo: settingsCard });
-    let innerGenSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerGenSettingsContainer })
-    let outerStudentSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>學生設定</h2>', appendTo: settingsCard });
-    let innerStudentSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerStudentSettingsContainer })
-    let outerEmployeeSettingsContainer = make({ el: 'section', class: 'container', html: '<h2>教職員設定</h2>', appendTo: settingsCard });
-    let innerEmployeeSettingsContainer = make({ el: 'div', class: 'settings container', appendTo: outerEmployeeSettingsContainer })
+    let settingsCard = make({
+        el: 'div',
+        class: 'settings-card container',
+        html: '<h1>Redux 設定</h1>',
+        appendTo: reduxSettings
+    });
+    let outerGenSettingsContainer = make({
+        el: 'section',
+        class: 'container',
+        html: '<h2>主要設定</h2>',
+        appendTo: settingsCard
+    });
+    let innerGenSettingsContainer = make({
+        el: 'div',
+        class: 'settings container',
+        appendTo: outerGenSettingsContainer
+    })
+    let outerStudentSettingsContainer = make({
+        el: 'section',
+        class: 'container',
+        html: '<h2>學生設定</h2>',
+        appendTo: settingsCard
+    });
+    let innerStudentSettingsContainer = make({
+        el: 'div',
+        class: 'settings container',
+        appendTo: outerStudentSettingsContainer
+    })
+    let outerEmployeeSettingsContainer = make({
+        el: 'section',
+        class: 'container',
+        html: '<h2>教職員設定</h2>',
+        appendTo: settingsCard
+    });
+    let innerEmployeeSettingsContainer = make({
+        el: 'div',
+        class: 'settings container',
+        appendTo: outerEmployeeSettingsContainer
+    })
 
     appendSwitch(innerGenSettingsContainer, optionIds.STYLIZED_LOGIN, "啟用首頁美化", "套用新的首頁樣式");
     appendSwitch(innerGenSettingsContainer, optionIds.BUTTON_REPLACEMENT, "啟用按鈕替換", "將校務行政系統的所有按鈕替換為新的按鈕樣式");
@@ -1532,7 +1616,7 @@ function getOrCreateSettingsLayer(baseNode) {
             return;
         }
         let storedValue = GM_getValue(input.id, undefined);
-        input.addEventListener('change', function(e) {
+        input.addEventListener('change', function (e) {
             GM_setValue(input.id, this.checked);
         });
         let isEnabled = storedValue === undefined ? true : storedValue;
@@ -1609,10 +1693,25 @@ function log(msg) {
 }
 
 function appendSettingsChip(parentNode, settingsId, settingsLabel, isCancelleable = false) {
-    let chip = make({ el: 'span', class: 'mdl-chip mdl-chip--deletable', appendTo: parentNode, id: settingsId });
-    make({ el: 'span', class: 'mdl-chip__text', text: settingsLabel, appendTo: chip });
+    let chip = make({
+        el: 'span',
+        class: 'mdl-chip mdl-chip--deletable',
+        appendTo: parentNode,
+        id: settingsId
+    });
+    make({
+        el: 'span',
+        class: 'mdl-chip__text',
+        text: settingsLabel,
+        appendTo: chip
+    });
     if (isCancelleable) {
-        let cancelButton = make({ el: 'button', class: 'mdl-chip__action', html: `<i class="material-icons">cancel</i></button>`, appendTo: chip })
+        let cancelButton = make({
+            el: 'button',
+            class: 'mdl-chip__action',
+            html: `<i class="material-icons">cancel</i></button>`,
+            appendTo: chip
+        })
         cancelButton.addEventListener('click', x => {
             let existingValues = GM_getValue(settingsId, []);
             existingValues = existingValues.filter(item => item !== settingsLabel)
@@ -1623,11 +1722,35 @@ function appendSettingsChip(parentNode, settingsId, settingsLabel, isCancelleabl
 }
 
 function appendInput(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
-    let settingsContainer = make({ el: 'div', class: 'individual-input', appendTo: parentNode });
-    let topLabel = make({ el: 'label', appendTo: settingsContainer, text: settingsLabel })
-    let outerLabel = make({ el: 'div', appendTo: settingsContainer, attr: { for: settingsId }, id: `${settingsId}-label`, class: 'mdl-textfield mdl-js-textfield mdl-textfield--floating-label' });
-    let innerInput = make({ el: 'input', attr: { type: 'text' }, id: settingsId, class: 'settings-input mdl-textfield__input', appendTo: outerLabel });
-    innerInput.addEventListener('keyup', function(e) {
+    let settingsContainer = make({
+        el: 'div',
+        class: 'individual-input',
+        appendTo: parentNode
+    });
+    let topLabel = make({
+        el: 'label',
+        appendTo: settingsContainer,
+        text: settingsLabel
+    })
+    let outerLabel = make({
+        el: 'div',
+        appendTo: settingsContainer,
+        attr: {
+            for: settingsId
+        },
+        id: `${settingsId}-label`,
+        class: 'mdl-textfield mdl-js-textfield mdl-textfield--floating-label'
+    });
+    let innerInput = make({
+        el: 'input',
+        attr: {
+            type: 'text'
+        },
+        id: settingsId,
+        class: 'settings-input mdl-textfield__input',
+        appendTo: outerLabel
+    });
+    innerInput.addEventListener('keyup', function (e) {
         if (event.key === "Enter") {
             let existingValues = GM_getValue(settingsId, []);
             existingValues.push(this.value);
@@ -1636,24 +1759,75 @@ function appendInput(parentNode, settingsId, settingsLabel, settingsDescription 
             this.value = null;
         }
     });
-    let innerLabel = make({ el: 'label', class: 'mdl-textfield__label', appendTo: outerLabel, text: settingsLabel });
-    let chipContainer = make({ el: 'div', class: 'chips', id: settingsId, appendTo: settingsContainer })
+    let innerLabel = make({
+        el: 'label',
+        class: 'mdl-textfield__label',
+        appendTo: outerLabel,
+        text: settingsLabel
+    });
+    let chipContainer = make({
+        el: 'div',
+        class: 'chips',
+        id: settingsId,
+        appendTo: settingsContainer
+    })
     let chipsValue = GM_getValue(settingsId, []);
     chipsValue.forEach(x => {
         appendSettingsChip(chipContainer, settingsId, x, true);
     })
     if (settingsDescription) {
-        make({ el: 'span', class: 'mdl-tooltip mdl-tooltip--large', appendTo: settingsContainer, text: settingsDescription, attr: { for: `${settingsId}-label` } });
+        make({
+            el: 'span',
+            class: 'mdl-tooltip mdl-tooltip--large',
+            appendTo: settingsContainer,
+            text: settingsDescription,
+            attr: {
+                for: `${settingsId}-label`
+            }
+        });
     }
 }
 
 function appendSwitch(parentNode, settingsId, settingsLabel, settingsDescription = undefined) {
-    let settingsContainer = make({ el: 'div', class: 'individual-settings', appendTo: parentNode });
-    let outerLabel = make({ el: 'label', appendTo: settingsContainer, attr: { for: settingsId }, id: `${settingsId}-label`, class: 'mdl-switch mdl-js-switch mdl-js-ripple-effect' });
-    let innerInput = make({ el: 'input', attr: { type: 'checkbox' }, id: settingsId, class: 'settings-input mdl-switch__input', appendTo: outerLabel });
-    let innerLabel = make({ el: 'span', class: 'mdl-switch__label', appendTo: outerLabel, text: settingsLabel });
+    let settingsContainer = make({
+        el: 'div',
+        class: 'individual-settings',
+        appendTo: parentNode
+    });
+    let outerLabel = make({
+        el: 'label',
+        appendTo: settingsContainer,
+        attr: {
+            for: settingsId
+        },
+        id: `${settingsId}-label`,
+        class: 'mdl-switch mdl-js-switch mdl-js-ripple-effect'
+    });
+    let innerInput = make({
+        el: 'input',
+        attr: {
+            type: 'checkbox'
+        },
+        id: settingsId,
+        class: 'settings-input mdl-switch__input',
+        appendTo: outerLabel
+    });
+    let innerLabel = make({
+        el: 'span',
+        class: 'mdl-switch__label',
+        appendTo: outerLabel,
+        text: settingsLabel
+    });
     if (settingsDescription) {
-        make({ el: 'span', class: 'mdl-tooltip mdl-tooltip--large', appendTo: settingsContainer, text: settingsDescription, attr: { for: `${settingsId}-label` } });
+        make({
+            el: 'span',
+            class: 'mdl-tooltip mdl-tooltip--large',
+            appendTo: settingsContainer,
+            text: settingsDescription,
+            attr: {
+                for: `${settingsId}-label`
+            }
+        });
     }
 }
 
