@@ -14,7 +14,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.6.2
+// @version 1.6.3
 // ==/UserScript==
 
 /* 
@@ -65,6 +65,7 @@ let options = {
     tableFixWhitelist: ["A0432SPage", "A0433SPage"],
     locationSelectionPage: ["A0413A02Page"],
     instructorShortcutPage: ["A0413S1Page"],
+    classShortcutPage: ["A0434SPage"],
     // Enables table downloading on these table/div IDs
     tableExportWhitelist: ["A0515S1_dgData", "A0515S_dgData", "A0809Q_dgData", "A0702S1_dgData", "B0105S_dgData", "B0208S_dgData", "A0425S_dgData", "B4002S_dgData", "A0413S_dgData_Content", "A0423S_dgData_Content"],
     isFlexRowWhitelist: ["A0428S3Page", "B4002SPage", "A0428S1Page", "A0428S2Page", "A0428SPage", "A1609QPage", "B1414SPage", "A0711SPage", "A1305SPage"]
@@ -216,7 +217,7 @@ const buttonTypes = {
 Prototype helper methods
 */
 
-Element.prototype.cloneElement = function (targetElementName = undefined, targetElementClass = undefined) {
+Element.prototype.cloneElement = function(targetElementName = undefined, targetElementClass = undefined) {
     let newElement = document.createElement(targetElementName || "span");
     newElement.innerHTML = this.innerHTML;
     if (targetElementClass) {
@@ -227,7 +228,7 @@ Element.prototype.cloneElement = function (targetElementName = undefined, target
     return newElement;
 }
 
-Element.prototype.replaceElement = function (newElementType = undefined) {
+Element.prototype.replaceElement = function(newElementType = undefined) {
     let newElement = document.createElement(newElementType || "span");
     this.childNodes.forEach(x => {
         newElement.appendChild(x);
@@ -235,16 +236,16 @@ Element.prototype.replaceElement = function (newElementType = undefined) {
     this.replaceWith(newElement);
 }
 
-Element.prototype.appendAfter = function (element) {
+Element.prototype.appendAfter = function(element) {
     element.parentNode.insertBefore(this, element.nextSibling);
 }, false;
 
-Element.prototype.appendBefore = function (element) {
+Element.prototype.appendBefore = function(element) {
     element.parentNode.insertBefore(this, element);
 }, false;
 
 // modified from https://stackoverflow.com/a/10073788
-Number.prototype.pad = function (width, z) {
+Number.prototype.pad = function(width, z) {
     z = z || '0';
     let n = this + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
@@ -263,7 +264,7 @@ let mainWindow = mainElement.contentWindow || mainElement.ownerDocument.defaultV
 let frameElement = mainWindow.frameElement || mainWindow;
 let contentWindow = frameElement.contentWindow || frameElement;
 if (contentWindow.WebForm_OnSubmit) {
-    contentWindow.WebForm_OnSubmit = function () {
+    contentWindow.WebForm_OnSubmit = function() {
         toggleOverlay(mainWindow.document);
     }
 }
@@ -276,7 +277,7 @@ Image Fix Injection
 
 let images = document.querySelectorAll('*[src*="_EN"]')
 images.forEach(img => {
-    img.addEventListener('error', function () {
+    img.addEventListener('error', function() {
         let englishSuffixRegex = new RegExp(/_en/gi);
         this.src = this.src.replace(englishSuffixRegex, '');
     })
@@ -413,7 +414,7 @@ if (isHomepage(document)) {
                 captchaTextField.autocomplete = "off";
             }
             let newLoginBtn = createShortcutButton('登入', 'vpn_key', 'colored');
-            newLoginBtn.addEventListener('click', function (e) {
+            newLoginBtn.addEventListener('click', function(e) {
                 this.nextElementSibling.click();
             })
             newLoginBtn.appendBefore(oldLoginBtn);
@@ -421,7 +422,7 @@ if (isHomepage(document)) {
         }
         let captchaImage = mainElement.querySelector('#imgCaptcha');
         if (captchaImage) {
-            captchaImage.addEventListener('click', function (e) {
+            captchaImage.addEventListener('click', function(e) {
                 this.src = `../Modules/CaptchaCreator.aspx?${Math.random()}`
             })
         }
@@ -445,13 +446,11 @@ if (document.querySelector('body>form') && !isHomepage(document)) {
         if (options.enableClassroomShortcut) {
             createQuickLocationSelection(contentBody);
         }
-        return;
     }
     if (options.instructorShortcutPage.includes(currentPage.name)) {
         if (options.enableInstructorShortcut) {
             createInstructorShortcut(contentBody);
         }
-        return;
     }
     injectHeader(contentBody);
     pageCleanup(contentBody, options.isFlexRowWhitelist.includes(currentPage.name));
@@ -473,7 +472,7 @@ if (document.querySelector('body>form') && !isHomepage(document)) {
     if (options.enableCustomExport) {
         printFix(contentBody);
     }
-    frameElement.onload = function () {
+    frameElement.onload = function() {
         if (currentPage.name === "A0433SPage") {
             injectNukeAll(contentBody);
         }
@@ -494,6 +493,9 @@ if (document.querySelector('body>form') && !isHomepage(document)) {
                     injectTableDownload(table);
                 })
             })
+        }
+        if (options.classShortcutPage.includes(currentPage.name)) {
+            createQuickRoomSelection(contentBody);
         }
         if (options.enableSurveyAutoFill) {
             if (currentPage.name === "A1007SPage" || currentPage.name === "A1014SPage") {
@@ -531,12 +533,35 @@ if (document.querySelector('frameset')) {
 // this will allow us to inject top-body-level content, even if the content is opened as a new frame tab
 getOrCreateSettingsLayer(window.parent.document.body);
 
+function createQuickRoomSelection(contentBody) {
+    let table = contentBody.querySelector('[id="P01"]');
+    let classRoomList = contentBody.querySelector('[id$="ddlROOM_ID"]');
+    if (table && classRoomList) {
+        let humanitiesClassrooms = classRoomList.querySelectorAll('option[value^="I1"], option[value^="I2"], option[value^="I3"], option[value^="I4"], option[value^="I5"]');
+        let buttonContainer = make({ el: 'div', class: 'container', attr: { style: `display: grid;grid-template-columns: 1fr 1fr 1fr;` } });
+        humanitiesClassrooms.forEach(x => {
+            let color = x.innerText.match(/大/g) ? "colored" : "alt";
+            let shortcutButton = createShortcutButton(x.innerText, undefined, color);
+            shortcutButton.keyValue = x.value;
+            shortcutButton.addEventListener('click', function(event) {
+                classRoomList.value = event.currentTarget.keyValue;
+                let submitButton = contentBody.querySelector('input[id*=ibtSave]');
+                if (submitButton) {
+                    submitButton.click();
+                }
+            });
+            buttonContainer.appendChild(shortcutButton);
+        })
+        table.appendChild(buttonContainer);
+    }
+}
+
 function injectNukeAll(contentBody) {
     let delAllBtn = createShortcutButton('全選刪除', "delete", "colored");
     let panel = contentBody.querySelector('[id$="pnlButtonUp"]');
     if (panel) {
         panel.prepend(delAllBtn);
-        delAllBtn.addEventListener('click', function (e) {
+        delAllBtn.addEventListener('click', function(e) {
             let chkDels = this.ownerDocument.body.querySelectorAll('[id$="chkDel"]');
             chkDels.forEach(x => {
                 x.checked = true;
@@ -854,7 +879,7 @@ function injectHeader(contentBody) {
         class: 'btn hoverable',
         text: 'settings'
     });
-    settingsBtn.addEventListener('click', function () {
+    settingsBtn.addEventListener('click', function() {
         let settingsOverlay = getOrCreateSettingsLayer(window.parent.document.body);
         toggleVisibility(settingsOverlay);
     })
@@ -967,7 +992,7 @@ function buttonReplacement(contentBody) {
             oldButtons.forEach(oldBtn => {
                 let newBtn = createShortcutButton(buttonType.label, buttonType.icon, buttonType.color);
                 oldBtn.style.display = "none";
-                newBtn.addEventListener('click', function (e) {
+                newBtn.addEventListener('click', function(e) {
                     this.nextElementSibling.click();
                 })
                 newBtn.appendBefore(oldBtn);
@@ -994,7 +1019,7 @@ function injectAbsenceTable(contentBody) {
         },
     });
     infoDiv.appendChild(absenceFrame);
-    absenceFrame.addEventListener('load', function () {
+    absenceFrame.addEventListener('load', function() {
         // remove irrelevant elements
         let frameBody = absenceFrame.contentDocument.body;
         let absenceTable = frameBody.querySelector('table[id*=dgData]');
@@ -1030,7 +1055,7 @@ function injectGradesTable(contentBody) {
         },
     });
     infoDiv.appendChild(gradesFrame);
-    gradesFrame.addEventListener('load', function () {
+    gradesFrame.addEventListener('load', function() {
         // remove irrelevant elements
         let frameBody = gradesFrame.contentDocument.body;
         let gradesTable = frameBody.querySelector('table[id*=dgData]');
@@ -1100,7 +1125,7 @@ function tableFix(contentBody) {
     if (tableRows) {
         tableRows.forEach(x => {
             x.removeAttribute('onclick');
-            x.addEventListener('click', function () {
+            x.addEventListener('click', function() {
                 if (this.style.backgroundColor === 'rgb(221, 238, 242)') {
                     this.style.backgroundColor = '#fff'
                 } else {
@@ -1136,7 +1161,7 @@ function getParentRowIndex(element) {
 function injectTableAutoFillByClassroomType(contentBody) {
     let selectGroups = contentBody.querySelectorAll('select[id*=ddlROOM_GROUP]');
     selectGroups.forEach(selectElement => {
-        selectElement.addEventListener('change', function () {
+        selectElement.addEventListener('change', function() {
             let targetValue = -1;
             let parentRow = this.parentNode.parentNode;
             if (!parentRow) {
@@ -1308,7 +1333,7 @@ function organizeCourseList(contentBody) {
                 class: 'class-option'
             });
             textElement.innerText = option.innerText;
-            textElement.addEventListener('click', function () {
+            textElement.addEventListener('click', function() {
                 option.parentNode.selectedIndex = option.index;
                 option.parentNode.onchange();
             });
@@ -1348,17 +1373,17 @@ function injectTableDownload(table) {
     table.parentNode.replaceChild(newTableContainer, table);
     // define table again
     table = newTableContainer.querySelector('table');
-    pngDownloadBtn.addEventListener('click', function () {
+    pngDownloadBtn.addEventListener('click', function() {
         toggleOverlay(table.getRootNode());
-        domtoimage.toPng(table).then(function (url) {
+        domtoimage.toPng(table).then(function(url) {
             let outputName = `${table.id || "image"}.png`
             GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
         });
     });
-    svgDownloadBtn.addEventListener('click', function () {
+    svgDownloadBtn.addEventListener('click', function() {
         toggleOverlay(table.getRootNode());
-        domtoimage.toSvg(table).then(function (url) {
+        domtoimage.toSvg(table).then(function(url) {
             let outputName = `${table.id || "image"}.svg`
             GM_download(url, outputName);
             toggleOverlay(table.getRootNode());
@@ -1368,7 +1393,7 @@ function injectTableDownload(table) {
 
 function setupClipboard(contentBody) {
     contentBody.querySelectorAll('.copyable').forEach(element => {
-        element.addEventListener('click', function () {
+        element.addEventListener('click', function() {
             GM_setClipboard(this.innerText);
             GM_notification(this.innerText, "已複製至剪貼簿中！");
         });
@@ -1389,7 +1414,7 @@ function createInstructorShortcut(contentBody) {
         button.key = key;
         button.keyValue = instructorShortcuts[key];
         button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
-        button.addEventListener('click', function (event) {
+        button.addEventListener('click', function(event) {
             let ddlEmployeeSelection = contentBody.querySelector('select[id*=ddlEMP_ID]');
             if (!ddlEmployeeSelection) {
                 throw "Failed to the obtain employee selection dropdown menu."
@@ -1420,7 +1445,7 @@ function createQuickLocationSelection(contentBody) {
         button.key = key;
         button.keyValue = locationShortcuts[key];
         button.shouldAutoSubmit = options.enableShortcutAutoSubmit;
-        button.addEventListener('click', function (event) {
+        button.addEventListener('click', function(event) {
             let ddlRoomSelection = contentBody.querySelector('select[id*=ddlROOM_ID]');
             if (!ddlRoomSelection) {
                 throw "Failed to the obtain room selection dropdown menu."
@@ -1429,7 +1454,9 @@ function createQuickLocationSelection(contentBody) {
             ddlRoomSelection.value = event.currentTarget.keyValue;
             if (event.currentTarget.shouldAutoSubmit) {
                 let submitButton = contentBody.querySelector('input[id*=ibtSave]');
-                submitButton.click();
+                if (submitButton) {
+                    submitButton.click();
+                }
             }
         });
         selectionContainer.appendChild(button);
@@ -1576,7 +1603,7 @@ function getOrCreateSettingsLayer(baseNode) {
         appendTo: topButtonsContainer,
         text: 'close'
     });
-    closeButton.addEventListener('click', function () {
+    closeButton.addEventListener('click', function() {
         toggleVisibility(reduxSettings);
     })
     let settingsCard = make({
@@ -1635,7 +1662,7 @@ function getOrCreateSettingsLayer(baseNode) {
             return;
         }
         let storedValue = GM_getValue(input.id, undefined);
-        input.addEventListener('change', function (e) {
+        input.addEventListener('change', function(e) {
             GM_setValue(input.id, this.checked);
         });
         let isEnabled = storedValue === undefined ? true : storedValue;
@@ -1769,7 +1796,7 @@ function appendInput(parentNode, settingsId, settingsLabel, settingsDescription 
         class: 'settings-input mdl-textfield__input',
         appendTo: outerLabel
     });
-    innerInput.addEventListener('keyup', function (e) {
+    innerInput.addEventListener('keyup', function(e) {
         if (event.key === "Enter") {
             let existingValues = GM_getValue(settingsId, []);
             existingValues.push(this.value);
