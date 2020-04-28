@@ -913,6 +913,11 @@ function pageCleanup(contentBody, shouldRenderInRows) {
             class: 'menu container'
         });
     }
+    let tables = contentBody.querySelectorAll('table');
+    tables.forEach(x => {
+        x.style.width = null;
+        x.style.height = null;
+    })
     mainBodies.forEach(element => {
         if (!isSafeToDelete(element)) {
             // identifier for menu tabs

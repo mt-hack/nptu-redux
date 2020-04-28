@@ -48,7 +48,7 @@ iframe[name="MENU"] {
 }
 
 iframe[name="MAIN"] {
-    flex: 4;
+    flex: 6;
 }
 
 .redux-patched-body {
