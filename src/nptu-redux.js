@@ -540,7 +540,7 @@ function createQuickRoomSelection(contentBody) {
         let humanitiesClassrooms = classRoomList.querySelectorAll('option[value^="I1"], option[value^="I2"], option[value^="I3"], option[value^="I4"], option[value^="I5"]');
         let buttonContainer = make({ el: 'div', class: 'container', attr: { style: `display: grid;grid-template-columns: 1fr 1fr 1fr;` } });
         humanitiesClassrooms.forEach(x => {
-            let color = x.innerText.match(/大/g) ? "colored" : "alt";
+            let color = x.innerText.match(/大|視聽/g) ? "colored" : "alt";
             let shortcutButton = createShortcutButton(x.innerText, undefined, color);
             shortcutButton.keyValue = x.value;
             shortcutButton.addEventListener('click', function(event) {
