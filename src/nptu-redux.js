@@ -14,7 +14,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.6.3
+// @version 1.6.4
 // ==/UserScript==
 
 /* 
@@ -727,7 +727,7 @@ function timeButtonFactory(body, hour, min) {
 
 function injectFillAllOptions(contentBody) {
     let surveyAnswerInputs = contentBody.querySelectorAll("input[id*='rblANSWER']");
-    let surveyTable = contentBody.querySelector('#A1007A_dgData, #A1014A_dgData');
+    let surveyTable = contentBody.querySelector('[id^="A1007A_dg"], [id^="A1014A_dg"]');
     if (surveyAnswerInputs.length != 0 && surveyTable) {
         let buttonContainer = make({
             el: "div",
