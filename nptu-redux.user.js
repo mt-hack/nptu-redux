@@ -14,7 +14,7 @@
 // @match *://webap*.nptu.edu.tw/*
 // @downloadUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
 // @updateUrl https://raw.githubusercontent.com/mt-hack/nptu-redux/master/nptu-redux.user.js
-// @version 1.6.4
+// @version 1.6.5
 // ==/UserScript==
 
 /* 
@@ -727,8 +727,8 @@ function timeButtonFactory(body, hour, min) {
 
 function injectFillAllOptions(contentBody) {
     let surveyAnswerInputs = contentBody.querySelectorAll("input[id*='rblANSWER']");
-    let surveyTable = contentBody.querySelector('[id^="A1007A_dg"], [id^="A1014A_dg"]');
-    if (surveyAnswerInputs.length != 0 && surveyTable) {
+    let surveyTables = contentBody.querySelectorAll('table[id$="dgQUESTION"]')
+    if (surveyAnswerInputs.length != 0 && surveyTables.length != 0) {
         let buttonContainer = make({
             el: "div",
             class: "container"
@@ -738,34 +738,43 @@ function injectFillAllOptions(contentBody) {
         let neutralBtn = createShortcutButton("普通");
         let disagreeBtn = createShortcutButton("不同意");
         let stronglyDisagreeBtn = createShortcutButton("很不同意");
+        let notApplicibleBtn = createShortcutButton("不適合反應");
         stronglyAgreeBtn.addEventListener("click", () => {
-            checkAllInput(surveyTable, "rblANSWER_0")
+            checkAllInput(surveyTables, "rblANSWER_0")
         });
         agreeBtn.addEventListener("click", () => {
-            checkAllInput(surveyTable, "rblANSWER_1")
+            checkAllInput(surveyTables, "rblANSWER_1")
         });
         neutralBtn.addEventListener("click", () => {
-            checkAllInput(surveyTable, "rblANSWER_2")
+            checkAllInput(surveyTables, "rblANSWER_2")
         });
         disagreeBtn.addEventListener("click", () => {
-            checkAllInput(surveyTable, "rblANSWER_3")
+            checkAllInput(surveyTables, "rblANSWER_3")
         });
         stronglyDisagreeBtn.addEventListener("click", () => {
-            checkAllInput(surveyTable, "rblANSWER_4")
+            checkAllInput(surveyTables, "rblANSWER_4")
+        });
+        notApplicibleBtn.addEventListener("click", () => {
+            checkAllInput(surveyTables, "rblANSWER_5")
         });
         buttonContainer.appendChild(stronglyAgreeBtn);
         buttonContainer.appendChild(agreeBtn);
         buttonContainer.appendChild(neutralBtn);
         buttonContainer.appendChild(disagreeBtn);
         buttonContainer.appendChild(stronglyDisagreeBtn);
-        surveyTable.parentNode.prepend(buttonContainer);
+        buttonContainer.appendChild(notApplicibleBtn);
+        surveyTables[0].parentNode.prepend(buttonContainer);
     }
 }
 
-function checkAllInput(contentBody, id) {
-    contentBody.querySelectorAll(`input[id*=\"${id}\"]`).forEach(x => {
-        x.checked = true
-    });
+function checkAllInput(surveyTables, id) {
+    for (let index = 1; index < surveyTables.length; index++) {
+        let table = surveyTables[index];
+        table.querySelectorAll(`input[id*=\"${id}\"]`).forEach(x => {
+            x.checked = true
+        });
+
+    }
 }
 
 // todo: should refactor when possible - it's a mess to navigate through
