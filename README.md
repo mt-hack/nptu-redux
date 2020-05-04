@@ -1,5 +1,8 @@
 <h1 align="center">Welcome to nptu-redux 👋</h1>
 <p>
+  <a href="https://ci.appveyor.com/project/Still/nptu-redux" target="_blank">
+    <img alt="AppVeyor" src="https://img.shields.io/appveyor/build/Still/nptu-redux">
+  </a>
   <a href="https://github.com/mt-hack/nptu-redux/blob/master/LICENSE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
